@@ -9,30 +9,33 @@ import Innovations from './pages/innovations';
 // Some page components may lack explicit prop typings; cast to any for usage here
 const InnovationsAny = Innovations as any;
 
+HEAD
 function App() {
   // Match the page types expected by child components
   const [currentPage, setCurrentPage] = useState<'home' | 'innovations'>('home');
 
-  // Provide a setter with the exact React state-setter type so it can be
-  // passed directly to child components that expect Dispatch<SetStateAction<...>>
-  const setPage: React.Dispatch<React.SetStateAction<'home' | 'innovations'>> =
-    setCurrentPage;
-  return (
-    <div className="app-shell">
-      {/* Passing the correct state variables to your navbar */}
-      <Navbar currentPage={currentPage} setPage={setPage} />
+  export default function App() {
+    const [page, setPage] = useState<'home' | 'innovation'>('home');
 
-      <main>
-        {currentPage === 'home' ? (
-          <Home setPage={setPage as unknown as (page: 'home' | 'innovation') => void} />
-        ) : (
-          <InnovationsAny setPage={setPage} />
-        )}
-      </main>
 
-      <Footer />
-    </div>
-  );
-}
+    // Provide a setter with the exact React state-setter type so it can be
+    // passed directly to child components that expect Dispatch<SetStateAction<...>>
+    const setPage: React.Dispatch<React.SetStateAction<'home' | 'innovations'>> =
+      setCurrentPage;
+    return (
+      <div className="app-shell">
+        {/* Passing the correct state variables to your navbar */}
+        <Navbar currentPage={currentPage} setPage={setPage} />
 
-export default App;
+        <main>
+          {currentPage === 'home' ? (
+            <Home setPage={setPage as unknown as (page: 'home' | 'innovation') => void} />
+          ) : (
+            <InnovationsAny setPage={setPage} />
+          )}
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
