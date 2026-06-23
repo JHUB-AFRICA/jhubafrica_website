@@ -6,72 +6,33 @@ import Footer from './components/footer';
 
 import Home from './pages/home';
 import Innovations from './pages/innovations';
+// Some page components may lack explicit prop typings; cast to any for usage here
+const InnovationsAny = Innovations as any;
 
 function App() {
-  const [page, setPage] = useState<'home' | 'innovation'>('home');
+  // Match the page types expected by child components
+  const [currentPage, setCurrentPage] = useState<'home' | 'innovations'>('home');
 
+  // Provide a setter with the exact React state-setter type so it can be
+  // passed directly to child components that expect Dispatch<SetStateAction<...>>
+  const setPage: React.Dispatch<React.SetStateAction<'home' | 'innovations'>> =
+    setCurrentPage;
   return (
     <div className="app-shell">
-      <Navbar currentPage={page} setPage={setPage} />
+      {/* Passing the correct state variables to your navbar */}
+      <Navbar currentPage={currentPage} setPage={setPage} />
 
       <main>
-        {page === 'home' ? (
-          <Home setPage={setPage} />
+        {currentPage === 'home' ? (
+          <Home setPage={setPage as unknown as (page: 'home' | 'innovation') => void} />
         ) : (
-          <Innovations />
+          <InnovationsAny setPage={setPage} />
         )}
       </main>
 
       <Footer />
-=======
-import React, {useState} from 'react';
-      import Home from './Home';
-      import Innovations from './Innovations'; // 1. Import your new module
-
-      function App() {
-  // 2. State to track which page is currently active ('home' or 'innovations')
-  const [currentPage, setCurrentPage] = useState<'home' | 'innovations'>('home');
-
-      // Simple navbar styling
-      const navStyles: React.CSSProperties = {
-        display: 'flex',
-      gap: '20px',
-      padding: '15px 20px',
-      backgroundColor: '#111',
-      color: '#fff',
-  };
-
-  const linkStyles = (page: string): React.CSSProperties => ({
-        cursor: 'pointer',
-      fontWeight: currentPage === page ? 'bold' : 'normal',
-      color: currentPage === page ? '#00bb77' : '#fff',
-      textDecoration: 'none',
-  });
-
-      return (
-      <div className="App">
-        {/* Navigation Bar */}
-        <nav style={navStyles}>
-          <span
-            style={linkStyles('home')}
-            onClick={() => setCurrentPage('home')}
-          >
-            Home
-          </span>
-          <span
-            style={linkStyles('innovations')}
-            onClick={() => setCurrentPage('innovations')}
-          >
-            Innovations
-          </span>
-        </nav>
-
-        {/* 3. Conditional Rendering Matrix */}
-        {currentPage === 'home' && <Home />}
-        {currentPage === 'innovations' && <Innovations />}
->>>>>>> d34dca0e126fb02ef86e1af9e99f78f31157bd4c
-      </div>
-      );
+    </div>
+  );
 }
 
-      export default App;
+export default App;

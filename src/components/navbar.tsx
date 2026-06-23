@@ -1,32 +1,28 @@
 import React from 'react';
 
+// 1. Define the interface for the props
 interface NavbarProps {
-  currentPage: 'home' | 'innovation';
-  setPage: (page: 'home' | 'innovation') => void;
+  currentPage: 'home' | 'innovations';
+  setPage: React.Dispatch<React.SetStateAction<'home' | 'innovations'>>;
 }
 
+// 2. Pass the interface to your component and destructure the props
 export default function Navbar({ currentPage, setPage }: NavbarProps) {
   return (
-    <header className="site-header">
-      <div className="brand" onClick={() => setPage('home')}>
-        <span className="brand-mark">JHUB</span> Africa
-      </div>
-
-      <nav className="site-nav">
-        <button 
-          className={`nav-link ${currentPage === 'home' ? 'active' : ''}`} 
-          onClick={() => setPage('home')}
-        >
-          Home
-        </button>
-        <button 
-          className={`nav-link ${currentPage === 'innovation' ? 'active' : ''}`} 
-          onClick={() => setPage('innovation')}
-        >
-          Innovation Pipelines
-        </button>
-        <a className="nav-link" href="#contact">Connect</a>
-      </nav>
-    </header>
+    <nav>
+      {/* Your existing navbar JSX goes here */}
+      <button
+        className={currentPage === 'home' ? 'active' : ''}
+        onClick={() => setPage('home')}
+      >
+        Home
+      </button>
+      <button
+        className={currentPage === 'innovations' ? 'active' : ''}
+        onClick={() => setPage('innovations')}
+      >
+        Innovations
+      </button>
+    </nav>
   );
 }

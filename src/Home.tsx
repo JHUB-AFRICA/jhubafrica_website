@@ -1,6 +1,15 @@
 import React from 'react';
 
-const Home: React.FC = () => {
+// 1. Define the interface to accept the setPage prop from App.tsx
+type HomeProps = {
+    setPage: React.Dispatch<
+        React.SetStateAction<'home' | 'innovations'>
+    >;
+};
+
+// 2. Updated to standard function component accepting HomeProps
+export default function Home({ setPage }: HomeProps) {
+
     // Strategy-aligned Design System Styles
     const styles: { [key: string]: React.CSSProperties } = {
         container: {
@@ -86,7 +95,7 @@ const Home: React.FC = () => {
             backgroundColor: '#fff',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'between',
+            justifyContent: 'space-between', // Fixed: changed 'between' to 'space-between'
             boxShadow: '0 4px 6px rgba(0,0,0,0.02)',
         },
         cardTitle: {
@@ -124,8 +133,9 @@ const Home: React.FC = () => {
                     <button style={styles.primaryBtn} onClick={() => alert('Routing to Submission Intake Form...')}>
                         Submit an Innovation
                     </button>
-                    <button style={styles.secondaryBtn} onClick={() => alert('Routing to Partnerships/Funding form...')}>
-                        Partner or Fund a Project
+                    {/* Updated this button to actually change the page state to 'innovations' */}
+                    <button style={styles.secondaryBtn} onClick={() => setPage('innovations')}>
+                        View Innovations
                     </button>
                 </div>
             </header>
@@ -165,7 +175,8 @@ const Home: React.FC = () => {
                             <p style={styles.cardText}>
                                 Discover sponsor-ready projects with clear stages, impact areas, teams, and support needs.
                             </p>
-                            <span style={styles.cardCta} onClick={() => alert('Navigating to /innovations')}>
+                            {/* Updated this to use the working state switcher to navigate to innovations */}
+                            <span style={styles.cardCta} onClick={() => setPage('innovations')}>
                                 View fundable projects &rarr;
                             </span>
                         </div>
@@ -196,6 +207,4 @@ const Home: React.FC = () => {
             </main>
         </div>
     );
-};
-
-export default Home;
+}
