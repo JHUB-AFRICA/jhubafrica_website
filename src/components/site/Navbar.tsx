@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/jhublogo.jpeg.asset.json";
+import logoAsset from "../../assets/jhublogo.jpeg";
 
 const NAV = [
     { to: "/", label: "Home" },
@@ -19,7 +19,7 @@ export default function Navbar() {
         <header className="site-header">
             <Link to="/" className="brand-container" onClick={() => setOpen(false)}>
                 <img
-                    src={logoAsset.url}
+                    src={logoAsset}
                     alt="JHUB Africa — Innovations for Transformation"
                     className="brand-logo-img"
                 />
