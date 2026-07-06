@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import ContactStrip from "../components/site/ContactStrip";
 import PartnersSection from "../components/site/PartnersSection";
 import { IMPACT_METRICS } from "../data/impact";
-import heroBg from "../assets/hero-bg.jpg.asset.json";
+import heroBg from "../assets/hero-bg.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,7 +22,7 @@ function Index() {
     <>
       <div
         className="hero-bg"
-        style={{ backgroundImage: `linear-gradient(135deg, rgba(8,20,45,0.72), rgba(8,20,45,0.55)), url(${heroBg.url})` }}
+        style={{ backgroundImage: `linear-gradient(135deg, rgba(8,20,45,0.72), rgba(8,20,45,0.55)), url(${heroBg})` }}
       >
         <section className="hero-section hero-on-image">
         <span className="hero-tag">Innovation for Transformation</span>
