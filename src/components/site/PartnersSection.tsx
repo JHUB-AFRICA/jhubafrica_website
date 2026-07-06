@@ -71,7 +71,7 @@ export default function PartnersSection({
       </div>
 
       {!compact && (
-        <div className="cards-grid" style={{ marginTop: "1.5rem" }}>
+        <div className="cards-grid cards-grid--spaced">
           {PARTNERS.map((p) => (
             <article key={p.name} className="prog-card">
               <span className="prog-tag prog-tag-b">{p.sector}</span>
