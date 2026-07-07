@@ -5,7 +5,10 @@ export default function ContactStrip() {
         <div>
           <div className="contact-label">Host Institution</div>
           <h3>Jomo Kenyatta University of Agriculture and Technology</h3>
-          <p>JKUAT Main Campus, Juja, Kenya. JHUB Africa is the innovation hub of JKUAT, supporting researchers, students and entrepreneurs.</p>
+          <p>
+            JKUAT Main Campus, Juja, Kenya. JHUB Africa is the innovation hub of
+            JKUAT, supporting researchers, students and entrepreneurs.
+          </p>
         </div>
         <div>
           <div className="contact-label">Call Us</div>
@@ -14,7 +17,9 @@ export default function ContactStrip() {
         </div>
         <div>
           <div className="contact-label">Email</div>
-          <p><a href="mailto:info.jhub@jkuat.ac.ke">info.jhub@jkuat.ac.ke</a></p>
+          <p>
+            <a href="mailto:info.jhub@jkuat.ac.ke">info.jhub@jkuat.ac.ke</a>
+          </p>
         </div>
       </div>
     </section>

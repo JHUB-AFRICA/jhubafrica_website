@@ -8,290 +8,290 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as SupportRouteImport } from './routes/support'
-import { Route as ResourcesRouteImport } from './routes/resources'
-import { Route as ProgramsRouteImport } from './routes/programs'
-import { Route as NewsRouteImport } from './routes/news'
-import { Route as InnovationRouteImport } from './routes/innovation'
-import { Route as ForStudentsRouteImport } from './routes/for-students'
-import { Route as ForPartnersRouteImport } from './routes/for-partners'
-import { Route as ForInnovatorsRouteImport } from './routes/for-innovators'
-import { Route as EventsRouteImport } from './routes/events'
-import { Route as CoursesRouteImport } from './routes/courses'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as SupportRouteImport } from "./routes/support";
+import { Route as ResourcesRouteImport } from "./routes/resources";
+import { Route as ProgramsRouteImport } from "./routes/programs";
+import { Route as NewsRouteImport } from "./routes/news";
+import { Route as InnovationRouteImport } from "./routes/innovation";
+import { Route as ForStudentsRouteImport } from "./routes/for-students";
+import { Route as ForPartnersRouteImport } from "./routes/for-partners";
+import { Route as ForInnovatorsRouteImport } from "./routes/for-innovators";
+import { Route as EventsRouteImport } from "./routes/events";
+import { Route as CoursesRouteImport } from "./routes/courses";
+import { Route as ContactRouteImport } from "./routes/contact";
+import { Route as AboutRouteImport } from "./routes/about";
+import { Route as IndexRouteImport } from "./routes/index";
 
 const SupportRoute = SupportRouteImport.update({
-  id: '/support',
-  path: '/support',
+  id: "/support",
+  path: "/support",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ResourcesRoute = ResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
+  id: "/resources",
+  path: "/resources",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ProgramsRoute = ProgramsRouteImport.update({
-  id: '/programs',
-  path: '/programs',
+  id: "/programs",
+  path: "/programs",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const NewsRoute = NewsRouteImport.update({
-  id: '/news',
-  path: '/news',
+  id: "/news",
+  path: "/news",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const InnovationRoute = InnovationRouteImport.update({
-  id: '/innovation',
-  path: '/innovation',
+  id: "/innovation",
+  path: "/innovation",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ForStudentsRoute = ForStudentsRouteImport.update({
-  id: '/for-students',
-  path: '/for-students',
+  id: "/for-students",
+  path: "/for-students",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ForPartnersRoute = ForPartnersRouteImport.update({
-  id: '/for-partners',
-  path: '/for-partners',
+  id: "/for-partners",
+  path: "/for-partners",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ForInnovatorsRoute = ForInnovatorsRouteImport.update({
-  id: '/for-innovators',
-  path: '/for-innovators',
+  id: "/for-innovators",
+  path: "/for-innovators",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
+  id: "/events",
+  path: "/events",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CoursesRoute = CoursesRouteImport.update({
-  id: '/courses',
-  path: '/courses',
+  id: "/courses",
+  path: "/courses",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+  id: "/contact",
+  path: "/contact",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+  id: "/about",
+  path: "/about",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRoute
-  '/events': typeof EventsRoute
-  '/for-innovators': typeof ForInnovatorsRoute
-  '/for-partners': typeof ForPartnersRoute
-  '/for-students': typeof ForStudentsRoute
-  '/innovation': typeof InnovationRoute
-  '/news': typeof NewsRoute
-  '/programs': typeof ProgramsRoute
-  '/resources': typeof ResourcesRoute
-  '/support': typeof SupportRoute
+  "/": typeof IndexRoute;
+  "/about": typeof AboutRoute;
+  "/contact": typeof ContactRoute;
+  "/courses": typeof CoursesRoute;
+  "/events": typeof EventsRoute;
+  "/for-innovators": typeof ForInnovatorsRoute;
+  "/for-partners": typeof ForPartnersRoute;
+  "/for-students": typeof ForStudentsRoute;
+  "/innovation": typeof InnovationRoute;
+  "/news": typeof NewsRoute;
+  "/programs": typeof ProgramsRoute;
+  "/resources": typeof ResourcesRoute;
+  "/support": typeof SupportRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRoute
-  '/events': typeof EventsRoute
-  '/for-innovators': typeof ForInnovatorsRoute
-  '/for-partners': typeof ForPartnersRoute
-  '/for-students': typeof ForStudentsRoute
-  '/innovation': typeof InnovationRoute
-  '/news': typeof NewsRoute
-  '/programs': typeof ProgramsRoute
-  '/resources': typeof ResourcesRoute
-  '/support': typeof SupportRoute
+  "/": typeof IndexRoute;
+  "/about": typeof AboutRoute;
+  "/contact": typeof ContactRoute;
+  "/courses": typeof CoursesRoute;
+  "/events": typeof EventsRoute;
+  "/for-innovators": typeof ForInnovatorsRoute;
+  "/for-partners": typeof ForPartnersRoute;
+  "/for-students": typeof ForStudentsRoute;
+  "/innovation": typeof InnovationRoute;
+  "/news": typeof NewsRoute;
+  "/programs": typeof ProgramsRoute;
+  "/resources": typeof ResourcesRoute;
+  "/support": typeof SupportRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRoute
-  '/events': typeof EventsRoute
-  '/for-innovators': typeof ForInnovatorsRoute
-  '/for-partners': typeof ForPartnersRoute
-  '/for-students': typeof ForStudentsRoute
-  '/innovation': typeof InnovationRoute
-  '/news': typeof NewsRoute
-  '/programs': typeof ProgramsRoute
-  '/resources': typeof ResourcesRoute
-  '/support': typeof SupportRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/about": typeof AboutRoute;
+  "/contact": typeof ContactRoute;
+  "/courses": typeof CoursesRoute;
+  "/events": typeof EventsRoute;
+  "/for-innovators": typeof ForInnovatorsRoute;
+  "/for-partners": typeof ForPartnersRoute;
+  "/for-students": typeof ForStudentsRoute;
+  "/innovation": typeof InnovationRoute;
+  "/news": typeof NewsRoute;
+  "/programs": typeof ProgramsRoute;
+  "/resources": typeof ResourcesRoute;
+  "/support": typeof SupportRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/'
-    | '/about'
-    | '/contact'
-    | '/courses'
-    | '/events'
-    | '/for-innovators'
-    | '/for-partners'
-    | '/for-students'
-    | '/innovation'
-    | '/news'
-    | '/programs'
-    | '/resources'
-    | '/support'
-  fileRoutesByTo: FileRoutesByTo
+    | "/"
+    | "/about"
+    | "/contact"
+    | "/courses"
+    | "/events"
+    | "/for-innovators"
+    | "/for-partners"
+    | "/for-students"
+    | "/innovation"
+    | "/news"
+    | "/programs"
+    | "/resources"
+    | "/support";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/'
-    | '/about'
-    | '/contact'
-    | '/courses'
-    | '/events'
-    | '/for-innovators'
-    | '/for-partners'
-    | '/for-students'
-    | '/innovation'
-    | '/news'
-    | '/programs'
-    | '/resources'
-    | '/support'
+    | "/"
+    | "/about"
+    | "/contact"
+    | "/courses"
+    | "/events"
+    | "/for-innovators"
+    | "/for-partners"
+    | "/for-students"
+    | "/innovation"
+    | "/news"
+    | "/programs"
+    | "/resources"
+    | "/support";
   id:
-    | '__root__'
-    | '/'
-    | '/about'
-    | '/contact'
-    | '/courses'
-    | '/events'
-    | '/for-innovators'
-    | '/for-partners'
-    | '/for-students'
-    | '/innovation'
-    | '/news'
-    | '/programs'
-    | '/resources'
-    | '/support'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/about"
+    | "/contact"
+    | "/courses"
+    | "/events"
+    | "/for-innovators"
+    | "/for-partners"
+    | "/for-students"
+    | "/innovation"
+    | "/news"
+    | "/programs"
+    | "/resources"
+    | "/support";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  ContactRoute: typeof ContactRoute
-  CoursesRoute: typeof CoursesRoute
-  EventsRoute: typeof EventsRoute
-  ForInnovatorsRoute: typeof ForInnovatorsRoute
-  ForPartnersRoute: typeof ForPartnersRoute
-  ForStudentsRoute: typeof ForStudentsRoute
-  InnovationRoute: typeof InnovationRoute
-  NewsRoute: typeof NewsRoute
-  ProgramsRoute: typeof ProgramsRoute
-  ResourcesRoute: typeof ResourcesRoute
-  SupportRoute: typeof SupportRoute
+  IndexRoute: typeof IndexRoute;
+  AboutRoute: typeof AboutRoute;
+  ContactRoute: typeof ContactRoute;
+  CoursesRoute: typeof CoursesRoute;
+  EventsRoute: typeof EventsRoute;
+  ForInnovatorsRoute: typeof ForInnovatorsRoute;
+  ForPartnersRoute: typeof ForPartnersRoute;
+  ForStudentsRoute: typeof ForStudentsRoute;
+  InnovationRoute: typeof InnovationRoute;
+  NewsRoute: typeof NewsRoute;
+  ProgramsRoute: typeof ProgramsRoute;
+  ResourcesRoute: typeof ResourcesRoute;
+  SupportRoute: typeof SupportRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/support': {
-      id: '/support'
-      path: '/support'
-      fullPath: '/support'
-      preLoaderRoute: typeof SupportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resources': {
-      id: '/resources'
-      path: '/resources'
-      fullPath: '/resources'
-      preLoaderRoute: typeof ResourcesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/programs': {
-      id: '/programs'
-      path: '/programs'
-      fullPath: '/programs'
-      preLoaderRoute: typeof ProgramsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/news': {
-      id: '/news'
-      path: '/news'
-      fullPath: '/news'
-      preLoaderRoute: typeof NewsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/innovation': {
-      id: '/innovation'
-      path: '/innovation'
-      fullPath: '/innovation'
-      preLoaderRoute: typeof InnovationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for-students': {
-      id: '/for-students'
-      path: '/for-students'
-      fullPath: '/for-students'
-      preLoaderRoute: typeof ForStudentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for-partners': {
-      id: '/for-partners'
-      path: '/for-partners'
-      fullPath: '/for-partners'
-      preLoaderRoute: typeof ForPartnersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for-innovators': {
-      id: '/for-innovators'
-      path: '/for-innovators'
-      fullPath: '/for-innovators'
-      preLoaderRoute: typeof ForInnovatorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/courses': {
-      id: '/courses'
-      path: '/courses'
-      fullPath: '/courses'
-      preLoaderRoute: typeof CoursesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/support": {
+      id: "/support";
+      path: "/support";
+      fullPath: "/support";
+      preLoaderRoute: typeof SupportRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/resources": {
+      id: "/resources";
+      path: "/resources";
+      fullPath: "/resources";
+      preLoaderRoute: typeof ResourcesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/programs": {
+      id: "/programs";
+      path: "/programs";
+      fullPath: "/programs";
+      preLoaderRoute: typeof ProgramsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/news": {
+      id: "/news";
+      path: "/news";
+      fullPath: "/news";
+      preLoaderRoute: typeof NewsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/innovation": {
+      id: "/innovation";
+      path: "/innovation";
+      fullPath: "/innovation";
+      preLoaderRoute: typeof InnovationRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/for-students": {
+      id: "/for-students";
+      path: "/for-students";
+      fullPath: "/for-students";
+      preLoaderRoute: typeof ForStudentsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/for-partners": {
+      id: "/for-partners";
+      path: "/for-partners";
+      fullPath: "/for-partners";
+      preLoaderRoute: typeof ForPartnersRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/for-innovators": {
+      id: "/for-innovators";
+      path: "/for-innovators";
+      fullPath: "/for-innovators";
+      preLoaderRoute: typeof ForInnovatorsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/events": {
+      id: "/events";
+      path: "/events";
+      fullPath: "/events";
+      preLoaderRoute: typeof EventsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/courses": {
+      id: "/courses";
+      path: "/courses";
+      fullPath: "/courses";
+      preLoaderRoute: typeof CoursesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/contact": {
+      id: "/contact";
+      path: "/contact";
+      fullPath: "/contact";
+      preLoaderRoute: typeof ContactRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/about": {
+      id: "/about";
+      path: "/about";
+      fullPath: "/about";
+      preLoaderRoute: typeof AboutRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
@@ -309,7 +309,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProgramsRoute: ProgramsRoute,
   ResourcesRoute: ResourcesRoute,
   SupportRoute: SupportRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
