@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getEvents } from "@/lib/api";
+import { getEvents, type EventItem } from "@/lib/api";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -28,7 +28,7 @@ function EventsPage() {
 
       <section className="content-section">
         <div className="cards-grid">
-          {events.map((e) => (
+          {events.map((e: EventItem) => (
             <div key={e.id || e.title} className="prog-card">
               <div className="event-card">
                 <div className="event-date">

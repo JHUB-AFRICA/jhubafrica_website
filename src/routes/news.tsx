@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getNews } from "@/lib/api";
+import { getNews, type NewsPost } from "@/lib/api";
 
 export const Route = createFileRoute("/news")({
   head: () => ({
@@ -62,7 +62,7 @@ function NewsPage() {
 
       <section className="content-section">
         <div className="cards-grid">
-          {posts.map((p) => (
+          {posts.map((p: NewsPost) => (
             <article key={p.id || p.title} className="prog-card">
               <span className={`prog-tag prog-tag-${p.color}`}>{p.tag}</span>
               <div className={`prog-title ${p.titleColor}`}>{p.title}</div>
