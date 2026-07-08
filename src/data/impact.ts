@@ -3,10 +3,10 @@
 // Source: jhubafrica.com (official) and JHUB Africa partnerships desk.
 
 export const IMPACT_METRICS = [
-  { n: "142", l: "Innovators Supported" },
-  { n: "20", l: "Active Innovations" },
-  { n: "6+", l: "Strategic Partners" },
-  { n: "3", l: "Registered Copyrights" },
+  { n: "1,000+", l: "Students Engaged" },
+  { n: "150+", l: "Innovations Supported" },
+  { n: "30+", l: "Active Projects" },
+  { n: "15+", l: "Strategic Partners" },
 ] as const;
 
 export const FOUNDED_YEAR = 2023;
@@ -32,7 +32,8 @@ export const PARTNERS: Partner[] = [
   {
     name: "Google",
     sector: "Technology",
-    outcome: "Cloud credits, developer tooling and mentorship for JHUB startups.",
+    outcome:
+      "Cloud credits, developer tooling and mentorship for JHUB startups.",
     caseStudy:
       "Google supports JHUB innovators with access to Google for Startups resources, Cloud credits and developer expertise, helping teams build and scale digital products.",
     url: "https://startup.google.com",
@@ -48,7 +49,8 @@ export const PARTNERS: Partner[] = [
   {
     name: "AEDIB|NET",
     sector: "EU–Africa Innovation",
-    outcome: "Connects JHUB into the African-European Digital Innovation Bridge Network.",
+    outcome:
+      "Connects JHUB into the African-European Digital Innovation Bridge Network.",
     caseStudy:
       "AEDIB|NET links JHUB Africa with European Digital Innovation Hubs, opening cross-continental funding calls, matchmaking and knowledge exchange for Kenyan innovators.",
     url: "https://aedibnet.eu",
@@ -64,7 +66,8 @@ export const PARTNERS: Partner[] = [
   {
     name: "Impact Africa Network",
     sector: "Venture Building",
-    outcome: "Joint venture-building programs for high-impact African founders.",
+    outcome:
+      "Joint venture-building programs for high-impact African founders.",
     caseStudy:
       "Impact Africa Network collaborates with JHUB on founder development, connecting innovators to a pan-African venture builder network focused on solving local problems at scale.",
     url: "https://impactafrica.network",
@@ -72,7 +75,8 @@ export const PARTNERS: Partner[] = [
   {
     name: "ASSEK",
     sector: "Industry Association",
-    outcome: "Plugs JHUB into the Association of Startup and SME Enablers of Kenya.",
+    outcome:
+      "Plugs JHUB into the Association of Startup and SME Enablers of Kenya.",
     caseStudy:
       "As a member of ASSEK, JHUB Africa contributes to national policy dialogue, ecosystem coordination and shared standards that strengthen Kenya's startup enablers.",
     url: "https://assek.or.ke",
@@ -104,7 +108,8 @@ export const PARTNERS: Partner[] = [
   {
     name: "Yatta Beekeepers",
     sector: "AgriTech / Community",
-    outcome: "Grassroots partner piloting digital tools for smallholder beekeepers.",
+    outcome:
+      "Grassroots partner piloting digital tools for smallholder beekeepers.",
     caseStudy:
       "Yatta Beekeepers works with JHUB Africa to test and deploy digital monitoring, traceability and market-access tools for honey producers in Machakos, translating hub innovations into rural livelihoods.",
   },
