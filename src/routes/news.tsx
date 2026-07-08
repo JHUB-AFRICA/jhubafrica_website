@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { getNews } from "@/lib/api";
 
 export const Route = createFileRoute("/news")({
     head: () => ({
@@ -9,16 +10,15 @@ export const Route = createFileRoute("/news")({
             { property: "og:description", content: "Announcements, partnerships and stories." },
         ],
     }),
+    loader: async () => {
+        return getNews();
+    },
     component: NewsPage,
 });
 
-const POSTS = [
-    { tag: "Announcement", title: "New Cohort Applications Open", date: "June 2026", body: "Applications are now open for our incoming startup cohort. Selected teams receive mentorship, workspace and seed support.", color: "g" as const, titleColor: "green" as const },
-    { tag: "Partnership", title: "JHUB Africa Signs MoU with Industry Partner", date: "May 2026", body: "A new partnership to accelerate applied research projects in fintech and agritech.", color: "b" as const, titleColor: "" as const },
-    { tag: "Story", title: "Alumni Startup Closes Pre-Seed Round", date: "April 2026", body: "A JHUB-incubated startup secures pre-seed funding to scale across East Africa.", color: "p" as const, titleColor: "red" as const },
-];
-
 function NewsPage() {
+    const posts = Route.useLoaderData();
+
     return (
         <>
             <header className="page-header">
@@ -28,8 +28,8 @@ function NewsPage() {
 
             <section className="content-section">
                 <div className="cards-grid">
-                    {POSTS.map((p) => (
-                        <article key={p.title} className="prog-card">
+                    {posts.map((p) => (
+                        <article key={p.id || p.title} className="prog-card">
                             <span className={`prog-tag prog-tag-${p.color}`}>{p.tag}</span>
                             <div className={`prog-title ${p.titleColor}`}>{p.title}</div>
                             <p className="prog-desc">{p.body}</p>
@@ -44,3 +44,4 @@ function NewsPage() {
         </>
     );
 }
+

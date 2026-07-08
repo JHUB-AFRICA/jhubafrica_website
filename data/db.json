@@ -1,0 +1,73 @@
+{
+  "news": [
+    {
+      "tag": "Announcement",
+      "title": "Mark",
+      "date": "june 2026",
+      "body": "Mark is the best programmer in the group!!",
+      "color": "p",
+      "titleColor": "green",
+      "id": "n_1783519796696"
+    },
+    {
+      "id": "n2",
+      "tag": "Partnership",
+      "title": "JHUB Africa Signs MoU with Industry Partner",
+      "date": "May 2026",
+      "body": "A new partnership to accelerate applied research projects in fintech and agritech.",
+      "color": "b",
+      "titleColor": ""
+    },
+    {
+      "id": "n3",
+      "tag": "Story",
+      "title": "Alumni Startup Closes Pre-Seed Round",
+      "date": "April 2026",
+      "body": "A JHUB-incubated startup secures pre-seed funding to scale across East Africa.",
+      "color": "p",
+      "titleColor": "red"
+    }
+  ],
+  "events": [
+    {
+      "id": "e1",
+      "day": "12",
+      "month": "Jul",
+      "title": "Innovation Demo Day",
+      "desc": "Cohort showcase of student-led startups pitching to investors and partners.",
+      "titleColor": ""
+    },
+    {
+      "id": "e2",
+      "day": "24",
+      "month": "Jul",
+      "title": "AI for Africa Hackathon",
+      "desc": "48-hour hackathon focused on applied AI solutions for local industries.",
+      "titleColor": "green"
+    },
+    {
+      "id": "e3",
+      "day": "09",
+      "month": "Aug",
+      "title": "Founders Fireside",
+      "desc": "Conversations with African founders on building and scaling ventures.",
+      "titleColor": "red"
+    },
+    {
+      "id": "e4",
+      "day": "21",
+      "month": "Aug",
+      "title": "Women in Tech Meetup",
+      "desc": "Network, mentorship and lightning talks for women in technology.",
+      "titleColor": ""
+    },
+    {
+      "day": "25",
+      "month": "jul",
+      "title": "Launch",
+      "desc": "Tuta lauch website yetu tarehe 25",
+      "titleColor": "green",
+      "id": "e_1783519880795"
+    }
+  ]
+}

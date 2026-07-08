@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { getEvents } from "@/lib/api";
 
 export const Route = createFileRoute("/events")({
     head: () => ({
@@ -9,17 +10,15 @@ export const Route = createFileRoute("/events")({
             { property: "og:description", content: "Hackathons, demo days, workshops and meetups." },
         ],
     }),
+    loader: async () => {
+        return getEvents();
+    },
     component: EventsPage,
 });
 
-const EVENTS = [
-    { day: "12", month: "Jul", title: "Innovation Demo Day", desc: "Cohort showcase of student-led startups pitching to investors and partners.", titleColor: "" },
-    { day: "24", month: "Jul", title: "AI for Africa Hackathon", desc: "48-hour hackathon focused on applied AI solutions for local industries.", titleColor: "green" },
-    { day: "09", month: "Aug", title: "Founders Fireside", desc: "Conversations with African founders on building and scaling ventures.", titleColor: "red" },
-    { day: "21", month: "Aug", title: "Women in Tech Meetup", desc: "Network, mentorship and lightning talks for women in technology.", titleColor: "" },
-];
-
 function EventsPage() {
+    const events = Route.useLoaderData();
+
     return (
         <>
             <header className="page-header">
@@ -29,8 +28,8 @@ function EventsPage() {
 
             <section className="content-section">
                 <div className="cards-grid">
-                    {EVENTS.map((e) => (
-                        <div key={e.title} className="prog-card">
+                    {events.map((e) => (
+                        <div key={e.id || e.title} className="prog-card">
                             <div className="event-card">
                                 <div className="event-date">
                                     <div className="event-day">{e.day}</div>
@@ -51,3 +50,4 @@ function EventsPage() {
         </>
     );
 }
+

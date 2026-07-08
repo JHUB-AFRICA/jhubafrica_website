@@ -20,6 +20,7 @@ import { Route as ForInnovatorsRouteImport } from './routes/for-innovators'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -78,6 +79,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -92,6 +98,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/events': typeof EventsRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/events': typeof EventsRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/events': typeof EventsRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
     | '/courses'
     | '/events'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
     | '/courses'
     | '/events'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
     | '/courses'
     | '/events'
@@ -186,6 +198,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
   CoursesRoute: typeof CoursesRoute
   EventsRoute: typeof EventsRoute
@@ -278,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -298,6 +318,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
   CoursesRoute: CoursesRoute,
   EventsRoute: EventsRoute,
