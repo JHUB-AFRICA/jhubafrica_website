@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
+
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -132,5 +132,8 @@ function apiPlugin() {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [TanStackRouterVite(), tsconfigPaths(), react(), apiPlugin()],
+  plugins: [TanStackRouterVite(), react(), apiPlugin()],
+  resolve: {
+    tsconfigPaths: true,
+  },
 })
