@@ -8,6 +8,7 @@ export type NewsPost = {
     body: string;
     color: "g" | "b" | "p";
     titleColor: "" | "green" | "red";
+    image?: string;
 };
 
 export type EventItem = {
@@ -17,6 +18,7 @@ export type EventItem = {
     title: string;
     desc: string;
     titleColor: "" | "green" | "red";
+    image?: string;
 };
 
 export const DEFAULT_NEWS: NewsPost[] = [

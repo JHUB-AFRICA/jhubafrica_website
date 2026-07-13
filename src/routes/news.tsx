@@ -64,6 +64,15 @@ function NewsPage() {
         <div className="cards-grid">
           {posts.map((p: NewsPost) => (
             <article key={p.id || p.title} className="prog-card">
+              {p.image && (
+                <div style={{ marginBottom: "1rem", borderRadius: "0.5rem", overflow: "hidden", height: "200px" }}>
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </div>
+              )}
               <span className={`prog-tag prog-tag-${p.color}`}>{p.tag}</span>
               <div className={`prog-title ${p.titleColor}`}>{p.title}</div>
               <p className="prog-desc">{p.body}</p>

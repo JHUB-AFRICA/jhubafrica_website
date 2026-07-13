@@ -9,6 +9,7 @@ export interface NewsPost {
     body: string;
     color: "g" | "b" | "p";
     titleColor: "" | "green" | "red";
+    image?: string;
 }
 
 export interface EventItem {
@@ -18,6 +19,7 @@ export interface EventItem {
     title: string;
     desc: string;
     titleColor: "" | "green" | "red";
+    image?: string;
 }
 
 export interface Database {

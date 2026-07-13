@@ -30,6 +30,15 @@ function EventsPage() {
         <div className="cards-grid">
           {events.map((e: EventItem) => (
             <div key={e.id || e.title} className="prog-card">
+              {e.image && (
+                <div style={{ marginBottom: "1rem", borderRadius: "0.5rem", overflow: "hidden", height: "200px" }}>
+                  <img
+                    src={e.image}
+                    alt={e.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </div>
+              )}
               <div className="event-card">
                 <div className="event-date">
                   <div className="event-day">{e.day}</div>

@@ -17,6 +17,16 @@ import {
     deleteEvent,
 } from "@/lib/api";
 
+// Helper function to convert file to base64
+async function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+    });
+}
+
 export const Route = createFileRoute("/admin")({
     head: () => ({
         meta: [
@@ -106,7 +116,7 @@ function AdminPage() {
 /* ---------- News admin ---------- */
 
 const EMPTY_NEWS: Omit<NewsPost, "id"> = {
-    tag: "Announcement", title: "", date: "", body: "", color: "g", titleColor: "green",
+    tag: "Announcement", title: "", date: "", body: "", color: "g", titleColor: "green", image: "",
 };
 
 interface NewsAdminProps {
@@ -177,6 +187,25 @@ function NewsAdmin({ items }: NewsAdminProps) {
                     <option value="red">Title: Red</option>
                 </select>
                 <textarea required rows={4} placeholder="Body" value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }} />
+                <label style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                            if (e.target.files?.[0]) {
+                                const base64 = await fileToBase64(e.target.files[0]);
+                                setDraft({ ...draft, image: base64 });
+                            }
+                        }}
+                        style={{ cursor: "pointer" }}
+                    />
+                    <span style={{ fontSize: "0.9rem" }}>Upload image (optional)</span>
+                </label>
+                {draft.image && (
+                    <div style={{ gridColumn: "1 / -1" }}>
+                        <img src={draft.image} alt="Preview" style={{ maxWidth: "100%", maxHeight: "200px", borderRadius: "8px" }} />
+                    </div>
+                )}
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: "0.75rem", alignItems: "center" }}>
                     <button type="submit" className="btn-primary" disabled={submitting}>
                         {submitting ? "Saving..." : ("id" in draft && draft.id ? "Update post" : "Add post")}
@@ -209,7 +238,7 @@ function NewsAdmin({ items }: NewsAdminProps) {
 /* ---------- Events admin ---------- */
 
 const EMPTY_EVENT: Omit<EventItem, "id"> = {
-    day: "", month: "", title: "", desc: "", titleColor: "",
+    day: "", month: "", title: "", desc: "", titleColor: "", image: "",
 };
 
 interface EventsAdminProps {
@@ -275,6 +304,25 @@ function EventsAdmin({ items }: EventsAdminProps) {
                     <option value="red">Title: Red</option>
                 </select>
                 <textarea required rows={3} placeholder="Description" value={draft.desc} onChange={(e) => setDraft({ ...draft, desc: e.target.value })} style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }} />
+                <label style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                            if (e.target.files?.[0]) {
+                                const base64 = await fileToBase64(e.target.files[0]);
+                                setDraft({ ...draft, image: base64 });
+                            }
+                        }}
+                        style={{ cursor: "pointer" }}
+                    />
+                    <span style={{ fontSize: "0.9rem" }}>Upload image (optional)</span>
+                </label>
+                {draft.image && (
+                    <div style={{ gridColumn: "1 / -1" }}>
+                        <img src={draft.image} alt="Preview" style={{ maxWidth: "100%", maxHeight: "200px", borderRadius: "8px" }} />
+                    </div>
+                )}
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: "0.75rem", alignItems: "center" }}>
                     <button type="submit" className="btn-primary" disabled={submitting}>
                         {submitting ? "Saving..." : ("id" in draft && draft.id ? "Update event" : "Add event")}
@@ -345,4 +393,4 @@ const rowStyle: React.CSSProperties = {
     border: "1px solid var(--border-color)",
     borderRadius: 10,
     background: "#fff",
-};
+};
