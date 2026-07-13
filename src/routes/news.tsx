@@ -52,7 +52,7 @@ const POSTS = [
 ];
 
 function NewsPage() {
-  const posts = Route.useLoaderData();
+  const posts: NewsPost[] = Route.useLoaderData();
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
   const selectedPost = posts.find((p) => p.id === selectedNewsId);
   const detailRef = useRef<HTMLElement | null>(null);
@@ -122,7 +122,7 @@ function NewsPage() {
             <span className={`prog-tag prog-tag-${selectedPost.color}`}>{selectedPost.tag}</span>
             <div className={`prog-title ${selectedPost.titleColor}`}>{selectedPost.title}</div>
             <p className="news-full-date">{selectedPost.date}</p>
-            {selectedPost.body.split("\n\n").map((paragraph, index) => (
+            {selectedPost.body.split("\n\n").map((paragraph: string, index: number) => (
               <p key={index} className="news-full-paragraph">
                 {paragraph}
               </p>
