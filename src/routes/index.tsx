@@ -40,59 +40,64 @@ const HOMEPAGE_METRICS = [
 ];
 
 function Index() {
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [nextImageIndex, setNextImageIndex] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const activeImageIndexRef = useRef(activeImageIndex);
+  const [slides, setSlides] = useState<
+    { id: number; imageIndex: number; state: "visible" | "entering" | "done" }[]
+  >([{ id: 0, imageIndex: 0, state: "visible" }]);
+  const slideCounter = useRef(1);
+  const currentImageIndex = useRef(0);
 
   useEffect(() => {
-    activeImageIndexRef.current = activeImageIndex;
-  }, [activeImageIndex]);
-
-  useEffect(() => {
-    if (isTransitioning) {
-      return;
-    }
-
     const interval = window.setInterval(() => {
-      const nextIndex = (activeImageIndexRef.current + 1) % HERO_IMAGES.length;
-      setNextImageIndex(nextIndex);
-      setIsTransitioning(true);
+      const nextIndex =
+        (currentImageIndex.current + 1) % HERO_IMAGES.length;
+      currentImageIndex.current = nextIndex;
+      const newId = slideCounter.current++;
+
+      // Add new slide off-screen to the right
+      setSlides((prev) => [
+        ...prev,
+        { id: newId, imageIndex: nextIndex, state: "entering" as const },
+      ]);
+
+      // Next frame: start sliding it in
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setSlides((prev) =>
+            prev.map((s) =>
+              s.state === "entering" ? { ...s, state: "visible" } : s
+            )
+          );
+        });
+      });
+
+      // After transition ends, remove all old slides (keep only the newest)
+      setTimeout(() => {
+        setSlides((prev) => {
+          const last = prev[prev.length - 1];
+          return last ? [{ ...last, state: "visible" }] : prev;
+        });
+      }, 1400);
     }, 5000);
 
     return () => window.clearInterval(interval);
-  }, [isTransitioning]);
-
-  useEffect(() => {
-    if (!isTransitioning) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      setActiveImageIndex(nextImageIndex);
-      setIsTransitioning(false);
-    }, 1200);
-
-    return () => window.clearTimeout(timeout);
-  }, [isTransitioning, nextImageIndex]);
+  }, []);
 
   return (
     <>
       <div className="hero-bg">
-        {/* eslint-disable-next-line */}
-        <div
-          className={`hero-bg-layer hero-bg-layer--current ${isTransitioning ? "hero-bg-layer--out" : ""}`}
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(8,20,45,0.72), rgba(8,20,45,0.55)), url(${HERO_IMAGES[activeImageIndex]})`,
-          }}
-        />
-        {/* eslint-disable-next-line */}
-        <div
-          className={`hero-bg-layer hero-bg-layer--incoming ${isTransitioning ? "hero-bg-layer--incoming-active" : ""}`}
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(8,20,45,0.72), rgba(8,20,45,0.55)), url(${HERO_IMAGES[nextImageIndex]})`,
-          }}
-        />
+        {slides.map((slide) => (
+          <div
+            key={slide.id}
+            className={`hero-bg-layer ${
+              slide.state === "visible"
+                ? "hero-bg-layer--visible"
+                : "hero-bg-layer--entering"
+            }`}
+            style={{
+              backgroundImage: `linear-gradient(135deg, rgba(8,20,45,0.72), rgba(8,20,45,0.55)), url(${HERO_IMAGES[slide.imageIndex]})`,
+            }}
+          />
+        ))}
         <section className="hero-section hero-on-image">
           <span className="hero-tag">INNOVATION FOR TRANSFORMATION</span>
           {/* eslint-disable-next-line */}

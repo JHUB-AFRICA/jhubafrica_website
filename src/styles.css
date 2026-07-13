@@ -296,23 +296,16 @@ main {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  transform: translateX(100%) scale(1.04);
-  opacity: 0.96;
-  transition: transform 1.2s ease-in-out, opacity 1.2s ease-in-out;
   will-change: transform, opacity;
   filter: saturate(1.04) contrast(1.05);
 }
-.hero-bg-layer--current {
-  transform: translateX(0) scale(1.04);
-}
-.hero-bg-layer--out {
-  transform: translateX(-100%) scale(1.04);
-}
-.hero-bg-layer--incoming {
+.hero-bg-layer--entering {
   transform: translateX(100%) scale(1.04);
+  transition: none;
 }
-.hero-bg-layer--incoming-active {
+.hero-bg-layer--visible {
   transform: translateX(0) scale(1.04);
+  transition: transform 1.2s ease-in-out;
 }
 .hero-on-image {
   max-width: 960px;
