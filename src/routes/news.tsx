@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { getNews, type NewsPost } from "@/lib/api";
 
@@ -55,6 +55,12 @@ function NewsPage() {
   const posts = Route.useLoaderData();
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
   const selectedPost = posts.find((p) => p.id === selectedNewsId);
+  const detailRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!selectedPost || !detailRef.current) return;
+    detailRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [selectedPost]);
 
   return (
     <>
@@ -103,7 +109,7 @@ function NewsPage() {
         </div>
 
         {selectedPost && (
-          <article className="prog-card news-full-detail">
+          <article ref={detailRef} className="prog-card news-full-detail">
             {selectedPost.image && (
               <div style={{ marginBottom: "1rem", borderRadius: "0.5rem", overflow: "hidden", height: "270px" }}>
                 <img
