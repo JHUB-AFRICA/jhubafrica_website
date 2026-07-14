@@ -27,6 +27,20 @@ async function fileToBase64(file: File): Promise<string> {
     });
 }
 
+// Timezone-safe date helper to get YYYY-MM-DD local format
+function dateToLocalYmd(d: Date): string {
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const day = d.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+// Convert local YYYY-MM-DD input value to a Date object without timezone offset shifting
+function localYmdToDate(ymd: string): Date {
+    const [year, month, day] = ymd.split("-").map(Number);
+    return new Date(year, month - 1, day);
+}
+
 export const Route = createFileRoute("/admin")({
     head: () => ({
         meta: [
@@ -115,9 +129,12 @@ function AdminPage() {
 
 /* ---------- News admin ---------- */
 
-const EMPTY_NEWS: Omit<NewsPost, "id"> = {
-    tag: "Announcement", title: "", date: "", body: "", color: "g", titleColor: "green", image: "",
-};
+function getEmptyNews(): Omit<NewsPost, "id"> {
+    const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    return {
+        tag: "Announcement", title: "", date: today, body: "", color: "g", titleColor: "green", image: "",
+    };
+}
 
 interface NewsAdminProps {
     items: NewsPost[];
@@ -125,7 +142,7 @@ interface NewsAdminProps {
 
 function NewsAdmin({ items }: NewsAdminProps) {
     const router = useRouter();
-    const [draft, setDraft] = useState<NewsPost | (Omit<NewsPost, "id"> & { id?: string })>(EMPTY_NEWS);
+    const [draft, setDraft] = useState<NewsPost | (Omit<NewsPost, "id"> & { id?: string })>(getEmptyNews());
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
@@ -141,7 +158,7 @@ function NewsAdmin({ items }: NewsAdminProps) {
                 await addNews(draft as Omit<NewsPost, "id">);
             }
             await router.invalidate();
-            setDraft(EMPTY_NEWS);
+            setDraft(getEmptyNews());
             setMsg("Saved.");
             setTimeout(() => setMsg(""), 1500);
         } catch (err) {
@@ -174,7 +191,26 @@ function NewsAdmin({ items }: NewsAdminProps) {
 
             <form onSubmit={submit} style={formGrid}>
                 <input required placeholder="Title" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} style={inputStyle} />
-                <input required placeholder="Date (e.g. June 2026)" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} style={inputStyle} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Publish Date</label>
+                    <input
+                        required
+                        type="date"
+                        value={(() => {
+                            if (!draft.date) return "";
+                            const d = new Date(draft.date);
+                            return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
+                        })()}
+                        style={inputStyle}
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                const d = localYmdToDate(e.target.value);
+                                const formatted = d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+                                setDraft({ ...draft, date: formatted });
+                            }
+                        }}
+                    />
+                </div>
                 <input required placeholder="Tag (e.g. Announcement)" value={draft.tag} onChange={(e) => setDraft({ ...draft, tag: e.target.value })} style={inputStyle} />
                 <select value={draft.color} onChange={(e) => setDraft({ ...draft, color: e.target.value as NewsPost["color"] })} style={inputStyle}>
                     <option value="g">Tag: Green</option>
@@ -211,7 +247,7 @@ function NewsAdmin({ items }: NewsAdminProps) {
                         {submitting ? "Saving..." : ("id" in draft && draft.id ? "Update post" : "Add post")}
                     </button>
                     {"id" in draft && draft.id && (
-                        <button type="button" className="btn-outline" onClick={() => setDraft(EMPTY_NEWS)} disabled={submitting}>Cancel edit</button>
+                        <button type="button" className="btn-outline" onClick={() => setDraft(getEmptyNews())} disabled={submitting}>Cancel edit</button>
                     )}
                     {msg && <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>{msg}</span>}
                 </div>
@@ -237,9 +273,14 @@ function NewsAdmin({ items }: NewsAdminProps) {
 
 /* ---------- Events admin ---------- */
 
-const EMPTY_EVENT: Omit<EventItem, "id"> = {
-    day: "", month: "", title: "", desc: "", titleColor: "", image: "",
-};
+function getEmptyEvent(): Omit<EventItem, "id"> {
+    const today = new Date();
+    const day = today.getDate().toString().padStart(2, "0");
+    const month = today.toLocaleDateString("en-US", { month: "short" });
+    return {
+        day, month, title: "", desc: "", titleColor: "", image: "",
+    };
+}
 
 interface EventsAdminProps {
     items: EventItem[];
@@ -247,7 +288,7 @@ interface EventsAdminProps {
 
 function EventsAdmin({ items }: EventsAdminProps) {
     const router = useRouter();
-    const [draft, setDraft] = useState<EventItem | (Omit<EventItem, "id"> & { id?: string })>(EMPTY_EVENT);
+    const [draft, setDraft] = useState<EventItem | (Omit<EventItem, "id"> & { id?: string })>(getEmptyEvent());
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
@@ -263,7 +304,7 @@ function EventsAdmin({ items }: EventsAdminProps) {
                 await addEvent(draft as Omit<EventItem, "id">);
             }
             await router.invalidate();
-            setDraft(EMPTY_EVENT);
+            setDraft(getEmptyEvent());
             setMsg("Saved.");
             setTimeout(() => setMsg(""), 1500);
         } catch (err) {
@@ -296,8 +337,28 @@ function EventsAdmin({ items }: EventsAdminProps) {
 
             <form onSubmit={submit} style={formGrid}>
                 <input required placeholder="Title" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} style={inputStyle} />
-                <input required placeholder="Day (e.g. 12)" value={draft.day} onChange={(e) => setDraft({ ...draft, day: e.target.value })} style={inputStyle} />
-                <input required placeholder="Month (e.g. Jul)" value={draft.month} onChange={(e) => setDraft({ ...draft, month: e.target.value })} style={inputStyle} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Event Date</label>
+                    <input
+                        required
+                        type="date"
+                        value={(() => {
+                            if (!draft.day || !draft.month) return "";
+                            const currentYear = new Date().getFullYear();
+                            const d = new Date(`${draft.month} ${draft.day}, ${currentYear}`);
+                            return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
+                        })()}
+                        style={inputStyle}
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                const d = localYmdToDate(e.target.value);
+                                const day = d.getDate().toString().padStart(2, "0");
+                                const month = d.toLocaleDateString("en-US", { month: "short" });
+                                setDraft({ ...draft, day, month });
+                            }
+                        }}
+                    />
+                </div>
                 <select value={draft.titleColor} onChange={(e) => setDraft({ ...draft, titleColor: e.target.value as EventItem["titleColor"] })} style={inputStyle}>
                     <option value="">Title: Default</option>
                     <option value="green">Title: Green</option>
@@ -328,7 +389,7 @@ function EventsAdmin({ items }: EventsAdminProps) {
                         {submitting ? "Saving..." : ("id" in draft && draft.id ? "Update event" : "Add event")}
                     </button>
                     {"id" in draft && draft.id && (
-                        <button type="button" className="btn-outline" onClick={() => setDraft(EMPTY_EVENT)} disabled={submitting}>Cancel edit</button>
+                        <button type="button" className="btn-outline" onClick={() => setDraft(getEmptyEvent())} disabled={submitting}>Cancel edit</button>
                     )}
                     {msg && <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>{msg}</span>}
                 </div>

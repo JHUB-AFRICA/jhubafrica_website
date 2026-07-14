@@ -41,47 +41,67 @@ export default function Navbar() {
   }, [lastScrollY]);
 
   return (
-    <header className={`site-header ${isHidden ? "site-header--hidden" : ""}`}>
-      <Link to="/" className="brand-container" onClick={() => setOpen(false)}>
-        <img
-          src={logoAsset}
-          alt="JHUB Africa — Innovations for Transformation"
-          className="brand-logo-img"
+    <>
+      <header className={`site-header ${isHidden ? "site-header--hidden" : ""}`}>
+        <Link to="/" className="brand-container" onClick={() => setOpen(false)}>
+          <img
+            src={logoAsset}
+            alt="JHUB Africa — Innovations for Transformation"
+            className="brand-logo-img"
+          />
+        </Link>
+
+        <button
+          className="mobile-toggle"
+          aria-label="Toggle navigation"
+          onClick={() => setOpen((v) => !v)}
+        >
+          ☰
+        </button>
+
+        <nav className={`site-nav ${open ? "open" : "collapsed"}`}>
+          <div className="mobile-nav-header">
+            <img src={logoAsset} alt="JHUB Logo" className="mobile-nav-logo" />
+            <button
+              type="button"
+              className="mobile-nav-close"
+              onClick={() => setOpen(false)}
+              aria-label="Close menu"
+            >
+              ✕
+            </button>
+          </div>
+          {NAV.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="nav-link"
+              activeProps={{ className: "nav-link active" }}
+              activeOptions={{ exact: item.to === "/" }}
+              onClick={() => setOpen(false)}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <Link
+          to="/contact"
+          className="nav-cta"
+          onClick={() => {
+            setOpen(false);
+          }}
+        >
+          Apply
+        </Link>
+      </header>
+
+      {open && (
+        <div
+          className="mobile-nav-backdrop"
+          onClick={() => setOpen(false)}
         />
-      </Link>
-
-      <button
-        className="mobile-toggle"
-        aria-label="Toggle navigation"
-        onClick={() => setOpen((v) => !v)}
-      >
-        ☰
-      </button>
-
-      <nav className={`site-nav ${open ? "" : "collapsed"} site-nav-desktop`}>
-        {NAV.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className="nav-link"
-            activeProps={{ className: "nav-link active" }}
-            activeOptions={{ exact: item.to === "/" }}
-            onClick={() => setOpen(false)}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-
-      <Link
-        to="/contact"
-        className="nav-cta"
-        onClick={() => {
-          setOpen(false);
-        }}
-      >
-        Apply
-      </Link>
-    </header>
+      )}
+    </>
   );
 }

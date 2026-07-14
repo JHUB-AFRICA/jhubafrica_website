@@ -72,14 +72,10 @@ function NewsPage() {
       <section className="content-section">
         <div className="cards-grid">
           {posts.map((p: NewsPost) => {
-            const isCompact =
-              p.id === "n_1783929524315" ||
-              p.title === "Advancing Rigorous, Practice-Driven AI in Africa";
-
             return (
               <article
                 key={p.id || p.title}
-                className={`prog-card${isCompact ? " news-card-compact" : ""}`}
+                className="prog-card news-card-compact"
               >
                 {p.image && (
                   <div style={{ marginBottom: "1rem", borderRadius: "0.5rem", overflow: "hidden", height: "200px" }}>
