@@ -100,7 +100,7 @@ function Index() {
           />
         ))}
         <section className="hero-section hero-on-image">
-          <span className="hero-tag">INNOVATION FOR TRANSFORMATION</span>
+          <div className="hero-kicker">INNOVATION FOR TRANSFORMATION</div>
           {/* eslint-disable-next-line */}
           <h1 style={{ color: "#ffffff" }}>
             Africa's <span>Innovation Gateway</span> at JKUAT
