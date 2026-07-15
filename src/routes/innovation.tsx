@@ -192,7 +192,6 @@ function InnovationPage() {
         <div className="cards-grid" style={{ marginTop: "1.25rem" }}>
           {filtered.map((p) => (
             <article key={p.title} className="prog-card">
-              <span className="prog-tag prog-tag-g">{p.sector}</span>
               <div className="prog-title">{p.title}</div>
               <p className="prog-desc">
                 <strong style={{ color: "var(--jhub-blue)" }}>Problem:</strong>{" "}

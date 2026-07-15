@@ -135,7 +135,6 @@ function Index() {
         <h2 className="section-h2">Where do you fit in the ecosystem?</h2>
         <div className="cards-grid">
           <Link to="/innovation" className="prog-card audience-card">
-            <span className="prog-tag prog-tag-g">Innovator</span>
             <div className="prog-title green">I have an idea or startup</div>
             <p className="prog-desc">
               Get mentorship, prototyping support, funding pathways and market
@@ -146,7 +145,6 @@ function Index() {
             </div>
           </Link>
           <Link to="/courses" className="prog-card audience-card">
-            <span className="prog-tag prog-tag-b">Student</span>
             <div className="prog-title">I want to learn or join</div>
             <p className="prog-desc">
               Join courses, the innovation club, hackathons, workshops and
@@ -157,7 +155,6 @@ function Index() {
             </div>
           </Link>
           <Link to="/support" className="prog-card audience-card">
-            <span className="prog-tag prog-tag-p">Funder</span>
             <div className="prog-title red">I want to fund a project</div>
             <p className="prog-desc">
               Discover credible, fundable innovations across agritech, climate,
@@ -168,7 +165,6 @@ function Index() {
             </div>
           </Link>
           <Link to="/for-partners" className="prog-card audience-card">
-            <span className="prog-tag prog-tag-b">Partner</span>
             <div className="prog-title">
               My organisation wants to collaborate
             </div>
@@ -181,7 +177,6 @@ function Index() {
             </div>
           </Link>
           <Link to="/for-innovators" className="prog-card audience-card">
-            <span className="prog-tag prog-tag-g">Researcher</span>
             <div className="prog-title green">
               I want to commercialise research
             </div>
@@ -194,7 +189,6 @@ function Index() {
             </div>
           </Link>
           <Link to="/news" className="prog-card audience-card">
-            <span className="prog-tag prog-tag-p">Stakeholder</span>
             <div className="prog-title red">I want to follow JHUB</div>
             <p className="prog-desc">
               Read news, impact stories and announcements from across the JHUB
@@ -216,7 +210,6 @@ function Index() {
         </p>
         <div className="cards-grid">
           <div className="prog-card">
-            <span className="prog-tag prog-tag-g">Incubation</span>
             <div className="prog-title green">Startup Incubator</div>
             <p className="prog-desc">
               Mentorship, workspace and seed support for early-stage founders
@@ -230,7 +223,6 @@ function Index() {
             </div>
           </div>
           <div className="prog-card">
-            <span className="prog-tag prog-tag-b">Training</span>
             <div className="prog-title">Digital Skills Academy</div>
             <p className="prog-desc">
               Industry-aligned short courses in software, data, design and
@@ -244,7 +236,6 @@ function Index() {
             </div>
           </div>
           <div className="prog-card">
-            <span className="prog-tag prog-tag-p">Research</span>
             <div className="prog-title red">Applied Research</div>
             <p className="prog-desc">
               Collaborative R&D with JKUAT faculties and industry to solve
@@ -271,9 +262,6 @@ function Index() {
         </p>
         <div className="cards-grid">
           <article className="prog-card">
-            <span className="prog-tag prog-tag-g">
-              Climate Smart Agriculture
-            </span>
             <div className="prog-title green">
               Smart Irrigation for Smallholders
             </div>
@@ -291,7 +279,6 @@ function Index() {
             </div>
           </article>
           <article className="prog-card">
-            <span className="prog-tag prog-tag-b">Big AI Ideas</span>
             <div className="prog-title">Swahili Voice Assistant</div>
             <p className="prog-desc">
               Speech models tuned for Kenyan Swahili and code-switching to power
@@ -307,7 +294,6 @@ function Index() {
             </div>
           </article>
           <article className="prog-card">
-            <span className="prog-tag prog-tag-p">Digital Trade</span>
             <div className="prog-title red">Cross-border SME Marketplace</div>
             <p className="prog-desc">
               Compliance-ready B2B marketplace connecting Kenyan SMEs to

@@ -110,7 +110,6 @@ function CoursesPage() {
         <div className="cards-grid">
           {COURSES.map((c) => (
             <div key={c.title} className="prog-card">
-              <span className={`prog-tag prog-tag-${c.color}`}>{c.tag}</span>
               <div className={`prog-title ${c.titleColor ?? ""}`}>
                 {c.title}
               </div>
