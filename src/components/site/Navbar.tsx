@@ -4,27 +4,31 @@ import logoAsset from "../../assets/jhublogo.jpeg";
 
 const NAV = [
   { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
   { to: "/innovation", label: "Innovation" },
-  { to: "/for-innovators", label: "For Innovators" },
-  { to: "/for-students", label: "For Students" },
-  { to: "/for-partners", label: "For Partners" },
   { to: "/courses", label: "Courses" },
   { to: "/events", label: "Events" },
   { to: "/news", label: "News" },
-  { to: "/about", label: "About" },
   { to: "/support", label: "Support" },
   { to: "/contact", label: "Contact" },
+] as const;
+
+const INVOLVEMENT_LINKS = [
+  { to: "/for-innovators", label: "For Innovators" },
+  { to: "/for-students", label: "For Students" },
+  { to: "/for-partners", label: "For Partners" },
 ] as const;
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isGetInvolvedOpen, setIsGetInvolvedOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         // Scrolling down
         setIsHidden(true);
@@ -32,7 +36,7 @@ export default function Navbar() {
         // Scrolling up
         setIsHidden(false);
       }
-      
+
       setLastScrollY(currentScrollY);
     };
 
@@ -78,11 +82,44 @@ export default function Navbar() {
               className="nav-link"
               activeProps={{ className: "nav-link active" }}
               activeOptions={{ exact: item.to === "/" }}
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                setIsGetInvolvedOpen(false);
+              }}
             >
               {item.label}
             </Link>
           ))}
+
+          <div className="nav-dropdown">
+            <button
+              type="button"
+              className={`nav-link nav-link--dropdown ${isGetInvolvedOpen ? "active" : ""}`}
+              aria-expanded={isGetInvolvedOpen}
+              onClick={() => setIsGetInvolvedOpen((value) => !value)}
+            >
+              Get Involved
+            </button>
+
+            {isGetInvolvedOpen && (
+              <div className="nav-submenu">
+                {INVOLVEMENT_LINKS.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="nav-submenu-link"
+                    activeProps={{ className: "nav-submenu-link active" }}
+                    onClick={() => {
+                      setOpen(false);
+                      setIsGetInvolvedOpen(false);
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         <Link

@@ -86,7 +86,6 @@ function NewsPage() {
                     />
                   </div>
                 )}
-                <span className={`prog-tag prog-tag-${p.color}`}>{p.tag}</span>
                 <div className={`prog-title ${p.titleColor}`}>{p.title}</div>
                 <p className="prog-desc">{p.body}</p>
                 <div className="prog-meta">
@@ -115,7 +114,6 @@ function NewsPage() {
                 />
               </div>
             )}
-            <span className={`prog-tag prog-tag-${selectedPost.color}`}>{selectedPost.tag}</span>
             <div className={`prog-title ${selectedPost.titleColor}`}>{selectedPost.title}</div>
             <p className="news-full-date">{selectedPost.date}</p>
             {selectedPost.body.split("\n\n").map((paragraph: string, index: number) => (

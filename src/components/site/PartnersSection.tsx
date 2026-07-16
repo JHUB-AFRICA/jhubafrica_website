@@ -74,7 +74,6 @@ export default function PartnersSection({
         <div className="cards-grid cards-grid--spaced">
           {PARTNERS.map((p) => (
             <article key={p.name} className="prog-card">
-              <span className="prog-tag prog-tag-b">{p.sector}</span>
               <div className="prog-title">{p.name}</div>
               <p className="prog-desc">
                 <strong>Outcome:</strong> {p.outcome}
