@@ -906,6 +906,10 @@ main {
   border-left-color: var(--jhub-green);
 }
 
+.info-card.no-accent {
+  border-left: 1px solid var(--border-color);
+}
+
 .info-card h3 {
   font-size: 1.05rem;
   color: var(--jhub-blue);

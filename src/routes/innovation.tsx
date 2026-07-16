@@ -139,14 +139,6 @@ function InnovationPage() {
           by sector, stage or support need — and sponsor a project that fits
           your priorities.
         </p>
-        <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <Link to="/contact" className="btn-primary">
-            Submit your innovation
-          </Link>
-          <Link to="/support" className="btn-outline">
-            Request portfolio brief
-          </Link>
-        </div>
       </header>
 
       <section className="content-section">
@@ -267,21 +259,21 @@ function InnovationPage() {
           </div>
         </div>
         <div className="split-panel">
-          <div className="info-card green">
+          <div className="info-card no-accent">
             <h3 className="green">Evidence tiers</h3>
             <p>
               Every project page lists concept notes, prototype demos, pilot
               data and users reached — no vague claims.
             </p>
           </div>
-          <div className="info-card blue">
+          <div className="info-card no-accent">
             <h3>Transparent selection</h3>
             <p>
               Innovations are reviewed against published criteria for impact,
               feasibility and team capacity.
             </p>
           </div>
-          <div className="info-card">
+          <div className="info-card no-accent">
             <h3 className="red">Reporting promise</h3>
             <p>
               Funded projects publish quarterly progress updates so sponsors see

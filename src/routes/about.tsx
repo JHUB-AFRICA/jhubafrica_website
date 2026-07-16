@@ -78,19 +78,19 @@ function AboutPage() {
           </ul>
         </div>
         <div className="split-panel">
-          <div className="info-card blue">
+          <div className="info-card no-accent">
             <h3>Mission</h3>
             <p>
               To nurture an innovation-driven ecosystem that creates jobs and
               solves African challenges.
             </p>
           </div>
-          <div className="info-card green">
-            <h3 className="info-card-title-green">Vision</h3>
+          <div className="info-card no-accent">
+            <h3>Vision</h3>
             <p>To be Africa's leading university-anchored innovation hub.</p>
           </div>
-          <div className="info-card">
-            <h3 className="info-card-title-red">Values</h3>
+          <div className="info-card no-accent">
+            <h3>Values</h3>
             <p>Integrity, collaboration, excellence and impact.</p>
           </div>
         </div>

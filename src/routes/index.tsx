@@ -44,8 +44,32 @@ function Index() {
   const [slides, setSlides] = useState<
     { id: number; imageIndex: number; state: "visible" | "entering" | "done" }[]
   >([{ id: 0, imageIndex: 0, state: "visible" }]);
+  const [counts, setCounts] = useState(() => [0, 0, 0, 0]);
   const slideCounter = useRef(1);
   const currentImageIndex = useRef(0);
+
+  useEffect(() => {
+    const metricTargets = HOMEPAGE_METRICS.map((m) =>
+      Number(m.n.replace(/[^0-9]/g, "")),
+    );
+    let cancelled = false;
+    const duration = 1500;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      if (cancelled) return;
+      const progress = Math.min((now - start) / duration, 1);
+      setCounts(
+        metricTargets.map((value) => Math.round(value * progress)),
+      );
+      if (progress < 1) window.requestAnimationFrame(animate);
+    };
+
+    window.requestAnimationFrame(animate);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -89,11 +113,10 @@ function Index() {
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className={`hero-bg-layer ${
-              slide.state === "visible"
-                ? "hero-bg-layer--visible"
-                : "hero-bg-layer--entering"
-            }`}
+            className={`hero-bg-layer ${slide.state === "visible"
+              ? "hero-bg-layer--visible"
+              : "hero-bg-layer--entering"
+              }`}
             style={{
               backgroundImage: `linear-gradient(135deg, rgba(8,20,45,0.72), rgba(8,20,45,0.55)), url(${HERO_IMAGES[slide.imageIndex]})`,
             }}
@@ -110,20 +133,14 @@ function Index() {
             tested, investable and scalable solutions — through incubation,
             mentorship, technical support, partnerships and market access.
           </p>
-          <div className="hero-btns">
-            <Link to="/innovation" className="btn-primary">
-              Submit Your Innovation
-            </Link>
-            <Link to="/support" className="btn-outline">
-              Sponsor a Project
-            </Link>
-          </div>
         </section>
 
         <div className="stats-bar stats-on-image">
-          {HOMEPAGE_METRICS.map((m) => (
+          {HOMEPAGE_METRICS.map((m, index) => (
             <div key={m.l} className="stat">
-              <div className="stat-n">{m.n}</div>
+              <div className="stat-n">
+                {counts[index].toLocaleString()}+
+              </div>
               <div className="stat-l">{m.l}</div>
             </div>
           ))}
