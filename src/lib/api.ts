@@ -19,6 +19,16 @@ export interface EventItem {
     image?: string;
 }
 
+export interface InnovationItem {
+    id: string;
+    title: string;
+    sector: string;
+    stage: "Concept" | "Prototype" | "Pilot" | "Market entry" | "Scale";
+    need: string;
+    problem: string;
+    solution: string;
+}
+
 export async function getNews(): Promise<NewsPost[]> {
     const res = await fetch("/api/news");
     if (!res.ok) throw new Error("Failed to fetch news");
@@ -87,4 +97,39 @@ export async function deleteEvent(id: string): Promise<void> {
         body: JSON.stringify({ action: "delete", event: { id } }),
     });
     if (!res.ok) throw new Error("Failed to delete event");
+}
+
+export async function getInnovations(): Promise<InnovationItem[]> {
+    const res = await fetch("/api/innovations");
+    if (!res.ok) throw new Error("Failed to fetch innovations");
+    return res.json();
+}
+
+export async function addInnovation(innovation: Omit<InnovationItem, "id">): Promise<InnovationItem> {
+    const res = await fetch("/api/innovations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "add", innovation }),
+    });
+    if (!res.ok) throw new Error("Failed to add innovation");
+    return res.json();
+}
+
+export async function updateInnovation(innovation: InnovationItem): Promise<InnovationItem> {
+    const res = await fetch("/api/innovations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", innovation }),
+    });
+    if (!res.ok) throw new Error("Failed to update innovation");
+    return res.json();
+}
+
+export async function deleteInnovation(id: string): Promise<void> {
+    const res = await fetch("/api/innovations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", innovation: { id } }),
+    });
+    if (!res.ok) throw new Error("Failed to delete innovation");
 }

@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { addInnovation, getInnovations, type InnovationItem } from "@/lib/api";
 
 export const Route = createFileRoute("/innovation")({
   head: () => ({
@@ -17,85 +18,9 @@ export const Route = createFileRoute("/innovation")({
       },
     ],
   }),
+  loader: async () => ({ innovations: await getInnovations() }),
   component: InnovationPage,
 });
-
-type Project = {
-  title: string;
-  sector: string;
-  stage: "Concept" | "Prototype" | "Pilot" | "Market entry" | "Scale";
-  need: string;
-  problem: string;
-  solution: string;
-};
-
-const PROJECTS: Project[] = [
-  {
-    title: "Smart Irrigation for Smallholders",
-    sector: "Climate Smart Agriculture",
-    stage: "Pilot",
-    need: "Pilot funding",
-    problem: "Smallholder farms lose yields to inconsistent water supply.",
-    solution: "Low-cost IoT controllers cutting water use by up to 35%.",
-  },
-  {
-    title: "Swahili Voice Assistant",
-    sector: "Big AI Ideas",
-    stage: "Prototype",
-    need: "Compute & data",
-    problem: "Voice tools exclude Swahili and code-switching speakers.",
-    solution:
-      "Speech models tuned for Kenyan Swahili and mixed-language input.",
-  },
-  {
-    title: "Cross-border SME Marketplace",
-    sector: "Digital Trade",
-    stage: "Market entry",
-    need: "Mentorship",
-    problem: "SMEs lack compliant pathways to regional buyers.",
-    solution: "B2B marketplace with AfCFTA-aware compliance tooling.",
-  },
-  {
-    title: "Solar Cold-Chain Box",
-    sector: "Green Digital Innovation",
-    stage: "Prototype",
-    need: "Pilot partners",
-    problem: "Post-harvest losses for dairy and horticulture exceed 30%.",
-    solution: "Solar-powered cold storage with remote monitoring.",
-  },
-  {
-    title: "Digital Twin for Campus Energy",
-    sector: "Digital Twin Models",
-    stage: "Pilot",
-    need: "Technical mentorship",
-    problem: "Campuses lack visibility into energy waste.",
-    solution: "Real-time digital twin modelling consumption and savings.",
-  },
-  {
-    title: "EduGame: STEM Learning",
-    sector: "Gaming",
-    stage: "Concept",
-    need: "Seed funding",
-    problem: "Low STEM engagement in upper-primary classrooms.",
-    solution: "Mobile-first educational games tied to the CBC curriculum.",
-  },
-  {
-    title: "AgriCredit Scoring",
-    sector: "Big AI Ideas",
-    stage: "Pilot",
-    need: "Data partners",
-    problem: "Smallholder farmers lack credit history for loans.",
-    solution: "Alternative-data credit scoring using farm and mobile signals.",
-  },
-  {
-    title: "Plastic-to-Pavement",
-    sector: "Green Digital Innovation",
-    stage: "Scale",
-    need: "Market access",
-    problem: "Plastic waste accumulates in urban areas.",
-    solution: "Recycled plastic pavement blocks for low-traffic streets.",
-  },
-];
 
 const STAGES = [
   "All",
@@ -106,17 +31,38 @@ const STAGES = [
   "Scale",
 ] as const;
 
+function getEmptyInnovation(): Omit<InnovationItem, "id"> {
+  return {
+    title: "",
+    sector: "",
+    stage: "Concept",
+    need: "",
+    problem: "",
+    solution: "",
+  };
+}
+
 function InnovationPage() {
+  const router = useRouter();
+  const { innovations: initialInnovations } = Route.useLoaderData();
   const [q, setQ] = useState("");
   const [stage, setStage] = useState<(typeof STAGES)[number]>("All");
   const [sector, setSector] = useState<string>("All");
+  const [projects, setProjects] = useState(initialInnovations);
+  const [draft, setDraft] = useState<Omit<InnovationItem, "id">>(getEmptyInnovation());
+  const [submitting, setSubmitting] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    setProjects(initialInnovations);
+  }, [initialInnovations]);
 
   const sectors = useMemo(
-    () => ["All", ...Array.from(new Set(PROJECTS.map((p) => p.sector)))],
-    [],
+    () => ["All", ...Array.from(new Set(projects.map((p) => p.sector)))],
+    [projects],
   );
 
-  const filtered = PROJECTS.filter((p) => {
+  const filtered = projects.filter((p) => {
     const matchQ =
       q.trim() === "" ||
       `${p.title} ${p.problem} ${p.solution}`
@@ -126,6 +72,28 @@ function InnovationPage() {
     const matchSector = sector === "All" || p.sector === sector;
     return matchQ && matchStage && matchSector;
   });
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!draft.title.trim() || !draft.sector.trim() || !draft.problem.trim() || !draft.solution.trim()) return;
+
+    setSubmitting(true);
+    setMsg("Saving...");
+
+    try {
+      const created = await addInnovation(draft);
+      setProjects((current) => [created, ...current]);
+      setDraft(getEmptyInnovation());
+      await router.invalidate();
+      setMsg("Thanks! Your innovation has been added.");
+      setTimeout(() => setMsg(""), 1800);
+    } catch (error) {
+      console.error(error);
+      setMsg("Unable to save this innovation right now.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <>
@@ -142,6 +110,31 @@ function InnovationPage() {
       </header>
 
       <section className="content-section">
+        <h2 style={{ marginBottom: "0.75rem" }}>Submit an innovation</h2>
+        <p className="prog-desc" style={{ marginBottom: "1rem" }}>
+          Share a new innovation idea with the JHUB team. It will be added to the portfolio for review.
+        </p>
+        <form onSubmit={submit} style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", marginBottom: "1.5rem" }}>
+          <input required placeholder="Innovation title" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} style={{ padding: "0.7rem 0.9rem", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.95rem", fontFamily: "inherit", background: "#fff", color: "var(--text-main)" }} />
+          <input required placeholder="Sector" value={draft.sector} onChange={(e) => setDraft({ ...draft, sector: e.target.value })} style={{ padding: "0.7rem 0.9rem", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.95rem", fontFamily: "inherit", background: "#fff", color: "var(--text-main)" }} />
+          <select value={draft.stage} onChange={(e) => setDraft({ ...draft, stage: e.target.value as InnovationItem["stage"] })} style={{ padding: "0.7rem 0.9rem", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.95rem", fontFamily: "inherit", background: "#fff", color: "var(--text-main)" }}>
+            <option value="Concept">Concept</option>
+            <option value="Prototype">Prototype</option>
+            <option value="Pilot">Pilot</option>
+            <option value="Market entry">Market entry</option>
+            <option value="Scale">Scale</option>
+          </select>
+          <input required placeholder="Support needed" value={draft.need} onChange={(e) => setDraft({ ...draft, need: e.target.value })} style={{ padding: "0.7rem 0.9rem", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.95rem", fontFamily: "inherit", background: "#fff", color: "var(--text-main)" }} />
+          <textarea required rows={3} placeholder="Problem" value={draft.problem} onChange={(e) => setDraft({ ...draft, problem: e.target.value })} style={{ padding: "0.7rem 0.9rem", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.95rem", fontFamily: "inherit", background: "#fff", color: "var(--text-main)", gridColumn: "1 / -1", resize: "vertical" }} />
+          <textarea required rows={3} placeholder="Solution" value={draft.solution} onChange={(e) => setDraft({ ...draft, solution: e.target.value })} style={{ padding: "0.7rem 0.9rem", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.95rem", fontFamily: "inherit", background: "#fff", color: "var(--text-main)", gridColumn: "1 / -1", resize: "vertical" }} />
+          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", gridColumn: "1 / -1" }}>
+            <button type="submit" className="btn-primary" disabled={submitting}>
+              {submitting ? "Saving..." : "Add innovation"}
+            </button>
+            {msg && <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>{msg}</span>}
+          </div>
+        </form>
+
         <div className="filter-bar">
           <input
             type="search"
@@ -178,12 +171,12 @@ function InnovationPage() {
         </div>
 
         <div className="filter-meta">
-          Showing {filtered.length} of {PROJECTS.length} innovations
+          Showing {filtered.length} of {projects.length} innovations
         </div>
 
         <div className="cards-grid" style={{ marginTop: "1.25rem" }}>
           {filtered.map((p) => (
-            <article key={p.title} className="prog-card">
+            <article key={p.id} className="prog-card">
               <div className="prog-title">{p.title}</div>
               <p className="prog-desc">
                 <strong style={{ color: "var(--jhub-blue)" }}>Problem:</strong>{" "}

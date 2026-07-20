@@ -8,6 +8,10 @@ import {
     addEvent,
     updateEvent,
     deleteEvent,
+    getInnovations,
+    addInnovation,
+    updateInnovation,
+    deleteInnovation,
 } from "./db";
 
 export default defineEventHandler(async (event) => {
@@ -22,6 +26,11 @@ export default defineEventHandler(async (event) => {
     // GET /api/events
     if (pathname === "/api/events" && method === "GET") {
         return getEvents();
+    }
+
+    // GET /api/innovations
+    if (pathname === "/api/innovations" && method === "GET") {
+        return getInnovations();
     }
 
     // POST /api/news
@@ -55,6 +64,26 @@ export default defineEventHandler(async (event) => {
             return updateEvent(eventData);
         } else if (action === "delete") {
             deleteEvent(eventData.id);
+            return { success: true };
+        } else {
+            throw createError({
+                statusCode: 400,
+                statusMessage: "Invalid action",
+            });
+        }
+    }
+
+    // POST /api/innovations
+    if (pathname === "/api/innovations" && method === "POST") {
+        const body = await readBody(event);
+        const { action, innovation: innovationData } = body;
+
+        if (action === "add") {
+            return addInnovation(innovationData);
+        } else if (action === "update") {
+            return updateInnovation(innovationData);
+        } else if (action === "delete") {
+            deleteInnovation(innovationData.id);
             return { success: true };
         } else {
             throw createError({

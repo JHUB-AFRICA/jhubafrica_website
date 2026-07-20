@@ -15,6 +15,11 @@ import {
     addEvent,
     updateEvent,
     deleteEvent,
+    getInnovations,
+    addInnovation,
+    updateInnovation,
+    deleteInnovation,
+    type InnovationItem,
 } from "@/lib/api";
 
 // Helper function to convert file to base64
@@ -50,8 +55,8 @@ export const Route = createFileRoute("/admin")({
         ],
     }),
     loader: async () => {
-        const [news, events] = await Promise.all([getNews(), getEvents()]);
-        return { news, events };
+        const [news, events, innovations] = await Promise.all([getNews(), getEvents(), getInnovations()]);
+        return { news, events, innovations };
     },
     component: AdminPage,
 });
@@ -60,7 +65,7 @@ function AdminPage() {
     const [unlocked, setUnlocked] = useState(false);
     const [pw, setPw] = useState("");
     const [err, setErr] = useState("");
-    const { news, events } = Route.useLoaderData();
+    const { news, events, innovations } = Route.useLoaderData();
 
     useEffect(() => {
         if (sessionStorage.getItem(ADMIN_SESSION_KEY) === "1") setUnlocked(true);
@@ -88,7 +93,7 @@ function AdminPage() {
             <>
                 <header className="page-header">
                     <h1>Admin <span style={{ color: "var(--jhub-green)" }}>Access</span></h1>
-                    <p>Enter the admin password to manage news and events.</p>
+                    <p>Enter the admin password to manage news, events and innovations.</p>
                 </header>
                 <section className="content-section" style={{ maxWidth: 460, margin: "0 auto" }}>
                     <form onSubmit={tryUnlock} style={{ display: "grid", gap: "0.85rem" }}>
@@ -115,7 +120,7 @@ function AdminPage() {
         <>
             <header className="page-header">
                 <h1>Manage <span style={{ color: "var(--jhub-green)" }}>Content</span></h1>
-                <p>Add, edit or remove news posts and events. Changes save to the server database instantly.</p>
+                <p>Add, edit or remove news posts, events and innovations. Changes save to the server database instantly.</p>
                 <button onClick={lock} className="btn-outline" style={{ marginTop: "0.75rem" }}>
                     Lock admin
                 </button>
@@ -123,6 +128,7 @@ function AdminPage() {
 
             <NewsAdmin items={news} />
             <EventsAdmin items={events} />
+            <InnovationsAdmin items={innovations} />
         </>
     );
 }
@@ -405,6 +411,114 @@ function EventsAdmin({ items }: EventsAdminProps) {
                         <div style={{ display: "flex", gap: "0.5rem" }}>
                             <button className="btn-outline" onClick={() => edit(p)}>Edit</button>
                             <button className="btn-outline" onClick={() => remove(p.id)} style={{ color: "#b91c1c" }}>Delete</button>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </section>
+    );
+}
+
+/* ---------- Innovations admin ---------- */
+
+function getEmptyInnovation(): Omit<InnovationItem, "id"> {
+    return {
+        title: "",
+        sector: "",
+        stage: "Concept",
+        need: "",
+        problem: "",
+        solution: "",
+    };
+}
+
+interface InnovationsAdminProps {
+    items: InnovationItem[];
+}
+
+function InnovationsAdmin({ items }: InnovationsAdminProps) {
+    const router = useRouter();
+    const [draft, setDraft] = useState<InnovationItem | (Omit<InnovationItem, "id"> & { id?: string })>(getEmptyInnovation());
+    const [msg, setMsg] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+
+    async function submit(e: React.FormEvent) {
+        e.preventDefault();
+        if (!draft.title.trim() || !draft.sector.trim() || !draft.problem.trim() || !draft.solution.trim()) return;
+        setSubmitting(true);
+        setMsg("Saving...");
+        try {
+            if ("id" in draft && draft.id) {
+                await updateInnovation(draft as InnovationItem);
+            } else {
+                await addInnovation(draft as Omit<InnovationItem, "id">);
+            }
+            await router.invalidate();
+            setDraft(getEmptyInnovation());
+            setMsg("Saved.");
+            setTimeout(() => setMsg(""), 1500);
+        } catch (err) {
+            console.error(err);
+            setMsg("Error saving changes.");
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    function edit(item: InnovationItem) { setDraft(item); window.scrollTo({ top: 300, behavior: "smooth" }); }
+
+    async function remove(id: string) {
+        if (!confirm("Delete this innovation?")) return;
+        setMsg("Deleting...");
+        try {
+            await deleteInnovation(id);
+            await router.invalidate();
+            setMsg("Deleted.");
+            setTimeout(() => setMsg(""), 1500);
+        } catch (err) {
+            console.error(err);
+            setMsg("Error deleting innovation.");
+        }
+    }
+
+    return (
+        <section className="content-section">
+            <h2 style={{ marginBottom: "1rem" }}>Innovations</h2>
+
+            <form onSubmit={submit} style={formGrid}>
+                <input required placeholder="Title" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} style={inputStyle} />
+                <input required placeholder="Sector" value={draft.sector} onChange={(e) => setDraft({ ...draft, sector: e.target.value })} style={inputStyle} />
+                <select value={draft.stage} onChange={(e) => setDraft({ ...draft, stage: e.target.value as InnovationItem["stage"] })} style={inputStyle}>
+                    <option value="Concept">Concept</option>
+                    <option value="Prototype">Prototype</option>
+                    <option value="Pilot">Pilot</option>
+                    <option value="Market entry">Market entry</option>
+                    <option value="Scale">Scale</option>
+                </select>
+                <input required placeholder="Support need" value={draft.need} onChange={(e) => setDraft({ ...draft, need: e.target.value })} style={inputStyle} />
+                <textarea required rows={3} placeholder="Problem" value={draft.problem} onChange={(e) => setDraft({ ...draft, problem: e.target.value })} style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }} />
+                <textarea required rows={3} placeholder="Solution" value={draft.solution} onChange={(e) => setDraft({ ...draft, solution: e.target.value })} style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }} />
+                <div style={{ gridColumn: "1 / -1", display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                    <button type="submit" className="btn-primary" disabled={submitting}>
+                        {submitting ? "Saving..." : ("id" in draft && draft.id ? "Update innovation" : "Add innovation")}
+                    </button>
+                    {"id" in draft && draft.id && (
+                        <button type="button" className="btn-outline" onClick={() => setDraft(getEmptyInnovation())} disabled={submitting}>Cancel edit</button>
+                    )}
+                    {msg && <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>{msg}</span>}
+                </div>
+            </form>
+
+            <ul style={listStyle}>
+                {items.map((item) => (
+                    <li key={item.id} style={rowStyle}>
+                        <div>
+                            <strong>{item.title}</strong> <span style={{ opacity: 0.6 }}>· {item.sector} · {item.stage}</span>
+                            <div style={{ fontSize: "0.9rem", opacity: 0.8, marginTop: 4 }}>{item.problem}</div>
+                        </div>
+                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                            <button className="btn-outline" onClick={() => edit(item)}>Edit</button>
+                            <button className="btn-outline" onClick={() => remove(item.id)} style={{ color: "#b91c1c" }}>Delete</button>
                         </div>
                     </li>
                 ))}

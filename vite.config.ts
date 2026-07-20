@@ -13,7 +13,7 @@ function apiPlugin() {
       const raw = await fs.readFile(DB_FILE, 'utf-8');
       return JSON.parse(raw);
     } catch {
-      return { news: [], events: [] };
+      return { news: [], events: [], innovations: [] };
     }
   }
 
@@ -21,47 +21,55 @@ function apiPlugin() {
     await fs.writeFile(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
   }
 
-  return {
-    name: 'api-plugin',
-    configureServer(server: any) {
-      server.middlewares.use(async (req: any, res: any, next: any) => {
-        if (!req.url?.startsWith('/api/')) {
-          return next();
-        }
-
-        res.setHeader('Content-Type', 'application/json');
-
+  function getBody(req: any) {
+    return new Promise<any>((resolve) => {
+      let body = '';
+      req.on('data', (chunk: string) => (body += chunk));
+      req.on('end', () => {
         try {
-          const url = new URL(req.url, 'http://localhost');
-          const pathname = url.pathname;
-          const method = req.method;
+          resolve(JSON.parse(body));
+        } catch {
+          resolve({});
+        }
+      });
+    });
+  }
 
-          // GET /api/news
-          if (pathname === '/api/news' && method === 'GET') {
-            const db = await readDb();
-            res.end(JSON.stringify(db.news));
-            return;
+  return {
+      name: 'api-plugin',
+      configureServer(server: any) {
+        server.middlewares.use(async (req: any, res: any, next: any) => {
+          if (!req.url?.startsWith('/api/')) {
+            return next();
           }
 
-          // GET /api/events
-          if (pathname === '/api/events' && method === 'GET') {
-            const db = await readDb();
-            res.end(JSON.stringify(db.events));
-            return;
-          }
+          res.setHeader('Content-Type', 'application/json');
 
-          // Helper to parse JSON body
-          const getBody = () => new Promise<any>((resolve) => {
-            let body = '';
-            req.on('data', (chunk: string) => body += chunk);
-            req.on('end', () => {
-              try {
-                resolve(JSON.parse(body));
-              } catch {
-                resolve({});
-              }
-            });
-          });
+          try {
+            const url = new URL(req.url, 'http://localhost');
+            const pathname = url.pathname;
+            const method = req.method;
+
+            // GET /api/news
+            if (pathname === '/api/news' && method === 'GET') {
+              const db = await readDb();
+              res.end(JSON.stringify(db.news));
+              return;
+            }
+
+            // GET /api/events
+            if (pathname === '/api/events' && method === 'GET') {
+              const db = await readDb();
+              res.end(JSON.stringify(db.events));
+              return;
+            }
+
+            // GET /api/innovations
+            if (pathname === '/api/innovations' && method === 'GET') {
+              const db = await readDb();
+              res.end(JSON.stringify(db.innovations || []));
+              return;
+            }
 
           // POST /api/news
           if (pathname === '/api/news' && method === 'POST') {
@@ -106,6 +114,32 @@ function apiPlugin() {
               res.end(JSON.stringify(event));
             } else if (action === 'delete') {
               db.events = db.events.filter((e: any) => e.id !== event.id);
+              await writeDb(db);
+              res.end(JSON.stringify({ success: true }));
+            } else {
+              res.statusCode = 400;
+              res.end(JSON.stringify({ error: 'Invalid action' }));
+            }
+            return;
+          }
+
+          // POST /api/innovations
+          if (pathname === '/api/innovations' && method === 'POST') {
+            const body = await getBody();
+            const db = await readDb();
+            const { action, innovation } = body;
+
+            if (action === 'add') {
+              const newInnovation = { ...innovation, id: `i_${Date.now()}` };
+              db.innovations = [newInnovation, ...(db.innovations || [])];
+              await writeDb(db);
+              res.end(JSON.stringify(newInnovation));
+            } else if (action === 'update') {
+              db.innovations = (db.innovations || []).map((item: any) => item.id === innovation.id ? innovation : item);
+              await writeDb(db);
+              res.end(JSON.stringify(innovation));
+            } else if (action === 'delete') {
+              db.innovations = (db.innovations || []).filter((item: any) => item.id !== innovation.id);
               await writeDb(db);
               res.end(JSON.stringify({ success: true }));
             } else {

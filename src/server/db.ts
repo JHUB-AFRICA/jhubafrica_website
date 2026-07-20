@@ -22,19 +22,64 @@ export interface EventItem {
     image?: string;
 }
 
+export interface InnovationItem {
+    id: string;
+    title: string;
+    sector: string;
+    stage: "Concept" | "Prototype" | "Pilot" | "Market entry" | "Scale";
+    need: string;
+    problem: string;
+    solution: string;
+}
+
 export interface Database {
     news: NewsPost[];
     events: EventItem[];
+    innovations: InnovationItem[];
 }
 
 const DB_PATH = join(process.cwd(), "data", "db.json");
 
+const DEFAULT_INNOVATIONS: InnovationItem[] = [
+    {
+        id: "i_default_1",
+        title: "Smart Irrigation for Smallholders",
+        sector: "Climate Smart Agriculture",
+        stage: "Pilot",
+        need: "Pilot funding",
+        problem: "Smallholder farms lose yields to inconsistent water supply.",
+        solution: "Low-cost IoT controllers cutting water use by up to 35%.",
+    },
+    {
+        id: "i_default_2",
+        title: "Swahili Voice Assistant",
+        sector: "Big AI Ideas",
+        stage: "Prototype",
+        need: "Compute & data",
+        problem: "Voice tools exclude Swahili and code-switching speakers.",
+        solution: "Speech models tuned for Kenyan Swahili and mixed-language input.",
+    },
+    {
+        id: "i_default_3",
+        title: "Cross-border SME Marketplace",
+        sector: "Digital Trade",
+        stage: "Market entry",
+        need: "Mentorship",
+        problem: "SMEs lack compliant pathways to regional buyers.",
+        solution: "B2B marketplace with AfCFTA-aware compliance tooling.",
+    },
+];
+
 export function readDatabase(): Database {
     try {
-        const data = readFileSync(DB_PATH, "utf-8");
-        return JSON.parse(data);
+        const data = JSON.parse(readFileSync(DB_PATH, "utf-8"));
+        return {
+            news: Array.isArray(data.news) ? data.news : [],
+            events: Array.isArray(data.events) ? data.events : [],
+            innovations: Array.isArray(data.innovations) ? data.innovations : [],
+        };
     } catch {
-        return { news: [], events: [] };
+        return { news: [], events: [], innovations: [] };
     }
 }
 
@@ -97,5 +142,34 @@ export function updateEvent(event: EventItem): EventItem {
 export function deleteEvent(id: string): void {
     const db = readDatabase();
     db.events = db.events.filter((e) => e.id !== id);
+    writeDatabase(db);
+}
+
+export function getInnovations(): InnovationItem[] {
+    const db = readDatabase();
+    return db.innovations.length > 0 ? db.innovations : DEFAULT_INNOVATIONS;
+}
+
+export function addInnovation(innovation: Omit<InnovationItem, "id">): InnovationItem {
+    const db = readDatabase();
+    const newInnovation: InnovationItem = {
+        ...innovation,
+        id: `i_${Date.now()}`,
+    };
+    db.innovations.unshift(newInnovation);
+    writeDatabase(db);
+    return newInnovation;
+}
+
+export function updateInnovation(innovation: InnovationItem): InnovationItem {
+    const db = readDatabase();
+    db.innovations = db.innovations.map((item) => (item.id === innovation.id ? innovation : item));
+    writeDatabase(db);
+    return innovation;
+}
+
+export function deleteInnovation(id: string): void {
+    const db = readDatabase();
+    db.innovations = db.innovations.filter((item) => item.id !== id);
     writeDatabase(db);
 }
