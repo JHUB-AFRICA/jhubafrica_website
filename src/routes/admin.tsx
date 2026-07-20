@@ -19,6 +19,8 @@ import {
   useInnovationAdmin,
   useNewsAdmin,
 } from "@/features/admin/useAdminContent";
+import { AdminFormActions } from "@/features/admin/components/AdminFormActions";
+import { AdminImageUpload } from "@/features/admin/components/AdminImageUpload";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -244,69 +246,24 @@ function NewsAdmin({ items }: NewsAdminProps) {
           onChange={(e) => setDraft({ ...draft, body: e.target.value })}
           style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
         />
-        <label
-          style={{
-            gridColumn: "1 / -1",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            cursor: "pointer",
+        <AdminImageUpload
+          onFileSelected={(file) => {
+            void handleImageUpload(file);
           }}
+          previewUrl={draft.image}
+        />
+        <AdminFormActions
+          submitting={submitting}
+          submitLabel={"id" in draft && draft.id ? "Update post" : "Add post"}
+          isEditing={Boolean("id" in draft && draft.id)}
+          onCancel={resetDraft}
         >
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              void handleImageUpload(e.target.files?.[0] ?? null);
-            }}
-            style={{ cursor: "pointer" }}
-          />
-          <span style={{ fontSize: "0.9rem" }}>Upload image (optional)</span>
-        </label>
-        {draft.image && (
-          <div style={{ gridColumn: "1 / -1" }}>
-            <img
-              src={draft.image}
-              alt="Preview"
-              style={{
-                maxWidth: "100%",
-                maxHeight: "200px",
-                borderRadius: "8px",
-              }}
-            />
-          </div>
-        )}
-        <div
-          style={{
-            gridColumn: "1 / -1",
-            display: "flex",
-            gap: "0.75rem",
-            alignItems: "center",
-          }}
-        >
-          <button type="submit" className="btn-primary" disabled={submitting}>
-            {submitting
-              ? "Saving..."
-              : "id" in draft && draft.id
-                ? "Update post"
-                : "Add post"}
-          </button>
-          {"id" in draft && draft.id && (
-            <button
-              type="button"
-              className="btn-outline"
-              onClick={resetDraft}
-              disabled={submitting}
-            >
-              Cancel edit
-            </button>
-          )}
           {msg && (
             <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>
               {msg}
             </span>
           )}
-        </div>
+        </AdminFormActions>
       </form>
 
       <ul style={listStyle}>
@@ -425,69 +382,24 @@ function EventsAdmin({ items }: EventsAdminProps) {
           onChange={(e) => setDraft({ ...draft, desc: e.target.value })}
           style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
         />
-        <label
-          style={{
-            gridColumn: "1 / -1",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            cursor: "pointer",
+        <AdminImageUpload
+          onFileSelected={(file) => {
+            void handleImageUpload(file);
           }}
+          previewUrl={draft.image}
+        />
+        <AdminFormActions
+          submitting={submitting}
+          submitLabel={"id" in draft && draft.id ? "Update event" : "Add event"}
+          isEditing={Boolean("id" in draft && draft.id)}
+          onCancel={resetDraft}
         >
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              void handleImageUpload(e.target.files?.[0] ?? null);
-            }}
-            style={{ cursor: "pointer" }}
-          />
-          <span style={{ fontSize: "0.9rem" }}>Upload image (optional)</span>
-        </label>
-        {draft.image && (
-          <div style={{ gridColumn: "1 / -1" }}>
-            <img
-              src={draft.image}
-              alt="Preview"
-              style={{
-                maxWidth: "100%",
-                maxHeight: "200px",
-                borderRadius: "8px",
-              }}
-            />
-          </div>
-        )}
-        <div
-          style={{
-            gridColumn: "1 / -1",
-            display: "flex",
-            gap: "0.75rem",
-            alignItems: "center",
-          }}
-        >
-          <button type="submit" className="btn-primary" disabled={submitting}>
-            {submitting
-              ? "Saving..."
-              : "id" in draft && draft.id
-                ? "Update event"
-                : "Add event"}
-          </button>
-          {"id" in draft && draft.id && (
-            <button
-              type="button"
-              className="btn-outline"
-              onClick={resetDraft}
-              disabled={submitting}
-            >
-              Cancel edit
-            </button>
-          )}
           {msg && (
             <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>
               {msg}
             </span>
           )}
-        </div>
+        </AdminFormActions>
       </form>
 
       <ul style={listStyle}>
@@ -589,37 +501,20 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           onChange={(e) => setDraft({ ...draft, solution: e.target.value })}
           style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
         />
-        <div
-          style={{
-            gridColumn: "1 / -1",
-            display: "flex",
-            gap: "0.75rem",
-            alignItems: "center",
-          }}
+        <AdminFormActions
+          submitting={submitting}
+          submitLabel={
+            "id" in draft && draft.id ? "Update innovation" : "Add innovation"
+          }
+          isEditing={Boolean("id" in draft && draft.id)}
+          onCancel={resetDraft}
         >
-          <button type="submit" className="btn-primary" disabled={submitting}>
-            {submitting
-              ? "Saving..."
-              : "id" in draft && draft.id
-                ? "Update innovation"
-                : "Add innovation"}
-          </button>
-          {"id" in draft && draft.id && (
-            <button
-              type="button"
-              className="btn-outline"
-              onClick={resetDraft}
-              disabled={submitting}
-            >
-              Cancel edit
-            </button>
-          )}
           {msg && (
             <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>
               {msg}
             </span>
           )}
-        </div>
+        </AdminFormActions>
       </form>
 
       <ul style={listStyle}>
