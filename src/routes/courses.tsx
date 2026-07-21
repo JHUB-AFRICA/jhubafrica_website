@@ -94,8 +94,6 @@ const COURSES = [
 ];
 
 function CoursesPage() {
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-
   return (
     <>
       <header className="page-header">
@@ -177,12 +175,6 @@ function CoursesPage() {
           </div>
         </div>
       </section>
-
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        source="Courses Page - Join Waitlist"
-      />
     </>
   );
 }

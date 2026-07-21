@@ -66,8 +66,6 @@ const PROCESS = [
 ];
 
 function ForPartnersPage() {
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-
   return (
     <>
       <header className="page-header">
@@ -80,12 +78,9 @@ function ForPartnersPage() {
           and support needs — backed by transparent reporting.
         </p>
         <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <button
-            className="btn-primary"
-            onClick={() => setIsContactModalOpen(true)}
-          >
+          <Link to="/contact" className="btn-primary">
             Request portfolio brief
-          </button>
+          </Link>
           <Link to="/innovation" className="btn-outline">
             Browse fundable projects
           </Link>
@@ -141,12 +136,6 @@ function ForPartnersPage() {
           />
         </div>
       </section>
-
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        source="For Partners Page"
-      />
     </>
   );
 }
