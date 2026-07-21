@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
@@ -132,9 +133,12 @@ function CoursesPage() {
               </div>
               <div className="prog-meta">
                 <span className="prog-slots">{c.cert}</span>
-                <Link to="/contact" className="prog-arrow">
-                  Join waitlist →
-                </Link>
+                <ApplyDialog
+                triggerText="Join waitlist →"
+                triggerVariant="ghost"
+                triggerClassName="prog-arrow"
+                source={c.title}
+              />
               </div>
             </div>
           ))}

@@ -29,6 +29,20 @@ export interface InnovationItem {
     solution: string;
 }
 
+export interface ApplicationRequest {
+    fullName: string;
+    email: string;
+    phone: string;
+    role: "Student" | "Innovator" | "Partner" | "Sponsor" | "Volunteer";
+    message: string;
+    source?: string;
+}
+
+export interface ApplicationItem extends ApplicationRequest {
+    id: string;
+    date: string;
+}
+
 export async function getNews(): Promise<NewsPost[]> {
     const res = await fetch("/api/news");
     if (!res.ok) throw new Error("Failed to fetch news");
@@ -132,4 +146,14 @@ export async function deleteInnovation(id: string): Promise<void> {
         body: JSON.stringify({ action: "delete", innovation: { id } }),
     });
     if (!res.ok) throw new Error("Failed to delete innovation");
+}
+
+export async function submitApplication(application: ApplicationRequest): Promise<ApplicationItem> {
+    const res = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "add", application }),
+    });
+    if (!res.ok) throw new Error("Failed to submit application");
+    return res.json();
 }

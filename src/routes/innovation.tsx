@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/innovation")({
   head: () => ({
@@ -19,6 +20,83 @@ export const Route = createFileRoute("/innovation")({
   }),
   component: InnovationPage,
 });
+
+type Project = {
+  title: string;
+  sector: string;
+  stage: "Concept" | "Prototype" | "Pilot" | "Market entry" | "Scale";
+  need: string;
+  problem: string;
+  solution: string;
+};
+
+const PROJECTS: Project[] = [
+  {
+    title: "Smart Irrigation for Smallholders",
+    sector: "Climate Smart Agriculture",
+    stage: "Pilot",
+    need: "Pilot funding",
+    problem: "Smallholder farms lose yields to inconsistent water supply.",
+    solution: "Low-cost IoT controllers cutting water use by up to 35%.",
+  },
+  {
+    title: "Swahili Voice Assistant",
+    sector: "Big AI Ideas",
+    stage: "Prototype",
+    need: "Compute & data",
+    problem: "Voice tools exclude Swahili and code-switching speakers.",
+    solution:
+      "Speech models tuned for Kenyan Swahili and mixed-language input.",
+  },
+  {
+    title: "Cross-border SME Marketplace",
+    sector: "Digital Trade",
+    stage: "Market entry",
+    need: "Mentorship",
+    problem: "SMEs lack compliant pathways to regional buyers.",
+    solution: "B2B marketplace with AfCFTA-aware compliance tooling.",
+  },
+  {
+    title: "Solar Cold-Chain Box",
+    sector: "Green Digital Innovation",
+    stage: "Prototype",
+    need: "Pilot partners",
+    problem: "Post-harvest losses for dairy and horticulture exceed 30%.",
+    solution: "Solar-powered cold storage with remote monitoring.",
+  },
+  {
+    title: "Digital Twin for Campus Energy",
+    sector: "Digital Twin Models",
+    stage: "Pilot",
+    need: "Technical mentorship",
+    problem: "Campuses lack visibility into energy waste.",
+    solution: "Real-time digital twin modelling consumption and savings.",
+  },
+  {
+    title: "EduGame: STEM Learning",
+    sector: "Gaming",
+    stage: "Concept",
+    need: "Seed funding",
+    problem: "Low STEM engagement in upper-primary classrooms.",
+    solution: "Mobile-first educational games tied to the CBC curriculum.",
+  },
+  {
+    title: "AgriCredit Scoring",
+    sector: "Big AI Ideas",
+    stage: "Pilot",
+    need: "Data partners",
+    problem: "Smallholder farmers lack credit history for loans.",
+    solution: "Alternative-data credit scoring using farm and mobile signals.",
+  },
+  {
+    title: "Plastic-to-Pavement",
+    sector: "Green Digital Innovation",
+    stage: "Scale",
+    need: "Market access",
+    problem: "Plastic waste accumulates in urban areas.",
+    solution: "Recycled plastic pavement blocks for low-traffic streets.",
+  },
+];
 
 type Project = {
   title: string;
@@ -204,9 +282,12 @@ function InnovationPage() {
                 </span>
               </div>
               <div className="prog-meta">
-                <Link to="/support" className="prog-arrow">
-                  Sponsor this project →
-                </Link>
+                <ApplyDialog
+                  triggerText="Sponsor this project →"
+                  triggerVariant="ghost"
+                  triggerClassName="prog-arrow"
+                  source={p.title}
+                />
               </div>
             </article>
           ))}
@@ -253,9 +334,10 @@ function InnovationPage() {
             </li>
           </ul>
           <div style={{ marginTop: "1.5rem" }}>
-            <Link to="/contact" className="btn-primary">
-              Talk to the JHUB team
-            </Link>
+            <ApplyDialog
+              triggerText="Talk to the JHUB team"
+              source="Innovation page"
+            />
           </div>
         </div>
         <div className="split-panel">
