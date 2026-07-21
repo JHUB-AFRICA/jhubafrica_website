@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import ApplyDialog from "../components/site/ApplyDialog";
 import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
 import ContactStrip from "../components/site/ContactStrip";
 import { ContactModal } from "../components/site/ContactModal";
@@ -131,12 +131,7 @@ function AboutPage() {
       </section>
 
       <section className="content-section about-section-center">
-        <button
-          className="btn-primary"
-          onClick={() => setIsContactModalOpen(true)}
-        >
-          Contact the team
-        </button>
+        <ApplyDialog triggerText="Contact the team" source="About page" />
       </section>
 
       <ContactStrip />

@@ -1,6 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ContactModal } from "../components/site/ContactModal";
+import { createFileRoute } from "@tanstack/react-router";
+import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
@@ -136,20 +135,12 @@ function CoursesPage() {
               </div>
               <div className="prog-meta">
                 <span className="prog-slots">{c.cert}</span>
-                <button
-                  className="prog-arrow"
-                  onClick={() => setIsContactModalOpen(true)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                    font: "inherit",
-                    color: "inherit",
-                  }}
-                >
-                  Join waitlist →
-                </button>
+                <ApplyDialog
+                triggerText="Join waitlist →"
+                triggerVariant="ghost"
+                triggerClassName="prog-arrow"
+                source={c.title}
+              />
               </div>
             </div>
           ))}

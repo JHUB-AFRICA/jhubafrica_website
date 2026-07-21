@@ -32,22 +32,22 @@ export interface InnovationItem {
     solution: string;
 }
 
-export interface ContactSubmission {
+export interface ApplicationItem {
     id: string;
+    date: string;
     fullName: string;
     email: string;
     phone: string;
-    reason: string;
+    role: "Student" | "Innovator" | "Partner" | "Sponsor" | "Volunteer";
     message: string;
-    source: string;
-    submittedAt: string;
+    source?: string;
 }
 
 export interface Database {
     news: NewsPost[];
     events: EventItem[];
     innovations: InnovationItem[];
-    contacts: ContactSubmission[];
+    applications: ApplicationItem[];
 }
 
 const DB_PATH = join(process.cwd(), "data", "db.json");
@@ -89,15 +89,32 @@ export function readDatabase(): Database {
             news: Array.isArray(data.news) ? data.news : [],
             events: Array.isArray(data.events) ? data.events : [],
             innovations: Array.isArray(data.innovations) ? data.innovations : [],
-            contacts: Array.isArray(data.contacts) ? data.contacts : [],
+            applications: Array.isArray(data.applications) ? data.applications : [],
         };
     } catch {
-        return { news: [], events: [], innovations: [], contacts: [] };
+        return { news: [], events: [], innovations: [], applications: [] };
     }
 }
 
 export function writeDatabase(data: Database): void {
     writeFileSync(DB_PATH, JSON.stringify(data, null, 2), "utf-8");
+}
+
+export function getApplications(): ApplicationItem[] {
+    const db = readDatabase();
+    return db.applications;
+}
+
+export function addApplication(application: Omit<ApplicationItem, "id" | "date">): ApplicationItem {
+    const db = readDatabase();
+    const newApplication: ApplicationItem = {
+        ...application,
+        id: `a_${Date.now()}`,
+        date: new Date().toISOString(),
+    };
+    db.applications.unshift(newApplication);
+    writeDatabase(db);
+    return newApplication;
 }
 
 export function getNews(): NewsPost[] {

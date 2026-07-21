@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ContactModal } from "../components/site/ContactModal";
+import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
@@ -86,22 +85,7 @@ function SupportPage() {
           turn into measurable impact.
         </p>
         <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <button
-            className="btn-primary"
-            onClick={() => setIsContactModalOpen(true)}
-            style={{
-              background: "var(--jhub-green)",
-              color: "white",
-              padding: "0.75rem 1.5rem",
-              borderRadius: "8px",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "1rem",
-              fontWeight: "600",
-            }}
-          >
-            Request a funding conversation
-          </button>
+          <ApplyDialog triggerText="Request a funding conversation" source="Support page" />
           <Link to="/innovation" className="btn-outline">
             View fundable innovations
           </Link>
@@ -118,20 +102,12 @@ function SupportPage() {
               <p className="prog-desc">{p.desc}</p>
               <div className="prog-meta">
                 <span className="prog-slots">{p.range}</span>
-                <button
-                  className="prog-arrow"
-                  onClick={() => setIsContactModalOpen(true)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                    font: "inherit",
-                    color: "inherit",
-                  }}
-                >
-                  Discuss →
-                </button>
+                <ApplyDialog
+                  triggerText="Discuss →"
+                  triggerVariant="ghost"
+                  triggerClassName="prog-arrow"
+                  source={p.name}
+                />
               </div>
             </div>
           ))}
@@ -186,22 +162,7 @@ function SupportPage() {
         </div>
 
         <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <button
-            className="btn-primary"
-            onClick={() => setIsContactModalOpen(true)}
-            style={{
-              background: "var(--jhub-green)",
-              color: "white",
-              padding: "0.75rem 1.5rem",
-              borderRadius: "8px",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "1rem",
-              fontWeight: "600",
-            }}
-          >
-            Start the conversation
-          </button>
+          <ApplyDialog triggerText="Start the conversation" source="Support page" />
         </div>
       </section>
 

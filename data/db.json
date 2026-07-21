@@ -90,5 +90,16 @@
       "titleColor": "green",
       "id": "e_1783519880795"
     }
+  ],
+  "applications": [
+    {
+      "fullName": "ivon",
+      "email": "nassahdemha789@gmail.com",
+      "phone": "0792792190",
+      "role": "Student",
+      "message": "wanna join",
+      "id": "a_1784624183977",
+      "date": "2026-07-21T08:56:23.978Z"
+    }
   ]
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
+import ApplyDialog from "./ApplyDialog";
 import logoAsset from "../../assets/jhublogo.jpeg";
 import { ContactModal } from "./ContactModal";
 
@@ -124,15 +125,9 @@ export default function Navbar() {
           </div>
         </nav>
 
-        <button
-          className="nav-cta"
-          onClick={() => {
-            setOpen(false);
-            setIsContactModalOpen(true);
-          }}
-        >
-          Apply
-        </button>
+        <div className="nav-cta">
+          <ApplyDialog triggerText="Apply" triggerVariant="default" />
+        </div>
       </header>
 
       {open && (

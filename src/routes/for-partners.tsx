@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ContactModal } from "../components/site/ContactModal";
+import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/for-partners")({
   head: () => ({
@@ -103,20 +102,12 @@ function ForPartnersPage() {
               <p className="prog-desc">{m.desc}</p>
               <div className="prog-meta">
                 <span className="prog-slots">{m.range}</span>
-                <button
-                  className="prog-arrow"
-                  onClick={() => setIsContactModalOpen(true)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                    font: "inherit",
-                    color: "inherit",
-                  }}
-                >
-                  Discuss →
-                </button>
+                <ApplyDialog
+                  triggerText="Discuss →"
+                  triggerVariant="ghost"
+                  triggerClassName="prog-arrow"
+                  source={m.name}
+                />
               </div>
             </div>
           ))}
@@ -144,12 +135,10 @@ function ForPartnersPage() {
         </div>
 
         <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <button
-            className="btn-primary"
-            onClick={() => setIsContactModalOpen(true)}
-          >
-            Start the conversation
-          </button>
+          <ApplyDialog
+            triggerText="Start the conversation"
+            source="Partners page"
+          />
         </div>
       </section>
 
