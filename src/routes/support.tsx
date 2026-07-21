@@ -71,8 +71,6 @@ const THEMES = [
 ];
 
 function SupportPage() {
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-
   return (
     <>
       <header className="page-header">
@@ -165,12 +163,6 @@ function SupportPage() {
           <ApplyDialog triggerText="Start the conversation" source="Support page" />
         </div>
       </section>
-
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        source="Support Page"
-      />
     </>
   );
 }

@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import ApplyDialog from "../components/site/ApplyDialog";
 import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
 import ContactStrip from "../components/site/ContactStrip";
-import { ContactModal } from "../components/site/ContactModal";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -24,8 +23,6 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-
   return (
     <>
       <header className="page-header">
@@ -135,12 +132,6 @@ function AboutPage() {
       </section>
 
       <ContactStrip />
-
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        source="About Page - Contact the Team"
-      />
     </>
   );
 }
