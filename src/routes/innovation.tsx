@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/innovation")({
   head: () => ({
@@ -205,12 +204,9 @@ function InnovationPage() {
                 </span>
               </div>
               <div className="prog-meta">
-                <ApplyDialog
-                  triggerText="Sponsor this project →"
-                  triggerVariant="ghost"
-                  triggerClassName="prog-arrow"
-                  source={p.title}
-                />
+                <Link to="/support" className="prog-arrow">
+                  Sponsor this project →
+                </Link>
               </div>
             </article>
           ))}
@@ -257,10 +253,9 @@ function InnovationPage() {
             </li>
           </ul>
           <div style={{ marginTop: "1.5rem" }}>
-            <ApplyDialog
-              triggerText="Talk to the JHUB team"
-              source="Innovation page"
-            />
+            <Link to="/contact" className="btn-primary">
+              Talk to the JHUB team
+            </Link>
           </div>
         </div>
         <div className="split-panel">
@@ -287,12 +282,6 @@ function InnovationPage() {
           </div>
         </div>
       </section>
-
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        source="Innovation Page - Talk to JHUB Team"
-      />
     </>
   );
 }
