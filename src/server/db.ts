@@ -32,10 +32,22 @@ export interface InnovationItem {
     solution: string;
 }
 
+export interface ContactSubmission {
+    id: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    reason: string;
+    message: string;
+    source: string;
+    submittedAt: string;
+}
+
 export interface Database {
     news: NewsPost[];
     events: EventItem[];
     innovations: InnovationItem[];
+    contacts: ContactSubmission[];
 }
 
 const DB_PATH = join(process.cwd(), "data", "db.json");
@@ -77,9 +89,10 @@ export function readDatabase(): Database {
             news: Array.isArray(data.news) ? data.news : [],
             events: Array.isArray(data.events) ? data.events : [],
             innovations: Array.isArray(data.innovations) ? data.innovations : [],
+            contacts: Array.isArray(data.contacts) ? data.contacts : [],
         };
     } catch {
-        return { news: [], events: [], innovations: [] };
+        return { news: [], events: [], innovations: [], contacts: [] };
     }
 }
 
@@ -172,4 +185,21 @@ export function deleteInnovation(id: string): void {
     const db = readDatabase();
     db.innovations = db.innovations.filter((item) => item.id !== id);
     writeDatabase(db);
+}
+
+export function getContactSubmissions(): ContactSubmission[] {
+    const db = readDatabase();
+    return db.contacts;
+}
+
+export function addContactSubmission(submission: Omit<ContactSubmission, "id" | "submittedAt">): ContactSubmission {
+    const db = readDatabase();
+    const newSubmission: ContactSubmission = {
+        ...submission,
+        id: `c_${Date.now()}`,
+        submittedAt: new Date().toISOString(),
+    };
+    db.contacts.unshift(newSubmission);
+    writeDatabase(db);
+    return newSubmission;
 }

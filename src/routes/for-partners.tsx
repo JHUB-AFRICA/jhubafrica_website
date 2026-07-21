@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { ContactModal } from "../components/site/ContactModal";
 
 export const Route = createFileRoute("/for-partners")({
   head: () => ({
@@ -65,6 +67,8 @@ const PROCESS = [
 ];
 
 function ForPartnersPage() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <>
       <header className="page-header">
@@ -77,9 +81,12 @@ function ForPartnersPage() {
           and support needs — backed by transparent reporting.
         </p>
         <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <Link to="/contact" className="btn-primary">
+          <button
+            className="btn-primary"
+            onClick={() => setIsContactModalOpen(true)}
+          >
             Request portfolio brief
-          </Link>
+          </button>
           <Link to="/innovation" className="btn-outline">
             Browse fundable projects
           </Link>
@@ -96,9 +103,20 @@ function ForPartnersPage() {
               <p className="prog-desc">{m.desc}</p>
               <div className="prog-meta">
                 <span className="prog-slots">{m.range}</span>
-                <Link to="/contact" className="prog-arrow">
+                <button
+                  className="prog-arrow"
+                  onClick={() => setIsContactModalOpen(true)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                    font: "inherit",
+                    color: "inherit",
+                  }}
+                >
                   Discuss →
-                </Link>
+                </button>
               </div>
             </div>
           ))}
@@ -126,11 +144,20 @@ function ForPartnersPage() {
         </div>
 
         <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <Link to="/contact" className="btn-primary">
+          <button
+            className="btn-primary"
+            onClick={() => setIsContactModalOpen(true)}
+          >
             Start the conversation
-          </Link>
+          </button>
         </div>
       </section>
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        source="For Partners Page"
+      />
     </>
   );
 }

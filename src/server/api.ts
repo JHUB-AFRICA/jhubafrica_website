@@ -12,7 +12,9 @@ import {
     addInnovation,
     updateInnovation,
     deleteInnovation,
+    addContactSubmission,
 } from "./db";
+import { sendContactNotification, sendConfirmationEmail } from "./email";
 
 export default defineEventHandler(async (event) => {
     const pathname = new URL(event.node.req.url || "", "http://localhost").pathname;
@@ -91,6 +93,27 @@ export default defineEventHandler(async (event) => {
                 statusMessage: "Invalid action",
             });
         }
+    }
+
+    // POST /api/contact
+    if (pathname === "/api/contact" && method === "POST") {
+        const body = await readBody(event);
+        const submission = addContactSubmission(body);
+
+        // Send notification email to JHUB team
+        await sendContactNotification(
+            body.fullName,
+            body.email,
+            body.phone,
+            body.reason,
+            body.message,
+            body.source
+        );
+
+        // Send confirmation email to the user
+        await sendConfirmationEmail(body.fullName, body.email, body.reason);
+
+        return submission;
     }
 
     throw createError({

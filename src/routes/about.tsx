@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
 import ContactStrip from "../components/site/ContactStrip";
+import { ContactModal } from "../components/site/ContactModal";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -22,6 +24,8 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <>
       <header className="page-header">
@@ -127,12 +131,21 @@ function AboutPage() {
       </section>
 
       <section className="content-section about-section-center">
-        <Link to="/contact" className="btn-primary">
+        <button
+          className="btn-primary"
+          onClick={() => setIsContactModalOpen(true)}
+        >
           Contact the team
-        </Link>
+        </button>
       </section>
 
       <ContactStrip />
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        source="About Page - Contact the Team"
+      />
     </>
   );
 }

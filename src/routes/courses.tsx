@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { ContactModal } from "../components/site/ContactModal";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
@@ -93,6 +95,8 @@ const COURSES = [
 ];
 
 function CoursesPage() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <>
       <header className="page-header">
@@ -132,9 +136,20 @@ function CoursesPage() {
               </div>
               <div className="prog-meta">
                 <span className="prog-slots">{c.cert}</span>
-                <Link to="/contact" className="prog-arrow">
+                <button
+                  className="prog-arrow"
+                  onClick={() => setIsContactModalOpen(true)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                    font: "inherit",
+                    color: "inherit",
+                  }}
+                >
                   Join waitlist →
-                </Link>
+                </button>
               </div>
             </div>
           ))}
@@ -171,6 +186,12 @@ function CoursesPage() {
           </div>
         </div>
       </section>
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        source="Courses Page - Join Waitlist"
+      />
     </>
   );
 }

@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { ContactModal } from "../components/site/ContactModal";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
@@ -70,6 +72,8 @@ const THEMES = [
 ];
 
 function SupportPage() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <>
       <header className="page-header">
@@ -82,9 +86,22 @@ function SupportPage() {
           turn into measurable impact.
         </p>
         <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <Link to="/contact" className="btn-primary">
+          <button
+            className="btn-primary"
+            onClick={() => setIsContactModalOpen(true)}
+            style={{
+              background: "var(--jhub-green)",
+              color: "white",
+              padding: "0.75rem 1.5rem",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "1rem",
+              fontWeight: "600",
+            }}
+          >
             Request a funding conversation
-          </Link>
+          </button>
           <Link to="/innovation" className="btn-outline">
             View fundable innovations
           </Link>
@@ -101,9 +118,20 @@ function SupportPage() {
               <p className="prog-desc">{p.desc}</p>
               <div className="prog-meta">
                 <span className="prog-slots">{p.range}</span>
-                <Link to="/contact" className="prog-arrow">
+                <button
+                  className="prog-arrow"
+                  onClick={() => setIsContactModalOpen(true)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                    font: "inherit",
+                    color: "inherit",
+                  }}
+                >
                   Discuss →
-                </Link>
+                </button>
               </div>
             </div>
           ))}
@@ -158,11 +186,30 @@ function SupportPage() {
         </div>
 
         <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <Link to="/contact" className="btn-primary">
+          <button
+            className="btn-primary"
+            onClick={() => setIsContactModalOpen(true)}
+            style={{
+              background: "var(--jhub-green)",
+              color: "white",
+              padding: "0.75rem 1.5rem",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "1rem",
+              fontWeight: "600",
+            }}
+          >
             Start the conversation
-          </Link>
+          </button>
         </div>
       </section>
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        source="Support Page"
+      />
     </>
   );
 }

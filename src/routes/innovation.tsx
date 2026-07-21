@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { addInnovation, getInnovations, type InnovationItem } from "@/lib/api";
+import { ContactModal } from "../components/site/ContactModal";
 
 export const Route = createFileRoute("/innovation")({
   head: () => ({
@@ -52,6 +53,7 @@ function InnovationPage() {
   const [draft, setDraft] = useState<Omit<InnovationItem, "id">>(getEmptyInnovation());
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState("");
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   useEffect(() => {
     setProjects(initialInnovations);
@@ -246,9 +248,12 @@ function InnovationPage() {
             </li>
           </ul>
           <div style={{ marginTop: "1.5rem" }}>
-            <Link to="/contact" className="btn-primary">
+            <button
+              className="btn-primary"
+              onClick={() => setIsContactModalOpen(true)}
+            >
               Talk to the JHUB team
-            </Link>
+            </button>
           </div>
         </div>
         <div className="split-panel">
@@ -275,6 +280,12 @@ function InnovationPage() {
           </div>
         </div>
       </section>
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        source="Innovation Page - Talk to JHUB Team"
+      />
     </>
   );
 }
