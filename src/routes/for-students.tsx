@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { ContactModal } from "../components/site/ContactModal";
 
 export const Route = createFileRoute("/for-students")({
   head: () => ({
@@ -53,6 +55,8 @@ const OPPS = [
 ];
 
 function ForStudentsPage() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <>
       <header className="page-header">
@@ -67,9 +71,22 @@ function ForStudentsPage() {
           <Link to="/courses" className="btn-primary">
             Explore courses
           </Link>
-          <Link to="/contact" className="btn-outline">
+          <button
+            className="btn-outline"
+            onClick={() => setIsContactModalOpen(true)}
+            style={{
+              background: "none",
+              border: "2px solid var(--jhub-orange)",
+              color: "var(--jhub-orange)",
+              padding: "0.75rem 1.5rem",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "1rem",
+              fontWeight: "600",
+            }}
+          >
             Join the club
-          </Link>
+          </button>
         </div>
       </header>
 
@@ -80,14 +97,31 @@ function ForStudentsPage() {
               <div className={`prog-title ${o.color}`}>{o.t}</div>
               <p className="prog-desc">{o.d}</p>
               <div className="prog-meta">
-                <Link to="/contact" className="prog-arrow">
+                <button
+                  className="prog-arrow"
+                  onClick={() => setIsContactModalOpen(true)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                    font: "inherit",
+                    color: "inherit",
+                  }}
+                >
                   Get involved →
-                </Link>
+                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        source="For Students Page"
+      />
     </>
   );
 }

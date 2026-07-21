@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
+import ApplyDialog from "./ApplyDialog";
 import logoAsset from "../../assets/jhublogo.jpeg";
+import { ContactModal } from "./ContactModal";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -24,6 +26,7 @@ export default function Navbar() {
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isGetInvolvedOpen, setIsGetInvolvedOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -122,15 +125,9 @@ export default function Navbar() {
           </div>
         </nav>
 
-        <Link
-          to="/contact"
-          className="nav-cta"
-          onClick={() => {
-            setOpen(false);
-          }}
-        >
-          Apply
-        </Link>
+        <div className="nav-cta">
+          <ApplyDialog triggerText="Apply" triggerVariant="default" />
+        </div>
       </header>
 
       {open && (
@@ -139,6 +136,12 @@ export default function Navbar() {
           onClick={() => setOpen(false)}
         />
       )}
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        source="Navbar Apply Button"
+      />
     </>
   );
 }

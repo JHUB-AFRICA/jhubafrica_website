@@ -32,10 +32,22 @@ export interface InnovationItem {
     solution: string;
 }
 
+export interface ApplicationItem {
+    id: string;
+    date: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    role: "Student" | "Innovator" | "Partner" | "Sponsor" | "Volunteer";
+    message: string;
+    source?: string;
+}
+
 export interface Database {
     news: NewsPost[];
     events: EventItem[];
     innovations: InnovationItem[];
+    applications: ApplicationItem[];
 }
 
 const DB_PATH = join(process.cwd(), "data", "db.json");
@@ -77,14 +89,32 @@ export function readDatabase(): Database {
             news: Array.isArray(data.news) ? data.news : [],
             events: Array.isArray(data.events) ? data.events : [],
             innovations: Array.isArray(data.innovations) ? data.innovations : [],
+            applications: Array.isArray(data.applications) ? data.applications : [],
         };
     } catch {
-        return { news: [], events: [], innovations: [] };
+        return { news: [], events: [], innovations: [], applications: [] };
     }
 }
 
 export function writeDatabase(data: Database): void {
     writeFileSync(DB_PATH, JSON.stringify(data, null, 2), "utf-8");
+}
+
+export function getApplications(): ApplicationItem[] {
+    const db = readDatabase();
+    return db.applications;
+}
+
+export function addApplication(application: Omit<ApplicationItem, "id" | "date">): ApplicationItem {
+    const db = readDatabase();
+    const newApplication: ApplicationItem = {
+        ...application,
+        id: `a_${Date.now()}`,
+        date: new Date().toISOString(),
+    };
+    db.applications.unshift(newApplication);
+    writeDatabase(db);
+    return newApplication;
 }
 
 export function getNews(): NewsPost[] {
@@ -172,4 +202,21 @@ export function deleteInnovation(id: string): void {
     const db = readDatabase();
     db.innovations = db.innovations.filter((item) => item.id !== id);
     writeDatabase(db);
+}
+
+export function getContactSubmissions(): ContactSubmission[] {
+    const db = readDatabase();
+    return db.contacts;
+}
+
+export function addContactSubmission(submission: Omit<ContactSubmission, "id" | "submittedAt">): ContactSubmission {
+    const db = readDatabase();
+    const newSubmission: ContactSubmission = {
+        ...submission,
+        id: `c_${Date.now()}`,
+        submittedAt: new Date().toISOString(),
+    };
+    db.contacts.unshift(newSubmission);
+    writeDatabase(db);
+    return newSubmission;
 }

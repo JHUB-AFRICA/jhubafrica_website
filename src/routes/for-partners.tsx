@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/for-partners")({
   head: () => ({
@@ -96,9 +97,12 @@ function ForPartnersPage() {
               <p className="prog-desc">{m.desc}</p>
               <div className="prog-meta">
                 <span className="prog-slots">{m.range}</span>
-                <Link to="/contact" className="prog-arrow">
-                  Discuss →
-                </Link>
+                <ApplyDialog
+                  triggerText="Discuss →"
+                  triggerVariant="ghost"
+                  triggerClassName="prog-arrow"
+                  source={m.name}
+                />
               </div>
             </div>
           ))}
@@ -126,9 +130,10 @@ function ForPartnersPage() {
         </div>
 
         <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <Link to="/contact" className="btn-primary">
-            Start the conversation
-          </Link>
+          <ApplyDialog
+            triggerText="Start the conversation"
+            source="Partners page"
+          />
         </div>
       </section>
     </>

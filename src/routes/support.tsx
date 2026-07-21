@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
@@ -82,9 +83,7 @@ function SupportPage() {
           turn into measurable impact.
         </p>
         <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <Link to="/contact" className="btn-primary">
-            Request a funding conversation
-          </Link>
+          <ApplyDialog triggerText="Request a funding conversation" source="Support page" />
           <Link to="/innovation" className="btn-outline">
             View fundable innovations
           </Link>
@@ -101,9 +100,12 @@ function SupportPage() {
               <p className="prog-desc">{p.desc}</p>
               <div className="prog-meta">
                 <span className="prog-slots">{p.range}</span>
-                <Link to="/contact" className="prog-arrow">
-                  Discuss →
-                </Link>
+                <ApplyDialog
+                  triggerText="Discuss →"
+                  triggerVariant="ghost"
+                  triggerClassName="prog-arrow"
+                  source={p.name}
+                />
               </div>
             </div>
           ))}
@@ -158,9 +160,7 @@ function SupportPage() {
         </div>
 
         <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <Link to="/contact" className="btn-primary">
-            Start the conversation
-          </Link>
+          <ApplyDialog triggerText="Start the conversation" source="Support page" />
         </div>
       </section>
     </>

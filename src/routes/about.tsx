@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import ApplyDialog from "../components/site/ApplyDialog";
 import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
 import ContactStrip from "../components/site/ContactStrip";
 
@@ -127,9 +128,7 @@ function AboutPage() {
       </section>
 
       <section className="content-section about-section-center">
-        <Link to="/contact" className="btn-primary">
-          Contact the team
-        </Link>
+        <ApplyDialog triggerText="Contact the team" source="About page" />
       </section>
 
       <ContactStrip />
