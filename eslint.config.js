@@ -39,5 +39,12 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
-  eslintPluginPrettier,
+  // We spread the recommended config and explicitly inject the endOfLine rule override here
+  {
+    ...eslintPluginPrettier,
+    rules: {
+      ...eslintPluginPrettier.rules,
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
+    },
+  },
 );
