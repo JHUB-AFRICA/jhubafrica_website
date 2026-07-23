@@ -30,13 +30,13 @@ export interface Lesson {
 }
 
 export const createCourse = async (course: Omit<Course, "id">): Promise<Course> => {
-  const response = await api.post<Course>("/api/v1/admin/courses", course);
-  return response.data;
+  const response = await api.post<{ data: Course }>("/api/v1/admin/courses", course);
+  return response.data.data;
 };
 
 export const updateCourse = async (id: string, course: Partial<Course>): Promise<Course> => {
-  const response = await api.patch<Course>(`/api/v1/admin/courses/${id}`, course);
-  return response.data;
+  const response = await api.patch<{ data: Course }>(`/api/v1/admin/courses/${id}`, course);
+  return response.data.data;
 };
 
 export const deleteCourse = async (id: string): Promise<void> => {
@@ -44,11 +44,11 @@ export const deleteCourse = async (id: string): Promise<void> => {
 };
 
 export const createCohort = async (courseId: string, cohort: Omit<Cohort, "id" | "courseId">): Promise<Cohort> => {
-  const response = await api.post<Cohort>(`/api/v1/admin/courses/${courseId}/cohorts`, cohort);
-  return response.data;
+  const response = await api.post<{ data: Cohort }>(`/api/v1/admin/courses/${courseId}/cohorts`, cohort);
+  return response.data.data;
 };
 
 export const createLesson = async (courseId: string, lesson: Omit<Lesson, "id" | "courseId">): Promise<Lesson> => {
-  const response = await api.post<Lesson>(`/api/v1/admin/courses/${courseId}/lessons`, lesson);
-  return response.data;
+  const response = await api.post<{ data: Lesson }>(`/api/v1/admin/courses/${courseId}/lessons`, lesson);
+  return response.data.data;
 };

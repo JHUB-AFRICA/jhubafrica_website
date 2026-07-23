@@ -9,7 +9,12 @@ export interface CreateAdminUserRequest {
   role: "ADMIN" | "INNOVATOR" | "STUDENT" | "PARTNER" | "FUNDER";
 }
 
+interface CreateAdminUserResponse {
+  message: string;
+  user: AdminUser;
+}
+
 export const createAdminUser = async (user: CreateAdminUserRequest): Promise<AdminUser> => {
-  const response = await api.post<AdminUser>("/api/v1/admin/users", user);
-  return response.data;
+  const response = await api.post<CreateAdminUserResponse>("/api/v1/admin/users", user);
+  return response.data.user;
 };

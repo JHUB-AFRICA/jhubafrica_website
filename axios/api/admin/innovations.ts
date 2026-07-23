@@ -13,14 +13,14 @@ export const updateInnovationStatus = async (
   status: "PENDING" | "APPROVED" | "REJECTED",
   reviewNotes?: string
 ): Promise<InnovationSubmission> => {
-  const response = await api.patch<InnovationSubmission>(`/api/v1/admin/innovations/${id}/status`, {
+  const response = await api.patch<{ data: InnovationSubmission }>(`/api/v1/admin/innovations/${id}/status`, {
     status,
     reviewNotes,
   });
-  return response.data;
+  return response.data.data;
 };
 
 export const toggleInnovationFeatured = async (id: string): Promise<{ success: boolean; isFeatured: boolean }> => {
-  const response = await api.patch<{ success: boolean; isFeatured: boolean }>(`/api/v1/admin/innovations/${id}/feature`);
-  return response.data;
+  const response = await api.patch<{ data: { success: boolean; isFeatured: boolean } }>(`/api/v1/admin/innovations/${id}/feature`);
+  return response.data.data;
 };

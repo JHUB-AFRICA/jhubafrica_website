@@ -38,18 +38,18 @@ export interface Sponsorship {
 }
 
 export const createPartner = async (partner: Omit<PartnerProfile, "id">): Promise<PartnerProfile> => {
-  const response = await api.post<PartnerProfile>("/api/v1/admin/partners", partner);
-  return response.data;
+  const response = await api.post<{ data: PartnerProfile }>("/api/v1/admin/partners", partner);
+  return response.data.data;
 };
 
 export const getPartnerApplications = async (): Promise<PartnerApplication[]> => {
-  const response = await api.get<PartnerApplication[]>("/api/v1/admin/partners/applications");
-  return response.data;
+  const response = await api.get<{ data: PartnerApplication[] }>("/api/v1/admin/partners/applications");
+  return response.data.data;
 };
 
 export const getPartnerApplicationById = async (id: string): Promise<PartnerApplication> => {
-  const response = await api.get<PartnerApplication>(`/api/v1/admin/partners/applications/${id}`);
-  return response.data;
+  const response = await api.get<{ data: PartnerApplication }>(`/api/v1/admin/partners/applications/${id}`);
+  return response.data.data;
 };
 
 export const updatePartnerApplicationStatus = async (
@@ -57,16 +57,16 @@ export const updatePartnerApplicationStatus = async (
   status: "PENDING" | "APPROVED" | "REJECTED",
   reviewNotes?: string
 ): Promise<PartnerApplication> => {
-  const response = await api.patch<PartnerApplication>(`/api/v1/admin/partners/applications/${id}`, {
+  const response = await api.patch<{ data: PartnerApplication }>(`/api/v1/admin/partners/applications/${id}`, {
     status,
     reviewNotes,
   });
-  return response.data;
+  return response.data.data;
 };
 
 export const updatePartner = async (id: string, partner: Partial<PartnerProfile>): Promise<PartnerProfile> => {
-  const response = await api.patch<PartnerProfile>(`/api/v1/admin/partners/${id}`, partner);
-  return response.data;
+  const response = await api.patch<{ data: PartnerProfile }>(`/api/v1/admin/partners/${id}`, partner);
+  return response.data.data;
 };
 
 export const deletePartner = async (id: string): Promise<void> => {
@@ -77,6 +77,6 @@ export const createSponsorship = async (
   partnerId: string,
   sponsorship: Omit<Sponsorship, "id" | "partnerId">
 ): Promise<Sponsorship> => {
-  const response = await api.post<Sponsorship>(`/api/v1/admin/partners/${partnerId}/sponsorships`, sponsorship);
-  return response.data;
+  const response = await api.post<{ data: Sponsorship }>(`/api/v1/admin/partners/${partnerId}/sponsorships`, sponsorship);
+  return response.data.data;
 };
