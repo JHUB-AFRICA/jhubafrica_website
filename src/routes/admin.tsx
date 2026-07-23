@@ -3,15 +3,13 @@ import { useEffect, useState } from "react";
 import {
   ADMIN_PASSWORD,
   ADMIN_SESSION_KEY,
-  type EventItem,
-  type NewsPost,
 } from "@/lib/adminContent";
-import {
-  getNews,
-  getEvents,
-  getInnovations,
-  type InnovationItem,
-} from "@/lib/api";
+import { getNews } from "../../axios/api/news";
+import { getEvents } from "../../axios/api/events";
+import { getInnovations } from "../../axios/api/innovations";
+import { NewsPost } from "../types/news";
+import { EventItem } from "../types/events";
+import { InnovationItem } from "../types/innovations";
 import {
   dateToLocalYmd,
   localYmdToDate,

@@ -1,0 +1,9 @@
+export interface InnovationItem {
+    id: string;
+    title: string;
+    sector: string;
+    stage: "Concept" | "Prototype" | "Pilot" | "Market entry" | "Scale";
+    need: string;
+    problem: string;
+    solution: string;
+}

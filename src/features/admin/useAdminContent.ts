@@ -1,19 +1,11 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
-import {
-    addEvent,
-    addInnovation,
-    addNews,
-    deleteEvent,
-    deleteInnovation,
-    deleteNews,
-    type EventItem,
-    type InnovationItem,
-    type NewsPost,
-    updateEvent,
-    updateInnovation,
-    updateNews,
-} from "@/lib/api";
+import { addNews, updateNews, deleteNews } from "../../../axios/api/news";
+import { addEvent, updateEvent, deleteEvent } from "../../../axios/api/events";
+import { addInnovation, updateInnovation, deleteInnovation } from "../../../axios/api/innovations";
+import { NewsPost } from "../../types/news";
+import { EventItem } from "../../types/events";
+import { InnovationItem } from "../../types/innovations";
 
 export type NewsDraft = NewsPost | (Omit<NewsPost, "id"> & { id?: string });
 export type EventDraft = EventItem | (Omit<EventItem, "id"> & { id?: string });

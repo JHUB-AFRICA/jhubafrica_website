@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getEvents, type EventItem } from "@/lib/api";
+import { getEvents } from "../../axios/api/events";
+import { EventItem } from "../types/events";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
