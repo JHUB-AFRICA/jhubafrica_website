@@ -1,9 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import {
-  ADMIN_PASSWORD,
-  ADMIN_SESSION_KEY,
-} from "@/lib/adminContent";
+import { adminLogin, adminLogout } from "../../axios/api/admin/auth";
 import { getNews } from "../../axios/api/news";
 import { getEvents } from "../../axios/api/events";
 import { getInnovations } from "../../axios/api/innovations";
@@ -47,29 +44,46 @@ export const Route = createFileRoute("/admin")({
 
 function AdminPage() {
   const [unlocked, setUnlocked] = useState(false);
-  const [pw, setPw] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const { news, events, innovations } = Route.useLoaderData();
 
   useEffect(() => {
-    if (sessionStorage.getItem(ADMIN_SESSION_KEY) === "1") setUnlocked(true);
+    if (localStorage.getItem("jhub_admin_token")) setUnlocked(true);
   }, []);
 
-  function tryUnlock(e: React.FormEvent) {
+  async function tryUnlock(e: React.FormEvent) {
     e.preventDefault();
-    if (pw === ADMIN_PASSWORD) {
-      sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
+    setLoading(true);
+    setErr("");
+    try {
+      const response = await adminLogin(email, password);
+      localStorage.setItem("jhub_admin_token", response.token);
+      localStorage.setItem("jhub_admin_refresh_token", response.refreshToken);
       setUnlocked(true);
       setErr("");
-    } else {
-      setErr("Incorrect password.");
+    } catch (error: any) {
+      console.error(error);
+      const errMsg = error?.response?.data?.error || "Invalid email or password.";
+      setErr(errMsg);
+    } finally {
+      setLoading(false);
     }
   }
 
-  function lock() {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  async function lock() {
+    try {
+      await adminLogout();
+    } catch (e) {
+      console.warn("Sign out request failed:", e);
+    }
+    localStorage.removeItem("jhub_admin_token");
+    localStorage.removeItem("jhub_admin_refresh_token");
     setUnlocked(false);
-    setPw("");
+    setEmail("");
+    setPassword("");
   }
 
   if (!unlocked) {
@@ -80,7 +94,7 @@ function AdminPage() {
             Admin <span style={{ color: "var(--jhub-green)" }}>Access</span>
           </h1>
           <p>
-            Enter the admin password to manage news, events and innovations.
+            Sign in with your email and password to manage news, events and innovations.
           </p>
         </header>
         <section
@@ -93,10 +107,20 @@ function AdminPage() {
           >
             <input
               autoFocus
+              required
+              type="email"
+              placeholder="Admin email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={inputStyle}
+              aria-label="Admin email"
+            />
+            <input
+              required
               type="password"
               placeholder="Admin password"
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               style={inputStyle}
               aria-label="Admin password"
             />
@@ -105,10 +129,11 @@ function AdminPage() {
             )}
             <button
               type="submit"
+              disabled={loading}
               className="btn-primary"
               style={{ justifySelf: "start" }}
             >
-              Unlock
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
         </section>
