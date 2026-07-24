@@ -73,16 +73,16 @@ export const getNews = async (): Promise<NewsPost[]> => {
 
 export const addNews = async (post: Omit<NewsPost, "id">): Promise<NewsPost> => {
   const payload = mapToBackendNews(post);
-  const response = await api.post<{ data: any }>("/api/v1/admin/posts", payload);
+  const response = await api.post<{ data: any }>("/api/v1/admin/news", payload);
   return mapNews(response.data.data);
 };
 
 export const updateNews = async (post: NewsPost): Promise<NewsPost> => {
   const payload = mapToBackendNews(post);
-  const response = await api.patch<{ data: any }>(`/api/v1/admin/posts/${post.id}`, payload);
+  const response = await api.patch<{ data: any }>(`/api/v1/admin/news/${post.id}`, payload);
   return mapNews(response.data.data);
 };
 
 export const deleteNews = async (id: string): Promise<void> => {
-  await api.delete(`/api/v1/admin/posts/${id}`);
+  await api.delete(`/api/v1/admin/news/${id}`);
 };
