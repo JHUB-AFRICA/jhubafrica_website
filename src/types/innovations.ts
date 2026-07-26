@@ -6,4 +6,5 @@ export interface InnovationItem {
     need: string;
     problem: string;
     solution: string;
+    status?: string;
 }

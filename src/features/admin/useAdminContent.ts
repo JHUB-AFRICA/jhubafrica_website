@@ -73,6 +73,7 @@ export function getEmptyInnovation(): Omit<InnovationItem, "id"> {
         need: "",
         problem: "",
         solution: "",
+        status: "APPROVED",
     };
 }
 

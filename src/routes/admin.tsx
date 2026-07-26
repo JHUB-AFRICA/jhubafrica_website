@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { adminLogin, adminLogout } from "../../axios/api/admin/auth";
 import { getNews } from "../../axios/api/news";
 import { getEvents } from "../../axios/api/events";
-import { getInnovations } from "../../axios/api/innovations";
+import { getAdminInnovations } from "../../axios/api/admin/innovations";
 import { NewsPost } from "../types/news";
 import { EventItem } from "../types/events";
 import { InnovationItem } from "../types/innovations";
@@ -32,17 +32,32 @@ export const Route = createFileRoute("/admin")({
     ],
   }),
   loader: async () => {
-    const [news, events, innovations] = await Promise.all([
-      getNews(),
-      getEvents(),
-      getInnovations(),
-    ]);
-    return { news, events, innovations };
+    const hasToken = typeof window !== "undefined" && Boolean(localStorage.getItem("jhub_admin_token"));
+    if (!hasToken) {
+      return { news: [], events: [], innovations: [] };
+    }
+
+    try {
+      const [news, events, innovations] = await Promise.all([
+        getNews(),
+        getEvents(),
+        getAdminInnovations(),
+      ]);
+      return { news, events, innovations };
+    } catch (error: any) {
+      console.warn("Loader failed to load admin content, likely expired session:", error);
+      if (error?.response?.status === 401) {
+        localStorage.removeItem("jhub_admin_token");
+        localStorage.removeItem("jhub_admin_refresh_token");
+      }
+      return { news: [], events: [], innovations: [] };
+    }
   },
   component: AdminPage,
 });
 
 function AdminPage() {
+  const router = useRouter();
   const [unlocked, setUnlocked] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -64,6 +79,7 @@ function AdminPage() {
       localStorage.setItem("jhub_admin_refresh_token", response.refreshToken);
       setUnlocked(true);
       setErr("");
+      await router.invalidate();
     } catch (error: any) {
       console.error(error);
       const errMsg = error?.response?.data?.error || "Invalid email or password.";
@@ -84,6 +100,7 @@ function AdminPage() {
     setUnlocked(false);
     setEmail("");
     setPassword("");
+    await router.invalidate();
   }
 
   if (!unlocked) {
@@ -504,6 +521,22 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           <option value="Market entry">Market entry</option>
           <option value="Scale">Scale</option>
         </SelectField>
+        <SelectField
+          value={draft.status || "APPROVED"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              status: e.target.value,
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="DRAFT">Status: Draft</option>
+          <option value="PENDING">Status: Pending</option>
+          <option value="UNDER_REVIEW">Status: Under Review</option>
+          <option value="APPROVED">Status: Approved</option>
+          <option value="REJECTED">Status: Rejected</option>
+        </SelectField>
         <InputField
           required
           placeholder="Support need"
@@ -548,6 +581,30 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           <li key={item.id} style={rowStyle}>
             <div>
               <strong>{item.title}</strong>{" "}
+              <span style={{
+                fontSize: "0.75rem",
+                padding: "0.2rem 0.5rem",
+                borderRadius: "999px",
+                marginLeft: "0.5rem",
+                marginRight: "0.5rem",
+                fontWeight: 600,
+                display: "inline-block",
+                verticalAlign: "middle",
+                backgroundColor: 
+                  item.status === "APPROVED" ? "#dcfce7" :
+                  item.status === "REJECTED" ? "#fee2e2" :
+                  item.status === "PENDING" ? "#fef9c3" :
+                  item.status === "UNDER_REVIEW" ? "#dbeafe" :
+                  "#f1f5f9",
+                color:
+                  item.status === "APPROVED" ? "#166534" :
+                  item.status === "REJECTED" ? "#991b1b" :
+                  item.status === "PENDING" ? "#854d0e" :
+                  item.status === "UNDER_REVIEW" ? "#1e40af" :
+                  "#475569"
+              }}>
+                {item.status || "DRAFT"}
+              </span>{" "}
               <span style={{ opacity: 0.6 }}>
                 · {item.sector} · {item.stage}
               </span>
