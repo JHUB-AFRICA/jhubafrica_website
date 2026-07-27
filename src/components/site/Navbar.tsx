@@ -5,27 +5,19 @@ import logoAsset from "../../assets/jhublogo.jpeg";
 import { ContactModal } from "./ContactModal";
 
 const NAV = [
-  { to: "/", label: "Home" },
   { to: "/about", label: "About" },
-  { to: "/innovation", label: "Innovation" },
-  { to: "/courses", label: "Courses" },
-  { to: "/events", label: "Events" },
-  { to: "/news", label: "News" },
-  { to: "/support", label: "Support" },
-  { to: "/contact", label: "Contact" },
-] as const;
-
-const INVOLVEMENT_LINKS = [
+  { to: "/innovation", label: "Innovations" },
   { to: "/for-innovators", label: "For Innovators" },
-  { to: "/for-students", label: "For Students" },
-  { to: "/for-partners", label: "For Partners" },
+  { to: "/for-partners", label: "For Partners & Funders" },
+  { to: "/courses", label: "Courses & Programs" },
+  { to: "/news", label: "News & Events" },
+  { to: "/contact", label: "Contact" },
 ] as const;
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [isGetInvolvedOpen, setIsGetInvolvedOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   useEffect(() => {
@@ -87,46 +79,15 @@ export default function Navbar() {
               activeOptions={{ exact: item.to === "/" }}
               onClick={() => {
                 setOpen(false);
-                setIsGetInvolvedOpen(false);
               }}
             >
               {item.label}
             </Link>
           ))}
-
-          <div className="nav-dropdown">
-            <button
-              type="button"
-              className={`nav-link nav-link--dropdown ${isGetInvolvedOpen ? "active" : ""}`}
-              aria-expanded={isGetInvolvedOpen}
-              onClick={() => setIsGetInvolvedOpen((value) => !value)}
-            >
-              Get Involved
-            </button>
-
-            {isGetInvolvedOpen && (
-              <div className="nav-submenu">
-                {INVOLVEMENT_LINKS.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className="nav-submenu-link"
-                    activeProps={{ className: "nav-submenu-link active" }}
-                    onClick={() => {
-                      setOpen(false);
-                      setIsGetInvolvedOpen(false);
-                    }}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
         </nav>
 
         <div className="nav-cta">
-          <ApplyDialog triggerText="Apply" triggerVariant="default" />
+          <ApplyDialog triggerText="Get Involved" triggerVariant="default" />
         </div>
       </header>
 

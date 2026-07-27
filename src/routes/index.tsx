@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ContactStrip from "../components/site/ContactStrip";
 import PartnersSection from "../components/site/PartnersSection";
+import { getEvents, getNews, type EventItem, type NewsPost } from "@/lib/api";
 import image1 from "../assets/images/image1.jpg";
 import image2 from "../assets/images/image2.jpeg";
 import image3 from "../assets/images/image3.jpeg";
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "JHUB Africa nurtures startups, builds digital skills and partners with industry to drive innovation across Africa.",
+          "JHUB Africa empowers innovators, builds solutions and partners across sectors to address Africa's most pressing challenges.",
       },
       {
         property: "og:title",
@@ -26,31 +27,48 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Programs, courses and events that grow Africa's innovation ecosystem.",
+          "Explore innovations, events, partner opportunities and impact stories from JHUB Africa.",
       },
     ],
   }),
+  loader: async () => {
+    const [events, news] = await Promise.all([getEvents(), getNews()]);
+    return { events, news };
+  },
   component: Index,
 });
 
 const HOMEPAGE_METRICS = [
-  { n: "1,000+", l: "Students Engaged" },
-  { n: "150+", l: "Innovations Supported" },
-  { n: "30+", l: "Active Projects" },
-  { n: "15+", l: "Strategic Partners" },
-];
+  { n: 2023, l: "Founded", suffix: "" },
+  { n: 400, l: "Innovators Supported", suffix: "+" },
+  { n: 150, l: "Innovations", suffix: "+" },
+  { n: 1000, l: "Students Engaged", suffix: "+" },
+  { n: 12, l: "Partners", suffix: "+" },
+] as const;
+
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+function formatCount(value: number) {
+  return numberFormatter.format(value);
+}
 
 function Index() {
+  const { events, news }: { events: EventItem[]; news: NewsPost[] } =
+    Route.useLoaderData();
   const [slides, setSlides] = useState<
-    { id: number; imageIndex: number; state: "visible" | "entering" | "done" }[]
+    { id: number; imageIndex: number; state: "visible" | "entering" }[]
   >([{ id: 0, imageIndex: 0, state: "visible" }]);
-  const [counts, setCounts] = useState(() => [0, 0, 0, 0]);
+  const [counts, setCounts] = useState(() =>
+    Array(HOMEPAGE_METRICS.length).fill(0),
+  );
   const slideCounter = useRef(1);
   const currentImageIndex = useRef(0);
 
   useEffect(() => {
     const metricTargets = HOMEPAGE_METRICS.map((m) =>
-      Number(m.n.replace(/[^0-9]/g, "")),
+      typeof m.n === "number"
+        ? m.n
+        : Number(String(m.n).replace(/[^0-9]/g, "")),
     );
     let cancelled = false;
     const duration = 1500;
@@ -78,31 +96,28 @@ function Index() {
       currentImageIndex.current = nextIndex;
       const newId = slideCounter.current++;
 
-      // Add new slide off-screen to the right
       setSlides((prev) => [
         ...prev,
-        { id: newId, imageIndex: nextIndex, state: "entering" as const },
+        { id: newId, imageIndex: nextIndex, state: "entering" },
       ]);
 
-      // Next frame: start sliding it in
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setSlides((prev) =>
             prev.map((s) =>
-              s.state === "entering" ? { ...s, state: "visible" } : s
-            )
+              s.state === "entering" ? { ...s, state: "visible" } : s,
+            ),
           );
         });
       });
 
-      // After transition ends, remove all old slides (keep only the newest)
       setTimeout(() => {
         setSlides((prev) => {
           const last = prev[prev.length - 1];
           return last ? [{ ...last, state: "visible" }] : prev;
         });
       }, 1400);
-    }, 5000);
+    }, 5200);
 
     return () => window.clearInterval(interval);
   }, []);
@@ -123,23 +138,32 @@ function Index() {
           />
         ))}
         <section className="hero-section hero-on-image">
-          <div className="hero-kicker">INNOVATION FOR TRANSFORMATION</div>
+          <div className="hero-kicker">Africa's Innovation Hub</div>
           {/* eslint-disable-next-line */}
-          <h1 style={{ color: "#ffffff" }}>
-            Africa's <span>Innovation Gateway</span> at JKUAT
+          <h1>
+            Africa's Innovation Hub for <span>Turning Ideas into Impact</span>
           </h1>
           <p className="hero-sub">
-            JHUB Africa turns student, research and entrepreneurial ideas into
-            tested, investable and scalable solutions — through incubation,
-            mentorship, technical support, partnerships and market access.
+            JHUB Africa empowers innovators, builds solutions and partners across
+            sectors to address Africa’s most pressing challenges and create
+            sustainable economic growth.
           </p>
+          <div className="hero-actions">
+            <Link to="/innovation" className="btn-primary">
+              Explore Innovations
+            </Link>
+            <Link to="/for-partners" className="btn-outline">
+              Partner With Us
+            </Link>
+          </div>
         </section>
 
         <div className="stats-bar stats-on-image">
           {HOMEPAGE_METRICS.map((m, index) => (
-            <div key={m.l} className="stat">
+            <div key={m.l} className="stat metric-card">
               <div className="stat-n">
-                {counts[index].toLocaleString()}+
+                {formatCount(counts[index])}
+                {m.suffix}
               </div>
               <div className="stat-l">{m.l}</div>
             </div>
@@ -148,220 +172,256 @@ function Index() {
       </div>
 
       <section className="content-section">
-        <div className="section-eyebrow">Choose your path</div>
-        <h2 className="section-h2">Where do you fit in the ecosystem?</h2>
-        <div className="cards-grid">
+        <div className="section-eyebrow">Audience-based navigation</div>
+        <h2 className="section-h2">Find what matters to you</h2>
+        <div className="cards-grid audience-grid">
           <Link to="/innovation" className="prog-card audience-card">
-            <div className="prog-title green">I have an idea or startup</div>
+            <div className="prog-title green">Innovators</div>
             <p className="prog-desc">
-              Get mentorship, prototyping support, funding pathways and market
-              access for your venture.
+              Get support to build, test and scale your solution.
             </p>
             <div className="prog-meta">
-              <span className="prog-arrow">Submit innovation →</span>
+              <span className="prog-arrow">Start Your Journey →</span>
             </div>
           </Link>
-          <Link to="/courses" className="prog-card audience-card">
-            <div className="prog-title">I want to learn or join</div>
+          <Link to="/for-students" className="prog-card audience-card">
+            <div className="prog-title">Students</div>
             <p className="prog-desc">
-              Join courses, the innovation club, hackathons, workshops and
-              volunteer opportunities.
+              Learn, innovate and grow your ideas with JHUB.
             </p>
             <div className="prog-meta">
-              <span className="prog-arrow">Explore courses →</span>
+              <span className="prog-arrow">Explore Programs →</span>
             </div>
           </Link>
           <Link to="/support" className="prog-card audience-card">
-            <div className="prog-title red">I want to fund a project</div>
+            <div className="prog-title red">Funders & Investors</div>
             <p className="prog-desc">
-              Discover credible, fundable innovations across agritech, climate,
-              AI and digital trade.
+              Discover high-potential innovations ready for support.
             </p>
             <div className="prog-meta">
-              <span className="prog-arrow">View portfolio →</span>
+              <span className="prog-arrow">View Opportunities →</span>
             </div>
           </Link>
           <Link to="/for-partners" className="prog-card audience-card">
-            <div className="prog-title">
-              My organisation wants to collaborate
-            </div>
+            <div className="prog-title">Partners & Researchers</div>
             <p className="prog-desc">
-              Co-design programs, challenge calls, pilots and applied research
-              across sectors.
+              Collaborate on research, pilots and applied innovation.
             </p>
             <div className="prog-meta">
-              <span className="prog-arrow">Partner with JHUB →</span>
-            </div>
-          </Link>
-          <Link to="/for-innovators" className="prog-card audience-card">
-            <div className="prog-title green">
-              I want to commercialise research
-            </div>
-            <p className="prog-desc">
-              Access labs, IP support, mentorship and pathways to translate
-              research into ventures.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-arrow">Collaborate →</span>
-            </div>
-          </Link>
-          <Link to="/news" className="prog-card audience-card">
-            <div className="prog-title red">I want to follow JHUB</div>
-            <p className="prog-desc">
-              Read news, impact stories and announcements from across the JHUB
-              Africa community.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-arrow">Read stories →</span>
+              <span className="prog-arrow">Partner With Us →</span>
             </div>
           </Link>
         </div>
       </section>
 
       <section className="content-section">
-        <div className="section-eyebrow">What we do</div>
-        <h2 className="section-h2">Programs that move ideas to market</h2>
-        <p className="section-p">
-          From skills training to startup incubation, our programs are designed
-          for the real challenges of building in Africa.
-        </p>
-        <div className="cards-grid">
-          <div className="prog-card">
-            <div className="prog-title green">Startup Incubator</div>
-            <p className="prog-desc">
-              Mentorship, workspace and seed support for early-stage founders
-              building digital products.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-slots">Rolling intake</span>
-              <Link to="/innovation" className="prog-arrow">
-                Learn more →
-              </Link>
-            </div>
-          </div>
-          <div className="prog-card">
-            <div className="prog-title">Digital Skills Academy</div>
-            <p className="prog-desc">
-              Industry-aligned short courses in software, data, design and
-              emerging technologies.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-slots">Quarterly cohorts</span>
-              <Link to="/courses" className="prog-arrow">
-                View courses →
-              </Link>
-            </div>
-          </div>
-          <div className="prog-card">
-            <div className="prog-title red">Applied Research</div>
-            <p className="prog-desc">
-              Collaborative R&D with JKUAT faculties and industry to solve
-              real-world problems.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-slots">Ongoing</span>
-              <Link to="/innovation" className="prog-arrow">
-                Read more →
-              </Link>
-            </div>
-          </div>
+        <div className="section-eyebrow">Our focus areas</div>
+        <h2 className="section-h2">Themes driving our innovation portfolio</h2>
+        <div className="focus-grid">
+          <article className="focus-card">
+            <div className="focus-icon">🌾</div>
+            <h3>Climate Smart Agriculture</h3>
+            <p>Digital tools for resilient, sustainable food systems.</p>
+          </article>
+          <article className="focus-card">
+            <div className="focus-icon">🧭</div>
+            <h3>Digital Twin Models</h3>
+            <p>Real-time simulation and monitoring for systems and energy.</p>
+          </article>
+          <article className="focus-card">
+            <div className="focus-icon">🌿</div>
+            <h3>Green Digital Innovation</h3>
+            <p>Climate-friendly products that reduce waste and improve efficiency.</p>
+          </article>
+          <article className="focus-card">
+            <div className="focus-icon">🌐</div>
+            <h3>Digital Trade</h3>
+            <p>Platforms and tools that enable regional market access.</p>
+          </article>
+          <article className="focus-card">
+            <div className="focus-icon">🤖</div>
+            <h3>AI & Digital Transformation</h3>
+            <p>Inclusive AI and automation for African enterprises.</p>
+          </article>
         </div>
       </section>
 
       <section className="content-section">
-        <div className="section-eyebrow">Featured portfolio</div>
-        <h2 className="section-h2 green">
-          Fundable innovations seeking support
-        </h2>
-        <p className="section-p">
-          A snapshot of active projects in our pipeline. Each project lists its
-          stage, sector and the type of support it needs.
-        </p>
+        <div className="section-eyebrow">Featured innovations</div>
+        <h2 className="section-h2 green">Real solutions with real progress</h2>
         <div className="cards-grid">
           <article className="prog-card">
-            <div className="prog-title green">
-              Smart Irrigation for Smallholders
-            </div>
+            <div className="prog-title green">AgriSense AI</div>
             <p className="prog-desc">
-              IoT-based irrigation controllers reducing water use by up to 35%
-              for smallholder farms in Kenya.
+              A precision agriculture platform helping smallholders optimise inputs and yields.
             </p>
             <div className="prog-meta">
-              <span className="prog-slots">
-                Stage: Pilot · Needs: Pilot funding
-              </span>
-              <Link to="/support" className="prog-arrow">
-                Sponsor →
-              </Link>
+              <span className="prog-slots">Agriculture · Prototype</span>
+              <Link to="/innovation" className="prog-arrow">View Project →</Link>
             </div>
           </article>
           <article className="prog-card">
-            <div className="prog-title">Swahili Voice Assistant</div>
+            <div className="prog-title">M-Twin Health</div>
             <p className="prog-desc">
-              Speech models tuned for Kenyan Swahili and code-switching to power
-              inclusive digital services.
+              Digital twin systems and diagnostics for rural health and community care.
             </p>
             <div className="prog-meta">
-              <span className="prog-slots">
-                Stage: Prototype · Needs: Compute &amp; data
-              </span>
-              <Link to="/support" className="prog-arrow">
-                Sponsor →
-              </Link>
+              <span className="prog-slots">Health · Pilot</span>
+              <Link to="/innovation" className="prog-arrow">View Project →</Link>
             </div>
           </article>
           <article className="prog-card">
-            <div className="prog-title red">Cross-border SME Marketplace</div>
+            <div className="prog-title red">TradeLink Africa</div>
             <p className="prog-desc">
-              Compliance-ready B2B marketplace connecting Kenyan SMEs to
-              regional buyers under AfCFTA.
+              A cross-border marketplace that simplifies compliance for SMEs.
             </p>
             <div className="prog-meta">
-              <span className="prog-slots">
-                Stage: Market entry · Needs: Mentorship
-              </span>
-              <Link to="/support" className="prog-arrow">
-                Sponsor →
-              </Link>
+              <span className="prog-slots">Digital Trade · Market entry</span>
+              <Link to="/innovation" className="prog-arrow">View Project →</Link>
             </div>
           </article>
         </div>
         <div className="homepage-browse-section">
-          <Link to="/innovation" className="btn-outline">
-            Browse full portfolio
-          </Link>
+          <Link to="/innovation" className="btn-outline">Browse full portfolio</Link>
         </div>
       </section>
 
       <section className="content-section">
-        <div className="section-eyebrow">Why JHUB</div>
-        <h2 className="section-h2">Trusted, anchored and accountable</h2>
-        <div className="cards-grid">
-          <div className="prog-card">
-            <div className="prog-title green">Anchored at JKUAT</div>
-            <p className="prog-desc">
-              Hosted by Jomo Kenyatta University of Agriculture and Technology,
-              with access to faculties, labs and graduate talent.
+        <div className="section-eyebrow">How JHUB supports innovation</div>
+        <h2 className="section-h2">Support at every stage</h2>
+        <div className="support-grid">
+          <article className="support-card">
+            <div className="support-card-icon">🧪</div>
+            <h3>Incubation</h3>
+            <p>Build ideas with coaching, lab access and pilot support.</p>
+          </article>
+          <article className="support-card">
+            <div className="support-card-icon">🤝</div>
+            <h3>Mentorship</h3>
+            <p>Connect with experts, investors and industry mentors.</p>
+          </article>
+          <article className="support-card">
+            <div className="support-card-icon">🎓</div>
+            <h3>Training</h3>
+            <p>Develop tech and innovation skills through applied programs.</p>
+          </article>
+          <article className="support-card">
+            <div className="support-card-icon">💼</div>
+            <h3>Funding connections</h3>
+            <p>Access partner networks, grant opportunities and strategic support.</p>
+          </article>
+          <article className="support-card">
+            <div className="support-card-icon">🚀</div>
+            <h3>Commercialisation</h3>
+            <p>Validate market fit, scale solutions and reach customers.</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="content-section story-section">
+        <div className="story-grid">
+          <article className="story-card">
+            <div className="section-eyebrow">Success stories</div>
+            <h2 className="section-h2">From idea to impact: EcoBriq</h2>
+            <p className="section-p">
+              EcoBriq used JHUB's incubation support to refine its product, secure funding and start commercial operations.
             </p>
+            <div className="story-stats">
+              <div>
+                <strong>25+</strong>
+                <span>Jobs created</span>
+              </div>
+              <div>
+                <strong>5</strong>
+                <span>Pilot sites</span>
+              </div>
+              <div>
+                <strong>120 tons</strong>
+                <span>Waste repurposed</span>
+              </div>
+            </div>
+            <Link to="/news" className="btn-outline">Read full story</Link>
+          </article>
+          <article className="quote-card">
+            <div className="quote-mark">“</div>
+            <p>
+              JHUB's mentorship and incubation support helped us refine our solution and secure our first investment.
+            </p>
+            <div className="quote-author">Carolyne W., Founder, EcoBriq</div>
+          </article>
+        </div>
+      </section>
+
+      <section className="content-section">
+        <div className="section-eyebrow">Visibility</div>
+        <h2 className="section-h2">Upcoming events and latest news</h2>
+        <div className="event-news-grid">
+          <div>
+            <div className="section-subtitle">Upcoming events</div>
+            <div className="cards-grid news-grid">
+              {events.slice(0, 3).map((event) => (
+                <article key={event.id} className="prog-card news-card-compact">
+                  <div className="event-card-inner">
+                    <div className="event-date">
+                      <div className="event-day">{event.day}</div>
+                      <div className="event-month">{event.month}</div>
+                    </div>
+                    <div>
+                      <div className={`prog-title ${event.titleColor}`}>{event.title}</div>
+                      <p className="prog-desc">{event.desc}</p>
+                    </div>
+                  </div>
+                  <div className="prog-meta">
+                    <Link to="/events" className="prog-arrow">Read →</Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <Link to="/events" className="btn-outline">View All Events</Link>
           </div>
-          <div className="prog-card">
-            <div className="prog-title">Transparent selection</div>
-            <p className="prog-desc">
-              Innovations are reviewed against clear criteria. Funded projects
-              publish progress and impact reports.
-            </p>
-          </div>
-          <div className="prog-card">
-            <div className="prog-title red">Ecosystem partners</div>
-            <p className="prog-desc">
-              We work with industry, government, research institutions and
-              development partners across the region.
-            </p>
+
+          <div>
+            <div className="section-subtitle">Latest news</div>
+            <div className="cards-grid news-grid">
+              {news.slice(0, 3).map((post) => (
+                <article key={post.id} className="prog-card news-card-compact">
+                  <div className={`prog-title ${post.titleColor}`}>{post.title}</div>
+                  <p className="prog-desc">{post.body}</p>
+                  <div className="prog-meta">
+                    <span className="prog-slots">{post.date}</span>
+                    <Link to="/news" className="prog-arrow">Read →</Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <Link to="/news" className="btn-outline">Read More News</Link>
           </div>
         </div>
       </section>
 
-      <PartnersSection />
+      <PartnersSection compact />
+
+      <section className="content-section newsletter-section">
+        <div className="newsletter-copy">
+          <div className="section-eyebrow">Stay connected</div>
+          <h2 className="section-h2">Get updates on innovations, events and opportunities</h2>
+          <p className="section-p">
+            Subscribe for the latest news, calls for applications and partner
+            opportunities.
+          </p>
+        </div>
+        <form className="newsletter-form" onSubmit={(event) => event.preventDefault()}>
+          <label className="sr-only" htmlFor="newsletter-email">Email address</label>
+          <input
+            id="newsletter-email"
+            type="email"
+            placeholder="Enter your email address"
+            className="newsletter-input"
+            aria-label="Newsletter email"
+          />
+          <button type="submit" className="btn-primary">Subscribe</button>
+        </form>
+      </section>
 
       <ContactStrip />
     </>
