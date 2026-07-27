@@ -21,6 +21,9 @@ import {
 } from "@/features/admin/useAdminContent";
 import { AdminFormActions } from "@/features/admin/components/AdminFormActions";
 import { AdminImageUpload } from "@/features/admin/components/AdminImageUpload";
+import { InputField } from "@/features/admin/components/InputField";
+import { TextareaField } from "@/features/admin/components/TextareaField";
+import { SelectField } from "@/features/admin/components/SelectField";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -165,7 +168,7 @@ function NewsAdmin({ items }: NewsAdminProps) {
       <h2 style={{ marginBottom: "1rem" }}>News posts</h2>
 
       <form onSubmit={submit} style={formGrid}>
-        <input
+        <InputField
           required
           placeholder="Title"
           value={draft.title}
@@ -206,14 +209,14 @@ function NewsAdmin({ items }: NewsAdminProps) {
             }}
           />
         </div>
-        <input
+        <InputField
           required
           placeholder="Tag (e.g. Announcement)"
           value={draft.tag}
           onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
           style={inputStyle}
         />
-        <select
+        <SelectField
           value={draft.color}
           onChange={(e) =>
             setDraft({ ...draft, color: e.target.value as NewsPost["color"] })
@@ -223,7 +226,7 @@ function NewsAdmin({ items }: NewsAdminProps) {
           <option value="g">Tag: Green</option>
           <option value="b">Tag: Blue</option>
           <option value="p">Tag: Pink/Red</option>
-        </select>
+        </SelectField>
         <select
           value={draft.titleColor}
           onChange={(e) =>
@@ -238,7 +241,7 @@ function NewsAdmin({ items }: NewsAdminProps) {
           <option value="green">Title: Green</option>
           <option value="red">Title: Red</option>
         </select>
-        <textarea
+        <TextareaField
           required
           rows={4}
           placeholder="Body"
@@ -321,7 +324,7 @@ function EventsAdmin({ items }: EventsAdminProps) {
       <h2 style={{ marginBottom: "1rem" }}>Events</h2>
 
       <form onSubmit={submit} style={formGrid}>
-        <input
+        <InputField
           required
           placeholder="Title"
           value={draft.title}
@@ -360,7 +363,7 @@ function EventsAdmin({ items }: EventsAdminProps) {
             }}
           />
         </div>
-        <select
+        <SelectField
           value={draft.titleColor}
           onChange={(e) =>
             setDraft({
@@ -373,8 +376,8 @@ function EventsAdmin({ items }: EventsAdminProps) {
           <option value="">Title: Default</option>
           <option value="green">Title: Green</option>
           <option value="red">Title: Red</option>
-        </select>
-        <textarea
+        </SelectField>
+        <TextareaField
           required
           rows={3}
           placeholder="Description"
@@ -448,21 +451,21 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
       <h2 style={{ marginBottom: "1rem" }}>Innovations</h2>
 
       <form onSubmit={submit} style={formGrid}>
-        <input
+        <InputField
           required
           placeholder="Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
           style={inputStyle}
         />
-        <input
+        <InputField
           required
           placeholder="Sector"
           value={draft.sector}
           onChange={(e) => setDraft({ ...draft, sector: e.target.value })}
           style={inputStyle}
         />
-        <select
+        <SelectField
           value={draft.stage}
           onChange={(e) =>
             setDraft({
@@ -477,15 +480,15 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           <option value="Pilot">Pilot</option>
           <option value="Market entry">Market entry</option>
           <option value="Scale">Scale</option>
-        </select>
-        <input
+        </SelectField>
+        <InputField
           required
           placeholder="Support need"
           value={draft.need}
           onChange={(e) => setDraft({ ...draft, need: e.target.value })}
           style={inputStyle}
         />
-        <textarea
+        <TextareaField
           required
           rows={3}
           placeholder="Problem"
@@ -493,7 +496,7 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           onChange={(e) => setDraft({ ...draft, problem: e.target.value })}
           style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
         />
-        <textarea
+        <TextareaField
           required
           rows={3}
           placeholder="Solution"
