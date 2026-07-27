@@ -4,15 +4,18 @@ import { adminLogin, adminLogout } from "../../axios/api/admin/auth";
 import { getNews } from "../../axios/api/news";
 import { getEvents } from "../../axios/api/events";
 import { getAdminInnovations } from "../../axios/api/admin/innovations";
+import { getAdminCourses } from "../../axios/api/admin/courses";
 import { NewsPost } from "../types/news";
 import { EventItem } from "../types/events";
 import { InnovationItem } from "../types/innovations";
+import { CourseItem } from "../types/courses";
 import {
   dateToLocalYmd,
   localYmdToDate,
   useEventAdmin,
   useInnovationAdmin,
   useNewsAdmin,
+  useCourseAdmin,
 } from "@/features/admin/useAdminContent";
 import { AdminFormActions } from "@/features/admin/components/AdminFormActions";
 import { AdminImageUpload } from "@/features/admin/components/AdminImageUpload";
@@ -34,23 +37,24 @@ export const Route = createFileRoute("/admin")({
   loader: async () => {
     const hasToken = typeof window !== "undefined" && Boolean(localStorage.getItem("jhub_admin_token"));
     if (!hasToken) {
-      return { news: [], events: [], innovations: [] };
+      return { news: [], events: [], innovations: [], courses: [] };
     }
 
     try {
-      const [news, events, innovations] = await Promise.all([
+      const [news, events, innovations, courses] = await Promise.all([
         getNews(),
         getEvents(),
         getAdminInnovations(),
+        getAdminCourses(),
       ]);
-      return { news, events, innovations };
+      return { news, events, innovations, courses };
     } catch (error: any) {
       console.warn("Loader failed to load admin content, likely expired session:", error);
       if (error?.response?.status === 401) {
         localStorage.removeItem("jhub_admin_token");
         localStorage.removeItem("jhub_admin_refresh_token");
       }
-      return { news: [], events: [], innovations: [] };
+      return { news: [], events: [], innovations: [], courses: [] };
     }
   },
   component: AdminPage,
@@ -63,7 +67,7 @@ function AdminPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  const { news, events, innovations } = Route.useLoaderData();
+  const { news, events, innovations, courses } = Route.useLoaderData();
 
   useEffect(() => {
     if (localStorage.getItem("jhub_admin_token")) setUnlocked(true);
@@ -180,6 +184,7 @@ function AdminPage() {
       <NewsAdmin items={news} />
       <EventsAdmin items={events} />
       <InnovationsAdmin items={innovations} />
+      <CoursesAdmin items={courses} />
     </>
   );
 }
@@ -610,6 +615,173 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
               </span>
               <div style={{ fontSize: "0.9rem", opacity: 0.8, marginTop: 4 }}>
                 {item.problem}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button className="btn-outline" onClick={() => edit(item)}>
+                Edit
+              </button>
+              <button
+                className="btn-outline"
+                onClick={() => remove(item.id)}
+                style={{ color: "#b91c1c" }}
+              >
+                Delete
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ---------- Courses admin ---------- */
+
+interface CoursesAdminProps {
+  items: CourseItem[];
+}
+
+function CoursesAdmin({ items }: CoursesAdminProps) {
+  const { draft, setDraft, msg, submitting, submit, edit, remove, resetDraft } =
+    useCourseAdmin();
+
+  return (
+    <section className="content-section">
+      <h2 style={{ marginBottom: "1rem" }}>Courses</h2>
+
+      <form onSubmit={submit} style={formGrid}>
+        <InputField
+          required
+          placeholder="Course Title"
+          value={draft.title}
+          onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+          style={inputStyle}
+        />
+        <InputField
+          required
+          placeholder="Category (e.g. Software, Data)"
+          value={draft.category || ""}
+          onChange={(e) => setDraft({ ...draft, category: e.target.value })}
+          style={inputStyle}
+        />
+        <SelectField
+          value={draft.deliveryMode || "ONLINE"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              deliveryMode: e.target.value as CourseItem["deliveryMode"],
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="ONLINE">Delivery: Online</option>
+          <option value="IN_PERSON">Delivery: In-Person</option>
+          <option value="HYBRID">Delivery: Hybrid</option>
+        </SelectField>
+        <InputField
+          required
+          type="number"
+          placeholder="Duration (Weeks)"
+          value={draft.durationWeeks || ""}
+          onChange={(e) => setDraft({ ...draft, durationWeeks: Number(e.target.value) })}
+          style={inputStyle}
+        />
+        <InputField
+          placeholder="Prerequisites"
+          value={draft.prerequisites || ""}
+          onChange={(e) => setDraft({ ...draft, prerequisites: e.target.value })}
+          style={inputStyle}
+        />
+        <SelectField
+          value={draft.isPublished ? "true" : "false"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              isPublished: e.target.value === "true",
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="true">Status: Published</option>
+          <option value="false">Status: Draft (Hidden)</option>
+        </SelectField>
+        <SelectField
+          value={draft.isFeatured ? "true" : "false"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              isFeatured: e.target.value === "true",
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="false">Featured: No</option>
+          <option value="true">Featured: Yes</option>
+        </SelectField>
+        <TextareaField
+          required
+          rows={3}
+          placeholder="Course Description"
+          value={draft.desc}
+          onChange={(e) => setDraft({ ...draft, desc: e.target.value })}
+          style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
+        />
+        <AdminFormActions
+          submitting={submitting}
+          submitLabel={
+            "id" in draft && draft.id ? "Update course" : "Add course"
+          }
+          isEditing={Boolean("id" in draft && draft.id)}
+          onCancel={resetDraft}
+        >
+          {msg && (
+            <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>
+              {msg}
+            </span>
+          )}
+        </AdminFormActions>
+      </form>
+
+      <ul style={listStyle}>
+        {items.map((item) => (
+          <li key={item.id} style={rowStyle}>
+            <div>
+              <strong>{item.title}</strong>{" "}
+              <span style={{
+                fontSize: "0.75rem",
+                padding: "0.2rem 0.5rem",
+                borderRadius: "999px",
+                marginLeft: "0.5rem",
+                marginRight: "0.5rem",
+                fontWeight: 600,
+                display: "inline-block",
+                verticalAlign: "middle",
+                backgroundColor: item.isPublished ? "#dcfce7" : "#fee2e2",
+                color: item.isPublished ? "#166534" : "#991b1b"
+              }}>
+                {item.isPublished ? "PUBLISHED" : "DRAFT"}
+              </span>{" "}
+              {item.isFeatured && (
+                <span style={{
+                  fontSize: "0.75rem",
+                  padding: "0.2rem 0.5rem",
+                  borderRadius: "999px",
+                  marginRight: "0.5rem",
+                  fontWeight: 600,
+                  display: "inline-block",
+                  verticalAlign: "middle",
+                  backgroundColor: "#dbeafe",
+                  color: "#1e40af"
+                }}>
+                  FEATURED
+                </span>
+              )}
+              <span style={{ opacity: 0.6 }}>
+                · {item.category} · {item.mode} · {item.duration}
+              </span>
+              <div style={{ fontSize: "0.9rem", opacity: 0.8, marginTop: 4 }}>
+                {item.desc}
               </div>
             </div>
             <div style={{ display: "flex", gap: "0.5rem" }}>

@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ApplyDialog from "../components/site/ApplyDialog";
+import { getPublicCourses } from "../../axios/api/courses";
+import { CourseItem } from "../types/courses";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
@@ -17,83 +19,12 @@ export const Route = createFileRoute("/courses")({
       },
     ],
   }),
+  loader: () => getPublicCourses(),
   component: CoursesPage,
 });
 
-const COURSES = [
-  {
-    tag: "Software",
-    title: "Full-Stack Web Development",
-    desc: "TypeScript, React, Node, databases and deployment to the cloud.",
-    level: "Beginner → Intermediate",
-    duration: "12 weeks",
-    mode: "Hybrid",
-    cohort: "Open",
-    cert: "Certificate of completion",
-    color: "g" as const,
-    titleColor: "green" as const,
-  },
-  {
-    tag: "Data",
-    title: "Data Analytics & Visualization",
-    desc: "Python, SQL, dashboards and storytelling with data.",
-    level: "Intermediate",
-    duration: "8 weeks",
-    mode: "Online",
-    cohort: "Open",
-    cert: "Certificate of completion",
-    color: "b" as const,
-  },
-  {
-    tag: "AI",
-    title: "Applied Machine Learning",
-    desc: "Hands-on ML workflows, model evaluation and deployment.",
-    level: "Advanced",
-    duration: "10 weeks",
-    mode: "Hybrid",
-    cohort: "Waitlist",
-    cert: "Certificate of completion",
-    color: "p" as const,
-    titleColor: "red" as const,
-  },
-  {
-    tag: "Design",
-    title: "Product & UX Design",
-    desc: "Research, prototyping and design systems for digital products.",
-    level: "Beginner",
-    duration: "6 weeks",
-    mode: "Hybrid",
-    cohort: "Open",
-    cert: "Certificate of completion",
-    color: "g" as const,
-    titleColor: "green" as const,
-  },
-  {
-    tag: "Cloud",
-    title: "Cloud & DevOps Essentials",
-    desc: "CI/CD, containers and cloud-native deployment on AWS / GCP.",
-    level: "Intermediate",
-    duration: "8 weeks",
-    mode: "Online",
-    cohort: "Waitlist",
-    cert: "Certificate of completion",
-    color: "b" as const,
-  },
-  {
-    tag: "Mobile",
-    title: "Mobile App Development",
-    desc: "Cross-platform mobile apps with React Native and Flutter.",
-    level: "Intermediate",
-    duration: "10 weeks",
-    mode: "On-campus",
-    cohort: "Open",
-    cert: "Certificate of completion",
-    color: "p" as const,
-    titleColor: "red" as const,
-  },
-];
-
 function CoursesPage() {
+  const courses = Route.useLoaderData();
   return (
     <>
       <header className="page-header">
@@ -109,8 +40,8 @@ function CoursesPage() {
 
       <section className="content-section">
         <div className="cards-grid">
-          {COURSES.map((c) => (
-            <div key={c.title} className="prog-card">
+          {courses.map((c: CourseItem) => (
+            <div key={c.id} className="prog-card">
               <div className={`prog-title ${c.titleColor ?? ""}`}>
                 {c.title}
               </div>
@@ -134,11 +65,11 @@ function CoursesPage() {
               <div className="prog-meta">
                 <span className="prog-slots">{c.cert}</span>
                 <ApplyDialog
-                triggerText="Join waitlist →"
-                triggerVariant="ghost"
-                triggerClassName="prog-arrow"
-                source={c.title}
-              />
+                  triggerText="Join waitlist →"
+                  triggerVariant="ghost"
+                  triggerClassName="prog-arrow"
+                  source={c.title}
+                />
               </div>
             </div>
           ))}

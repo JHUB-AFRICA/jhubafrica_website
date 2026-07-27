@@ -1,14 +1,6 @@
 import { api } from "../../axios.ts";
-
-export interface Course {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  slug: string;
-  image?: string;
-  isActive: boolean;
-}
+import { CourseItem } from "../../../src/types/courses";
+import { mapCourse } from "../courses";
 
 export interface Cohort {
   id: string;
@@ -29,14 +21,41 @@ export interface Lesson {
   order: number;
 }
 
-export const createCourse = async (course: Omit<Course, "id">): Promise<Course> => {
-  const response = await api.post<{ data: Course }>("/api/v1/admin/courses", course);
-  return response.data.data;
+export const getAdminCourses = async (): Promise<CourseItem[]> => {
+  const response = await api.get<{ data: any[] }>("/api/v1/admin/courses");
+  return response.data.data.map(mapCourse);
 };
 
-export const updateCourse = async (id: string, course: Partial<Course>): Promise<Course> => {
-  const response = await api.patch<{ data: Course }>(`/api/v1/admin/courses/${id}`, course);
-  return response.data.data;
+export const createCourse = async (course: Omit<CourseItem, "id">): Promise<CourseItem> => {
+  const payload = {
+    title: course.title,
+    description: course.desc,
+    category: course.category || "Software",
+    deliveryMode: course.deliveryMode || "ONLINE",
+    durationWeeks: course.durationWeeks || undefined,
+    prerequisites: course.prerequisites || "",
+    coverImageUrl: course.coverImageUrl || undefined,
+    isFeatured: course.isFeatured || false,
+    isPublished: course.isPublished || false,
+  };
+  const response = await api.post<{ data: any }>("/api/v1/admin/courses", payload);
+  return mapCourse(response.data.data);
+};
+
+export const updateCourse = async (id: string, course: Partial<CourseItem>): Promise<CourseItem> => {
+  const payload = {
+    title: course.title,
+    description: course.desc,
+    category: course.category,
+    deliveryMode: course.deliveryMode,
+    durationWeeks: course.durationWeeks,
+    prerequisites: course.prerequisites,
+    coverImageUrl: course.coverImageUrl || undefined,
+    isFeatured: course.isFeatured,
+    isPublished: course.isPublished,
+  };
+  const response = await api.patch<{ data: any }>(`/api/v1/admin/courses/${id}`, payload);
+  return mapCourse(response.data.data);
 };
 
 export const deleteCourse = async (id: string): Promise<void> => {
