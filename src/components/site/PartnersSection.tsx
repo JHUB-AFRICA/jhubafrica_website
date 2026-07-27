@@ -47,27 +47,45 @@ export default function PartnersSection({
       <p className="section-p">{intro}</p>
 
       <div className="partner-logos" aria-label="Partner organisations">
-        {PARTNERS.map((p) => (
-          <div key={p.name} className="partner-logo">
-            {LOGOS[p.name] ? (
-              <img
-                src={LOGOS[p.name]}
-                alt={`${p.name} logo`}
-                className="partner-logo-img"
-                loading="lazy"
-              />
-            ) : (
-              <span className="partner-logo-mark" aria-hidden="true">
-                {p.name
-                  .split(/\s+/)
-                  .slice(0, 2)
-                  .map((w) => w[0])
-                  .join("")}
-              </span>
-            )}
-            <span className="partner-logo-name">{p.name}</span>
-          </div>
-        ))}
+        {PARTNERS.map((p) => {
+          const partnerContent = (
+            <>
+              {LOGOS[p.name] ? (
+                <img
+                  src={LOGOS[p.name]}
+                  alt={`${p.name} logo`}
+                  className="partner-logo-img"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="partner-logo-mark" aria-hidden="true">
+                  {p.name
+                    .split(/\s+/)
+                    .slice(0, 2)
+                    .map((w) => w[0])
+                    .join("")}
+                </span>
+              )}
+              <span className="partner-logo-name">{p.name}</span>
+            </>
+          );
+
+          return p.url ? (
+            <a
+              key={p.name}
+              href={p.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="partner-logo"
+            >
+              {partnerContent}
+            </a>
+          ) : (
+            <div key={p.name} className="partner-logo">
+              {partnerContent}
+            </div>
+          );
+        })}
       </div>
 
       {!compact && (

@@ -8,8 +8,43 @@ import image2 from "../assets/images/image2.jpeg";
 import image3 from "../assets/images/image3.jpeg";
 import image4 from "../assets/images/image4.jpeg";
 import image5 from "../assets/images/image5.jpeg";
+import image6 from "../assets/images/images6.jpg";
+import image7 from "../assets/images/images7.jpg";
 
 const HERO_IMAGES = [image1, image2, image3, image4, image5];
+
+const SUPPORT_STEPS = [
+  {
+    title: "Incubation",
+    description: "Build ideas with coaching, lab access and pilot support.",
+    image: image7,
+    overlay: "linear-gradient(135deg, rgba(15, 45, 89, 0.9), rgba(16, 185, 129, 0.4))",
+  },
+  {
+    title: "Mentorship",
+    description: "Connect with experts, investors and industry mentors.",
+    image: image2,
+    overlay: "linear-gradient(135deg, rgba(4, 120, 87, 0.92), rgba(59, 130, 246, 0.35))",
+  },
+  {
+    title: "Training",
+    description: "Develop tech and innovation skills through applied programs.",
+    image: image6,
+    overlay: "linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(245, 158, 11, 0.35))",
+  },
+  {
+    title: "Funding connections",
+    description: "Access partner networks, grant opportunities and strategic support.",
+    image: image4,
+    overlay: "linear-gradient(135deg, rgba(127, 29, 29, 0.9), rgba(14, 165, 233, 0.35))",
+  },
+  {
+    title: "Commercialisation",
+    description: "Validate market fit, scale solutions and reach customers.",
+    image: image5,
+    overlay: "linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(16, 185, 129, 0.4))",
+  },
+] as const;
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -290,31 +325,20 @@ function Index() {
         <div className="section-eyebrow">How JHUB supports innovation</div>
         <h2 className="section-h2">Support at every stage</h2>
         <div className="support-grid">
-          <article className="support-card">
-            <div className="support-card-icon">🧪</div>
-            <h3>Incubation</h3>
-            <p>Build ideas with coaching, lab access and pilot support.</p>
-          </article>
-          <article className="support-card">
-            <div className="support-card-icon">🤝</div>
-            <h3>Mentorship</h3>
-            <p>Connect with experts, investors and industry mentors.</p>
-          </article>
-          <article className="support-card">
-            <div className="support-card-icon">🎓</div>
-            <h3>Training</h3>
-            <p>Develop tech and innovation skills through applied programs.</p>
-          </article>
-          <article className="support-card">
-            <div className="support-card-icon">💼</div>
-            <h3>Funding connections</h3>
-            <p>Access partner networks, grant opportunities and strategic support.</p>
-          </article>
-          <article className="support-card">
-            <div className="support-card-icon">🚀</div>
-            <h3>Commercialisation</h3>
-            <p>Validate market fit, scale solutions and reach customers.</p>
-          </article>
+          {SUPPORT_STEPS.map((step) => (
+            <article key={step.title} className="support-card">
+              <div
+                className="support-card-media"
+                style={{
+                  backgroundImage: `${step.overlay}, url(${step.image})`,
+                }}
+              />
+              <div className="support-card-body">
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
