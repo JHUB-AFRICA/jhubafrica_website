@@ -1,73 +1,91 @@
-# React + TypeScript + Vite
+# JHUB Africa Portal (Frontend Client)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The official web portal and administrator control center for **JHUB Africa**, built using React, TypeScript, and Vite. This application integrates directly with `jhub-backend` (running on Express + PostgreSQL + Supabase) to deliver dynamic resource catalogs, portfolio showcases, and administrative controls.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Key Features
 
-## React Compiler
+*   **Course Catalog**: A database-driven listing of short courses, categorized dynamically (e.g., Software, Data, Design), featuring duration calculators, prerequisites, delivery modes (Online/Hybrid/In-Person), and cohort recruitment status indicators.
+*   **Innovations Showcase**: Portfolio grids highlighting JKUAT/JHUB innovations. Support for guest proposal submissions, stage mapping (Concept to Scale), and automated JWT-claim based ownership tracking.
+*   **Events Calendar**: Interactive cards tracking upcoming dates, converting datetime stamps to readable calendar badges, and integrating waitlist sign-ups.
+*   **News & Announcements**: Dynamic blog board tracking announcements with category tags.
+*   **Secure Admin Dashboard**: Restricted JWT-protected management portal enabling staff to securely log in, verify statistics, and run full **CRUD operations** (Create, Read, Update, Delete) on:
+    *   *News posts* (with base64 image uploads)
+    *   *Events schedules* (automatically parsed by category keywords)
+    *   *Innovations proposals* (approving, rejecting, or editing status stages)
+    *   *Courses programs* (editing catalog options, publishing drafts, and featuring items)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠 Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+*   **Framework**: [React 18](https://react.dev/)
+*   **Build Tool**: [Vite](https://vite.dev/)
+*   **Routing**: [TanStack Router](https://tanstack.com/router) (for absolute type-safe routing)
+*   **HTTP Client**: [Axios](https://axios-http.com/)
+*   **Styling**: Vanilla CSS (Premium, cohesive palette with light/dark glassmorphism, responsive flex grids, and status pills)
+*   **Type Checker**: TypeScript
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 📁 Project Structure
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```
+├── axios/
+│   ├── api/                 # Modular API client callers
+│   │   ├── admin/           # Admin restricted callers (Auth, Courses, Innovations)
+│   │   ├── courses.ts       # Public course catalog API
+│   │   ├── events.ts        # Public events API + formatting mapping
+│   │   ├── innovations.ts   # Public innovations + JWT sub ownership mapping
+│   │   └── news.ts          # Public news API + slug realignments
+│   └── axios.ts             # Axios client with JWT Bearer auth request interceptors
+├── src/
+│   ├── components/          # Reusable UI component blocks (Apply dialogs, forms)
+│   ├── features/
+│   │   └── admin/           # Admin custom form layouts and useAdminContent state hooks
+│   ├── routes/              # TanStack type-safe pages (Home, Courses, Events, Innovations, Admin)
+│   ├── types/               # Type definitions mapping database models
+│   ├── main.tsx             # App entry point
+│   └── index.css            # Root tokens and layout styling rules
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+## 💻 Getting Started
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+### Prerequisites
+
+Ensure you have [Node.js](https://nodejs.org/) installed on your machine.
+
+### Installation
+
+1. Clone this repository.
+2. Navigate to the project root directory:
+   ```bash
+   cd jhubafrica_website
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Running Locally
+
+1. Create a `.env` file in the root directory:
+   ```env
+   VITE_APP_API_URL=http://localhost:4000/
+   ```
+2. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+   The portal will be available locally at `http://localhost:5173/`.
+
+### Building for Production
+
+Compile and bundle the production assets:
+```bash
+npm run build
 ```
+Production assets will be built inside the `/dist` directory.
