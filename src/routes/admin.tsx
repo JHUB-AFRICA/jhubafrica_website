@@ -565,6 +565,104 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           onChange={(e) => setDraft({ ...draft, solution: e.target.value })}
           style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
         />
+
+        {/* Team Members Editor Section */}
+        <div style={{ gridColumn: "1 / -1", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "10px", backgroundColor: "#fafafa" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+            <h3 style={{ margin: 0, fontSize: "1.1rem", color: "#111" }}>Team Members</h3>
+            <button
+              type="button"
+              onClick={() => {
+                const members = draft.teamMembers || [];
+                setDraft({
+                  ...draft,
+                  teamMembers: [...members, { name: "", role: "" }],
+                });
+              }}
+              style={{
+                backgroundColor: "var(--jhub-green)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "6px",
+                padding: "0.4rem 0.8rem",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "0.85rem",
+              }}
+            >
+              + Add Member
+            </button>
+          </div>
+
+          {(draft.teamMembers || []).length === 0 ? (
+            <p style={{ margin: 0, fontSize: "0.9rem", color: "#666", fontStyle: "italic" }}>
+              No team members added yet. They will be generated deterministically on the project details view, or you can specify them here.
+            </p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              {(draft.teamMembers || []).map((m, idx) => (
+                <div key={idx} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Full Name"
+                    value={m.name}
+                    onChange={(e) => {
+                      const updated = [...(draft.teamMembers || [])];
+                      updated[idx] = { ...updated[idx], name: e.target.value };
+                      setDraft({ ...draft, teamMembers: updated });
+                    }}
+                    style={{
+                      ...inputStyle,
+                      flex: 1,
+                      padding: "0.5rem 0.75rem",
+                      borderRadius: "6px",
+                    }}
+                  />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Role (e.g. Lead Developer)"
+                    value={m.role}
+                    onChange={(e) => {
+                      const updated = [...(draft.teamMembers || [])];
+                      updated[idx] = { ...updated[idx], role: e.target.value };
+                      setDraft({ ...draft, teamMembers: updated });
+                    }}
+                    style={{
+                      ...inputStyle,
+                      flex: 1,
+                      padding: "0.5rem 0.75rem",
+                      borderRadius: "6px",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = (draft.teamMembers || []).filter((_, i) => i !== idx);
+                      setDraft({ ...draft, teamMembers: updated });
+                    }}
+                    style={{
+                      backgroundColor: "#fee2e2",
+                      color: "#991b1b",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.5rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    title="Remove Member"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <AdminFormActions
           submitting={submitting}
           submitLabel={

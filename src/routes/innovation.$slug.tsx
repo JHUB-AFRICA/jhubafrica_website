@@ -221,60 +221,76 @@ function InnovationDetailPage() {
           <div className="section-eyebrow">Development Team</div>
           <h2 className="section-h2" style={{ marginBottom: "1.5rem" }}>The group members building this project</h2>
           
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-              gap: "1.25rem",
-            }}
-          >
-            {innovation.teamMembers?.map((m, idx) => (
-              <div
-                key={idx}
-                className="prog-card"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1rem",
-                  padding: "1rem 1.25rem",
-                  borderRadius: "10px",
-                  border: "1px solid var(--border-color)",
-                  background: "#fff",
-                }}
-              >
+          {!innovation.teamMembers || innovation.teamMembers.length === 0 ? (
+            <div
+              style={{
+                padding: "2rem",
+                borderRadius: "12px",
+                border: "1px dashed var(--border-color)",
+                background: "#fafafa",
+                color: "#64748b",
+                textAlign: "center",
+                fontSize: "0.95rem",
+              }}
+            >
+              💼 Team directory details are currently being finalized. For direct inquiries or sponsorship profiles, reach out to the JHUB Africa desk.
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                gap: "1.25rem",
+              }}
+            >
+              {innovation.teamMembers.map((m, idx) => (
                 <div
+                  key={idx}
+                  className="prog-card"
                   style={{
-                    width: "44px",
-                    height: "44px",
-                    borderRadius: "50%",
-                    backgroundColor: 
-                      idx % 3 === 0 ? "#dbeafe" :
-                      idx % 3 === 1 ? "#dcfce7" :
-                      "#f3e8ff",
-                    color: 
-                      idx % 3 === 0 ? "#1e40af" :
-                      idx % 3 === 1 ? "#166534" :
-                      "#6b21a8",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 700,
-                    fontSize: "0.95rem",
+                    gap: "1rem",
+                    padding: "1rem 1.25rem",
+                    borderRadius: "10px",
+                    border: "1px solid var(--border-color)",
+                    background: "#fff",
                   }}
                 >
-                  {getInitials(m.name)}
+                  <div
+                    style={{
+                      width: "44px",
+                      height: "44px",
+                      borderRadius: "50%",
+                      backgroundColor: 
+                        idx % 3 === 0 ? "#dbeafe" :
+                        idx % 3 === 1 ? "#dcfce7" :
+                        "#f3e8ff",
+                      color: 
+                        idx % 3 === 0 ? "#1e40af" :
+                        idx % 3 === 1 ? "#166534" :
+                        "#6b21a8",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    {getInitials(m.name)}
+                  </div>
+                  <div>
+                    <strong style={{ color: "#1e293b", fontSize: "0.95rem", display: "block" }}>
+                      {m.name}
+                    </strong>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                      {m.role}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <strong style={{ color: "#1e293b", fontSize: "0.95rem", display: "block" }}>
-                    {m.name}
-                  </strong>
-                  <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
-                    {m.role}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </>

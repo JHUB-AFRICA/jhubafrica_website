@@ -77,6 +77,7 @@ export function getEmptyInnovation(): Omit<InnovationItem, "id"> {
         problem: "",
         solution: "",
         status: "APPROVED",
+        teamMembers: [],
     };
 }
 
