@@ -1,0 +1,38 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jhub-website
+    ports:
+      - "${PORT:-4173}:4173"
+    environment:
+      - NODE_ENV=production
+      - PORT=4173
+      - EMAIL_TO=${EMAIL_TO:-info.jhub@jkuat.ac.ke}
+      - EMAIL_FROM=${EMAIL_FROM:-no-reply@jhub.africa}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    volumes:
+      - jhub-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4173/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - jhub-network
+
+volumes:
+  jhub-data:
+    name: jhub-data
+
+networks:
+  jhub-network:
+    name: jhub-network
+    driver: bridge
