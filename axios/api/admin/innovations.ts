@@ -32,6 +32,9 @@ const mapInnovation = (item: any): InnovationSubmission => ({
   status: item.status,
   isFeatured: item.is_featured || item.isFeatured || false,
   createdAt: item.created_at || item.createdAt || "",
+  slug: item.slug || "",
+  coverImageUrl: item.cover_image_url || item.coverImageUrl || "",
+  teamMembers: item.team_members || [],
 });
 
 export const getAdminInnovations = async (): Promise<InnovationSubmission[]> => {

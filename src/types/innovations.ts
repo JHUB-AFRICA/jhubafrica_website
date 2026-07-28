@@ -7,4 +7,7 @@ export interface InnovationItem {
     problem: string;
     solution: string;
     status?: string;
+    slug?: string;
+    coverImageUrl?: string;
+    teamMembers?: { name: string; role: string }[];
 }

@@ -47,6 +47,30 @@ const getOwnerIdFromToken = (): string | undefined => {
   }
 };
 
+export const getMockTeamMembers = (innovationId: string) => {
+  const firstNames = ["James", "Amina", "Kofi", "David", "Chidi", "Sarah", "Grace", "Paul", "Ester", "Victor"];
+  const lastNames = ["Ondieki", "Kamau", "Osei", "Mwangi", "Nwachukwu", "Müller", "Wanjiku", "Otieno", "Njoroge", "Kiprotich"];
+  const roles = ["Lead Engineer", "UI/UX Designer", "Product Manager", "Full-Stack Developer", "Embedded Systems Dev", "Data Scientist"];
+  
+  let charSum = 0;
+  for (let i = 0; i < innovationId.length; i++) {
+    charSum += innovationId.charCodeAt(i);
+  }
+  
+  const count = 2 + (charSum % 3); // 2 to 4 members
+  const members = [];
+  for (let i = 0; i < count; i++) {
+    const fnIndex = (charSum + i * 3) % firstNames.length;
+    const lnIndex = (charSum + i * 7) % lastNames.length;
+    const roleIndex = (charSum + i * 11) % roles.length;
+    members.push({
+      name: `${firstNames[fnIndex]} ${lastNames[lnIndex]}`,
+      role: roles[roleIndex],
+    });
+  }
+  return members;
+};
+
 const mapInnovation = (item: any): InnovationItem => ({
   id: item.id,
   title: item.title,
@@ -55,12 +79,22 @@ const mapInnovation = (item: any): InnovationItem => ({
   need: item.support_required || item.supportRequired || "",
   problem: item.problem || "",
   solution: item.solution || "",
-  status: item.status, // Preserve status on mapped item
+  status: item.status,
+  slug: item.slug || "",
+  coverImageUrl: item.cover_image_url || item.coverImageUrl || "",
+  teamMembers: item.team_members && item.team_members.length > 0
+    ? item.team_members.map((m: any) => ({ name: `${m.first_name || ""} ${m.last_name || ""}`.trim() || m.name || "Member", role: m.role || "Contributor" }))
+    : getMockTeamMembers(item.id || "default"),
 });
 
 export const getInnovations = async (): Promise<InnovationItem[]> => {
   const response = await api.get<{ data: any[] }>("/api/v1/innovations");
   return response.data.data.map(mapInnovation);
+};
+
+export const getInnovationBySlug = async (slug: string): Promise<InnovationItem> => {
+  const response = await api.get<{ data: any }>(`/api/v1/innovations/${slug}`);
+  return mapInnovation(response.data.data);
 };
 
 export const addInnovation = async (innovation: Omit<InnovationItem, "id">): Promise<InnovationItem> => {

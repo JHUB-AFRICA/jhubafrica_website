@@ -23,6 +23,8 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InnovationIndexRouteImport } from './routes/innovation.index'
+import { Route as InnovationSlugRouteImport } from './routes/innovation.$slug'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -94,6 +96,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InnovationIndexRoute = InnovationIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => InnovationRoute,
+} as any)
+const InnovationSlugRoute = InnovationSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => InnovationRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -105,11 +117,13 @@ export interface FileRoutesByFullPath {
   '/for-innovators': typeof ForInnovatorsRoute
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
-  '/innovation': typeof InnovationRoute
+  '/innovation': typeof InnovationRouteWithChildren
   '/news': typeof NewsRoute
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
+  '/innovation/$slug': typeof InnovationSlugRoute
+  '/innovation/': typeof InnovationIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -121,11 +135,12 @@ export interface FileRoutesByTo {
   '/for-innovators': typeof ForInnovatorsRoute
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
-  '/innovation': typeof InnovationRoute
   '/news': typeof NewsRoute
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
+  '/innovation/$slug': typeof InnovationSlugRoute
+  '/innovation': typeof InnovationIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -138,11 +153,13 @@ export interface FileRoutesById {
   '/for-innovators': typeof ForInnovatorsRoute
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
-  '/innovation': typeof InnovationRoute
+  '/innovation': typeof InnovationRouteWithChildren
   '/news': typeof NewsRoute
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
+  '/innovation/$slug': typeof InnovationSlugRoute
+  '/innovation/': typeof InnovationIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +178,8 @@ export interface FileRouteTypes {
     | '/programs'
     | '/resources'
     | '/support'
+    | '/innovation/$slug'
+    | '/innovation/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -172,11 +191,12 @@ export interface FileRouteTypes {
     | '/for-innovators'
     | '/for-partners'
     | '/for-students'
-    | '/innovation'
     | '/news'
     | '/programs'
     | '/resources'
     | '/support'
+    | '/innovation/$slug'
+    | '/innovation'
   id:
     | '__root__'
     | '/'
@@ -193,6 +213,8 @@ export interface FileRouteTypes {
     | '/programs'
     | '/resources'
     | '/support'
+    | '/innovation/$slug'
+    | '/innovation/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -205,7 +227,7 @@ export interface RootRouteChildren {
   ForInnovatorsRoute: typeof ForInnovatorsRoute
   ForPartnersRoute: typeof ForPartnersRoute
   ForStudentsRoute: typeof ForStudentsRoute
-  InnovationRoute: typeof InnovationRoute
+  InnovationRoute: typeof InnovationRouteWithChildren
   NewsRoute: typeof NewsRoute
   ProgramsRoute: typeof ProgramsRoute
   ResourcesRoute: typeof ResourcesRoute
@@ -312,8 +334,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/innovation/': {
+      id: '/innovation/'
+      path: '/'
+      fullPath: '/innovation/'
+      preLoaderRoute: typeof InnovationIndexRouteImport
+      parentRoute: typeof InnovationRoute
+    }
+    '/innovation/$slug': {
+      id: '/innovation/$slug'
+      path: '/$slug'
+      fullPath: '/innovation/$slug'
+      preLoaderRoute: typeof InnovationSlugRouteImport
+      parentRoute: typeof InnovationRoute
+    }
   }
 }
+
+interface InnovationRouteChildren {
+  InnovationSlugRoute: typeof InnovationSlugRoute
+  InnovationIndexRoute: typeof InnovationIndexRoute
+}
+
+const InnovationRouteChildren: InnovationRouteChildren = {
+  InnovationSlugRoute: InnovationSlugRoute,
+  InnovationIndexRoute: InnovationIndexRoute,
+}
+
+const InnovationRouteWithChildren = InnovationRoute._addFileChildren(
+  InnovationRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -325,7 +375,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForInnovatorsRoute: ForInnovatorsRoute,
   ForPartnersRoute: ForPartnersRoute,
   ForStudentsRoute: ForStudentsRoute,
-  InnovationRoute: InnovationRoute,
+  InnovationRoute: InnovationRouteWithChildren,
   NewsRoute: NewsRoute,
   ProgramsRoute: ProgramsRoute,
   ResourcesRoute: ResourcesRoute,
