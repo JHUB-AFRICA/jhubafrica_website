@@ -142,8 +142,8 @@ export function useNewsAdmin() {
         window.scrollTo({ top: 300, behavior: "smooth" });
     }, []);
 
-    const remove = useCallback(async (id: string) => {
-        if (!confirm("Delete this news post?")) return;
+    const remove = useCallback(async (id: string, bypassConfirm = false) => {
+        if (!bypassConfirm && !confirm("Delete this news post?")) return;
 
         setMsg("Deleting...");
 
@@ -219,8 +219,8 @@ export function useEventAdmin() {
         window.scrollTo({ top: 300, behavior: "smooth" });
     }, []);
 
-    const remove = useCallback(async (id: string) => {
-        if (!confirm("Delete this event?")) return;
+    const remove = useCallback(async (id: string, bypassConfirm = false) => {
+        if (!bypassConfirm && !confirm("Delete this event?")) return;
 
         setMsg("Deleting...");
 
@@ -296,8 +296,8 @@ export function useInnovationAdmin() {
         window.scrollTo({ top: 300, behavior: "smooth" });
     }, []);
 
-    const remove = useCallback(async (id: string) => {
-        if (!confirm("Delete this innovation?")) return;
+    const remove = useCallback(async (id: string, bypassConfirm = false) => {
+        if (!bypassConfirm && !confirm("Delete this innovation?")) return;
 
         setMsg("Deleting...");
 
@@ -366,8 +366,8 @@ export function useCourseAdmin() {
         window.scrollTo({ top: 300, behavior: "smooth" });
     }, []);
 
-    const remove = useCallback(async (id: string) => {
-        if (!confirm("Delete this course?")) return;
+    const remove = useCallback(async (id: string, bypassConfirm = false) => {
+        if (!bypassConfirm && !confirm("Delete this course?")) return;
 
         setMsg("Deleting...");
 

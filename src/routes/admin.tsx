@@ -107,6 +107,24 @@ function AdminPage() {
     await router.invalidate();
   }
 
+  const [confirmDelete, setConfirmDelete] = useState<{
+    isOpen: boolean;
+    title: string;
+    onConfirm: () => Promise<void>;
+  }>({
+    isOpen: false,
+    title: "",
+    onConfirm: async () => {},
+  });
+
+  const requestDelete = (title: string, onConfirm: () => Promise<void>) => {
+    setConfirmDelete({
+      isOpen: true,
+      title,
+      onConfirm,
+    });
+  };
+
   if (!unlocked) {
     return (
       <>
@@ -181,10 +199,50 @@ function AdminPage() {
         </button>
       </header>
 
-      <NewsAdmin items={news} />
-      <EventsAdmin items={events} />
-      <InnovationsAdmin items={innovations} />
-      <CoursesAdmin items={courses} />
+      <NewsAdmin items={news} onDeleteRequest={requestDelete} />
+      <EventsAdmin items={events} onDeleteRequest={requestDelete} />
+      <InnovationsAdmin items={innovations} onDeleteRequest={requestDelete} />
+      <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
+
+      {confirmDelete.isOpen && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h3 style={{ margin: "0 0 1rem 0", color: "#1e293b", fontSize: "1.25rem", fontWeight: 700 }}>Confirm Deletion</h3>
+            <p style={{ margin: "0 0 1.5rem 0", color: "#64748b", fontSize: "0.95rem", lineHeight: 1.5 }}>
+              Are you sure you want to delete <strong>{confirmDelete.title}</strong>? This action is permanent and cannot be undone.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+              <button
+                className="btn-outline"
+                type="button"
+                onClick={() => setConfirmDelete({ ...confirmDelete, isOpen: false })}
+                style={{ padding: "0.5rem 1.25rem", borderRadius: "6px", cursor: "pointer", fontSize: "0.9rem" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await confirmDelete.onConfirm();
+                  setConfirmDelete({ ...confirmDelete, isOpen: false });
+                }}
+                style={{
+                  backgroundColor: "#dc2626",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "0.5rem 1.25rem",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                }}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -193,9 +251,10 @@ function AdminPage() {
 
 interface NewsAdminProps {
   items: NewsPost[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
 }
 
-function NewsAdmin({ items }: NewsAdminProps) {
+function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
   const {
     draft,
     setDraft,
@@ -332,7 +391,7 @@ function NewsAdmin({ items }: NewsAdminProps) {
               </button>
               <button
                 className="btn-outline"
-                onClick={() => remove(p.id)}
+                onClick={() => onDeleteRequest(p.title, () => remove(p.id, true))}
                 style={{ color: "#b91c1c" }}
               >
                 Delete
@@ -349,9 +408,10 @@ function NewsAdmin({ items }: NewsAdminProps) {
 
 interface EventsAdminProps {
   items: EventItem[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
 }
 
-function EventsAdmin({ items }: EventsAdminProps) {
+function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
   const {
     draft,
     setDraft,
@@ -468,7 +528,7 @@ function EventsAdmin({ items }: EventsAdminProps) {
               </button>
               <button
                 className="btn-outline"
-                onClick={() => remove(p.id)}
+                onClick={() => onDeleteRequest(p.title, () => remove(p.id, true))}
                 style={{ color: "#b91c1c" }}
               >
                 Delete
@@ -485,9 +545,10 @@ function EventsAdmin({ items }: EventsAdminProps) {
 
 interface InnovationsAdminProps {
   items: InnovationItem[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
 }
 
-function InnovationsAdmin({ items }: InnovationsAdminProps) {
+function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
   const { draft, setDraft, msg, submitting, submit, edit, remove, resetDraft } =
     useInnovationAdmin();
 
@@ -731,7 +792,7 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
               </button>
               <button
                 className="btn-outline"
-                onClick={() => remove(item.id)}
+                onClick={() => onDeleteRequest(item.title, () => remove(item.id, true))}
                 style={{ color: "#b91c1c" }}
               >
                 Delete
@@ -748,9 +809,10 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
 
 interface CoursesAdminProps {
   items: CourseItem[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
 }
 
-function CoursesAdmin({ items }: CoursesAdminProps) {
+function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
   const { draft, setDraft, msg, submitting, submit, edit, remove, resetDraft } =
     useCourseAdmin();
 
@@ -898,7 +960,7 @@ function CoursesAdmin({ items }: CoursesAdminProps) {
               </button>
               <button
                 className="btn-outline"
-                onClick={() => remove(item.id)}
+                onClick={() => onDeleteRequest(item.title, () => remove(item.id, true))}
                 style={{ color: "#b91c1c" }}
               >
                 Delete
@@ -952,4 +1014,28 @@ const rowStyle: React.CSSProperties = {
   border: "1px solid var(--border-color)",
   borderRadius: 10,
   background: "#fff",
+};
+
+const modalOverlayStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.4)",
+  backdropFilter: "blur(4px)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 9999,
+};
+
+const modalContentStyle: React.CSSProperties = {
+  backgroundColor: "#fff",
+  borderRadius: "12px",
+  padding: "2rem",
+  width: "90%",
+  maxWidth: "440px",
+  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+  fontFamily: "inherit",
 };
