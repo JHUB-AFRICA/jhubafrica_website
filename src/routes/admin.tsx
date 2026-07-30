@@ -596,7 +596,7 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
 
           {(draft.teamMembers || []).length === 0 ? (
             <p style={{ margin: 0, fontSize: "0.9rem", color: "#666", fontStyle: "italic" }}>
-              No team members added yet. They will be generated deterministically on the project details view, or you can specify them here.
+              No team members added yet. Specify team members here to showcase them on the project details view page.
             </p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
@@ -714,6 +714,16 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
               <div style={{ fontSize: "0.9rem", opacity: 0.8, marginTop: 4 }}>
                 {item.problem}
               </div>
+              {item.teamMembers && item.teamMembers.length > 0 && (
+                <div style={{ fontSize: "0.8rem", color: "#475569", marginTop: 8, display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                  <span style={{ fontWeight: 600, color: "#1e293b" }}>Team:</span>
+                  {item.teamMembers.map((m, idx) => (
+                    <span key={idx} style={{ background: "#f1f5f9", padding: "0.1rem 0.4rem", borderRadius: "4px" }}>
+                      {m.name} ({m.role})
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div style={{ display: "flex", gap: "0.5rem" }}>
               <button className="btn-outline" onClick={() => edit(item)}>
