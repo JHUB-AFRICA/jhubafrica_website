@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ContactModal } from "../components/site/ContactModal";
+import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/for-innovators")({
   head: () => ({
@@ -91,7 +90,6 @@ const FAQ = [
 ];
 
 function ForInnovatorsPage() {
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   return (
     <>
@@ -104,12 +102,7 @@ function ForInnovatorsPage() {
           to move your idea toward market readiness.
         </p>
         <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <button
-            className="btn-primary"
-            onClick={() => setIsContactModalOpen(true)}
-          >
-            Submit your innovation
-          </button>
+          <ApplyDialog triggerText="Submit your innovation" source="For Innovators Page" triggerVariant="default" triggerClassName="btn-primary" />
           <Link to="/innovation" className="btn-outline">
             See current portfolio
           </Link>
@@ -164,20 +157,11 @@ function ForInnovatorsPage() {
         </div>
 
         <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <button
-            className="btn-primary"
-            onClick={() => setIsContactModalOpen(true)}
-          >
-            Start your application
-          </button>
+          <ApplyDialog triggerText="Start your application" source="For Innovators Page" triggerVariant="default" triggerClassName="btn-primary" />
         </div>
       </section>
 
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        source="For Innovators Page"
-      />
+      
     </>
   );
 }

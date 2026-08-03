@@ -58,16 +58,41 @@ async function sendApplicationEmail(application: {
         `Role: ${application.role}`,
         `Source: ${application.source ?? "Unknown"}`,
         "",
+        // include optional innovation details when present
+        ...(application.innovationTitle ? ["Innovation title: " + application.innovationTitle] : []),
+        ...(application.sector ? ["Sector: " + application.sector] : []),
+        ...(application.stage ? ["Stage: " + application.stage] : []),
+        ...(application.need ? ["Need: " + application.need] : []),
+        ...(application.problem ? ["Problem:", application.problem] : []),
+        ...(application.solution ? ["Solution:", application.solution] : []),
+        "",
         "Message:",
         application.message,
     ];
+
+    const htmlParts = [
+      `<p><strong>Name:</strong> ${application.fullName}</p>`,
+      `<p><strong>Email:</strong> ${application.email}</p>`,
+      `<p><strong>Phone:</strong> ${application.phone}</p>`,
+      `<p><strong>Role:</strong> ${application.role}</p>`,
+      `<p><strong>Source:</strong> ${application.source ?? "Unknown"}</p>`,
+    ];
+
+    if (application.innovationTitle) htmlParts.push(`<p><strong>Innovation:</strong> ${application.innovationTitle}</p>`);
+    if (application.sector) htmlParts.push(`<p><strong>Sector:</strong> ${application.sector}</p>`);
+    if (application.stage) htmlParts.push(`<p><strong>Stage:</strong> ${application.stage}</p>`);
+    if (application.need) htmlParts.push(`<p><strong>Need:</strong> ${application.need}</p>`);
+    if (application.problem) htmlParts.push(`<h4>Problem</h4><p>${application.problem.replace(/\n/g, "<br />")}</p>`);
+    if (application.solution) htmlParts.push(`<h4>Solution</h4><p>${application.solution.replace(/\n/g, "<br />")}</p>`);
+
+    htmlParts.push(`<hr /><p>${application.message.replace(/\n/g, "<br />")}</p>`);
 
     await transport.sendMail({
         from: EMAIL_FROM,
         to: EMAIL_TO,
         subject,
         text: bodyLines.join("\n"),
-        html: `<p><strong>Name:</strong> ${application.fullName}</p><p><strong>Email:</strong> ${application.email}</p><p><strong>Phone:</strong> ${application.phone}</p><p><strong>Role:</strong> ${application.role}</p><p><strong>Source:</strong> ${application.source ?? "Unknown"}</p><hr /><p>${application.message.replace(/\n/g, "<br />")}</p>`,
+        html: htmlParts.join("\n"),
     });
 }
 

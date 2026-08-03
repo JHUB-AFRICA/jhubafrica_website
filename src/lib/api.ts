@@ -36,6 +36,13 @@ export interface ApplicationRequest {
     role: "Student" | "Innovator" | "Partner" | "Sponsor" | "Volunteer";
     message: string;
     source?: string;
+    // optional innovation details
+    innovationTitle?: string;
+    sector?: string;
+    stage?: "Concept" | "Prototype" | "Pilot" | "Market entry" | "Scale";
+    problem?: string;
+    solution?: string;
+    need?: string;
 }
 
 export interface ApplicationItem extends ApplicationRequest {

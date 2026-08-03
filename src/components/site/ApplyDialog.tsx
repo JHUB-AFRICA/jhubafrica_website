@@ -30,6 +30,12 @@ interface ApplyFormData {
   phone: string;
   role: RoleOption;
   message: string;
+  innovationTitle?: string;
+  sector?: string;
+  stage?: "Concept" | "Prototype" | "Pilot" | "Market entry" | "Scale";
+  problem?: string;
+  solution?: string;
+  need?: string;
 }
 
 const initialForm: ApplyFormData = {
@@ -38,6 +44,12 @@ const initialForm: ApplyFormData = {
   phone: "",
   role: "Student",
   message: "",
+  innovationTitle: "",
+  sector: "",
+  stage: "Concept",
+  problem: "",
+  solution: "",
+  need: "",
 };
 
 export default function ApplyDialog({
@@ -53,10 +65,14 @@ export default function ApplyDialog({
 
   const dialogContentStyle: CSSProperties = {
     backgroundColor: "#ffffff",
-    borderRadius: "28px",
-    boxShadow: "0 32px 80px rgba(15, 23, 42, 0.16)",
-    border: "1px solid rgba(148, 163, 184, 0.18)",
-    padding: "2rem",
+    borderRadius: "20px",
+    boxShadow: "0 24px 64px rgba(15, 23, 42, 0.12)",
+    border: "1px solid rgba(148, 163, 184, 0.12)",
+    padding: "1.25rem",
+    width: "min(92vw, 720px)",
+    maxWidth: "720px",
+    maxHeight: "85vh",
+    overflowY: "auto",
   };
 
   const dialogHeaderStyle: CSSProperties = {
@@ -67,7 +83,7 @@ export default function ApplyDialog({
   };
 
   const dialogTitleStyle: CSSProperties = {
-    fontSize: "2rem",
+    fontSize: "1.5rem",
     lineHeight: 1.05,
     fontWeight: 800,
     color: "#0f172a",
@@ -139,7 +155,7 @@ export default function ApplyDialog({
 
   const textareaStyle: CSSProperties = {
     ...inputStyle,
-    minHeight: "140px",
+    minHeight: "120px",
     resize: "vertical",
   };
 
@@ -153,7 +169,7 @@ export default function ApplyDialog({
   };
 
   const submitButtonStyle: CSSProperties = {
-    minWidth: "14rem",
+    minWidth: "12rem",
     padding: "0.95rem 1.25rem",
     backgroundColor: "#0f766e",
     color: "white",
@@ -209,6 +225,13 @@ export default function ApplyDialog({
         role: formData.role,
         message: formData.message.trim(),
         source,
+        // optional innovation details
+        innovationTitle: formData.innovationTitle?.trim(),
+        sector: formData.sector?.trim(),
+        stage: formData.stage,
+        problem: formData.problem?.trim(),
+        solution: formData.solution?.trim(),
+        need: formData.need?.trim(),
       });
       setStatus("success");
       setFeedback("Thanks! We received your request and will respond soon.");
@@ -294,6 +317,84 @@ export default function ApplyDialog({
               </select>
             </label>
           </div>
+
+          {(source === "For Innovators Page" || formData.role === "Innovator") && (
+            <div style={{ display: "grid", gap: "0.75rem", marginTop: "0.5rem" }}>
+              <label style={{ display: "grid", gap: "0.5rem" }}>
+                <span style={fieldLabelStyle}>Innovation title</span>
+                <input
+                  name="innovationTitle"
+                  value={formData.innovationTitle}
+                  onChange={(e) => setFormData({ ...formData, innovationTitle: e.target.value })}
+                  placeholder="Name of your innovation"
+                  style={inputStyle}
+                />
+              </label>
+
+              <div style={twoColumnGridStyle}>
+                <label style={{ display: "grid", gap: "0.5rem" }}>
+                  <span style={fieldLabelStyle}>Sector</span>
+                  <input
+                    name="sector"
+                    value={formData.sector}
+                    onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
+                    placeholder="e.g., Climate Smart Agriculture"
+                    style={inputStyle}
+                  />
+                </label>
+
+                <label style={{ display: "grid", gap: "0.5rem" }}>
+                  <span style={fieldLabelStyle}>Stage</span>
+                  <select
+                    value={formData.stage}
+                    onChange={(e) => setFormData({ ...formData, stage: e.target.value as any })}
+                    style={inputStyle}
+                  >
+                    <option>Concept</option>
+                    <option>Prototype</option>
+                    <option>Pilot</option>
+                    <option>Market entry</option>
+                    <option>Scale</option>
+                  </select>
+                </label>
+              </div>
+
+              <label style={{ display: "grid", gap: "0.5rem" }}>
+                <span style={fieldLabelStyle}>What problem are you solving?</span>
+                <textarea
+                  name="problem"
+                  value={formData.problem}
+                  onChange={(e) => setFormData({ ...formData, problem: e.target.value })}
+                  placeholder="Explain the problem your solution addresses"
+                  rows={3}
+                  style={textareaStyle}
+                />
+              </label>
+
+              <label style={{ display: "grid", gap: "0.5rem" }}>
+                <span style={fieldLabelStyle}>Solution summary</span>
+                <textarea
+                  name="solution"
+                  value={formData.solution}
+                  onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
+                  placeholder="Briefly describe your solution"
+                  rows={3}
+                  style={textareaStyle}
+                />
+              </label>
+
+              <label style={{ display: "grid", gap: "0.5rem" }}>
+                <span style={fieldLabelStyle}>What do you need?</span>
+                <input
+                  name="need"
+                  value={formData.need}
+                  onChange={(e) => setFormData({ ...formData, need: e.target.value })}
+                  placeholder="Funding, mentorship, lab access, etc."
+                  style={inputStyle}
+                />
+              </label>
+            </div>
+          )}
 
           <label style={{ display: "grid", gap: "0.5rem" }}>
             <span style={fieldLabelStyle}>Message<span style={requiredStarStyle}>*</span></span>
