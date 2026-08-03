@@ -56,7 +56,7 @@ function apiPlugin() {
     });
   }
 
-  return {
+  const plugin = {
       name: 'api-plugin',
       configureServer(server: any) {
         server.middlewares.use(async (req: any, res: any, next: any) => {
@@ -225,9 +225,11 @@ function apiPlugin() {
       });
     },
     configurePreviewServer(server: any) {
-      this.configureServer(server);
+      plugin.configureServer(server);
     }
   }
+
+  return plugin;
 }
 
 // https://vite.dev/config/

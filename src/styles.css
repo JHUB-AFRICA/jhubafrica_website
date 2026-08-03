@@ -966,7 +966,7 @@ main {
     border-color 0.2s;
 }
 
-..section-innovations .prog-card {
+.section-innovations .prog-card {
   background: #f7fafd;
   border-color: rgba(15, 45, 89, 0.1);
 }
