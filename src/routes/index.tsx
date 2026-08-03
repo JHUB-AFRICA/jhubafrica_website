@@ -8,6 +8,10 @@ import image2 from "../assets/images/image2.jpeg";
 import image3 from "../assets/images/image3.jpeg";
 import image4 from "../assets/images/image4.jpeg";
 import image5 from "../assets/images/image5.jpeg";
+import smartNyuki from "../assets/images/smart-nyuki-1.jpg";
+import poliagentx from "../assets/images/poliagentx.png";
+import afridataImg from "../assets/images/Data-Repo-1.jpg";
+import geoPastureImg from "../assets/images/Geopasture-1.webp";
 import image6 from "../assets/images/images6.jpg";
 import image7 from "../assets/images/images7.jpg";
 
@@ -74,7 +78,7 @@ export const Route = createFileRoute("/")({
 });
 
 const HOMEPAGE_METRICS = [
-  { n: 2023, l: "Founded", suffix: "" },
+  { n: "2023", l: "Founded", suffix: "" },
   { n: 400, l: "Innovators Supported", suffix: "+" },
   { n: 150, l: "Innovations", suffix: "+" },
   { n: 1000, l: "Students Engaged", suffix: "+" },
@@ -83,8 +87,10 @@ const HOMEPAGE_METRICS = [
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 
-function formatCount(value: number) {
-  return numberFormatter.format(value);
+function formatCount(value: number, metric: { n: number | string }) {
+  return typeof metric.n === "string"
+    ? String(metric.n)
+    : numberFormatter.format(value);
 }
 
 function Index() {
@@ -197,7 +203,7 @@ function Index() {
           {HOMEPAGE_METRICS.map((m, index) => (
             <div key={m.l} className="stat metric-card">
               <div className="stat-n">
-                {formatCount(counts[index])}
+                {formatCount(counts[index], m)}
                 {m.suffix}
               </div>
               <div className="stat-l">{m.l}</div>
@@ -251,6 +257,9 @@ function Index() {
 
       <section className="content-section">
         <div className="section-eyebrow">Our focus areas</div>
+        <p className="section-copy section-copy--right">
+          At JHUB Africa, we pride ourselves in fostering groundbreaking solutions that address pressing challenges. Our featured innovations span various sectors, showcasing the creativity and dedication of our innovators. Explore our transformative solutions that are making a real difference.
+        </p>
         <h2 className="section-h2">Themes driving our innovation portfolio</h2>
         <div className="focus-grid">
           <article className="focus-card">
@@ -339,6 +348,69 @@ function Index() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="content-section section-innovations">
+        <div className="section-eyebrow">Learn more about our innovations</div>
+        <h2 className="section-h2">From groundbreaking ideas to community impact</h2>
+        <div className="cards-grid">
+          <article className="prog-card">
+            <div className="prog-card-image">
+              <span className="prog-card-badge">Climate Smart Agriculture</span>
+              <img src={smartNyuki} alt="Smart Nyuki" />
+            </div>
+            <div className="prog-title green">Smart Nyuki</div>
+            <p className="prog-desc">
+              A tech-driven beekeeping initiative that empowers African farmers through IoT-enabled hive monitoring and real-time insights.
+            </p>
+            <div className="prog-meta">
+              <span className="prog-slots">Climate Smart Agriculture</span>
+              <Link to="/innovation" className="prog-arrow">Learn More →</Link>
+            </div>
+          </article>
+          <article className="prog-card">
+            <div className="prog-card-image">
+              <span className="prog-card-badge">Big AI Ideas</span>
+              <img src={poliagentx} alt="PoliagentX" />
+            </div>
+            <div className="prog-title">PoliagentX</div>
+            <p className="prog-desc">
+              A dynamic policy visualization platform that helps decision makers test scenarios and strengthen evidence-based governance.
+            </p>
+            <div className="prog-meta">
+              <span className="prog-slots">Big AI Ideas</span>
+              <Link to="/innovation" className="prog-arrow">Learn More →</Link>
+            </div>
+          </article>
+          <article className="prog-card">
+            <div className="prog-card-image">
+              <span className="prog-card-badge">Digital Transformation</span>
+              <img src={afridataImg} alt="AfriData" />
+            </div>
+            <div className="prog-title red">AfriData</div>
+            <p className="prog-desc">
+              Africa’s first community-driven open data platform built to bridge the continent’s information gaps and support research.
+            </p>
+            <div className="prog-meta">
+              <span className="prog-slots">Digital Transformation</span>
+              <Link to="/innovation" className="prog-arrow">Learn More →</Link>
+            </div>
+          </article>
+          <article className="prog-card">
+            <div className="prog-card-image">
+              <span className="prog-card-badge">Green Digital Innovation</span>
+              <img src={geoPastureImg} alt="GeoPasture" />
+            </div>
+            <div className="prog-title">GeoPasture</div>
+            <p className="prog-desc">
+              A mobile solution for peaceful coexistence between pastoralists and agricultural communities through resource-sharing tools.
+            </p>
+            <div className="prog-meta">
+              <span className="prog-slots">Green Digital Innovation</span>
+              <Link to="/innovation" className="prog-arrow">Learn More →</Link>
+            </div>
+          </article>
         </div>
       </section>
 
