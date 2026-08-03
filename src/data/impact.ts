@@ -121,4 +121,28 @@ export const PARTNERS: Partner[] = [
       "Zoho supports startups incubated at JHUB with wallet credits redeemable across Zoho's productivity, CRM and finance suite — cutting early operating costs for founders.",
     url: "https://www.zoho.com",
   },
+  {
+    name: "Samsung",
+    sector: "Technology",
+    outcome: "Device access and ecosystem exposure for product pilots.",
+    caseStudy:
+      "Samsung supports JHUB innovators with visibility into mobile and device ecosystems, helping teams improve product testing, usability and scale-readiness for real-market deployments.",
+    url: "https://www.samsung.com",
+  },
+  {
+    name: "Oracle",
+    sector: "Cloud & Enterprise Tech",
+    outcome: "Cloud architecture guidance and enterprise software exposure.",
+    caseStudy:
+      "Oracle helps JHUB startups learn enterprise-grade cloud patterns, data tooling and product reliability practices that strengthen commercialization pathways.",
+    url: "https://www.oracle.com",
+  },
+  {
+    name: "AMREF",
+    sector: "Health Systems",
+    outcome: "Public health innovation partnerships across health delivery systems.",
+    caseStudy:
+      "AMREF collaborates with JHUB to surface solutions in health access, community systems and digital health services that improve public-health outcomes across Kenya.",
+    url: "https://www.amref.org",
+  },
 ];

@@ -11,6 +11,9 @@ import numeraliotLogo from "../../assets/partners/numeraliot.jpeg";
 import taimbaLogo from "../../assets/partners/taimba.jpeg";
 import yattaLogo from "../../assets/partners/yatta-beekeepers.jpeg";
 import zohoLogo from "../../assets/partners/zoho.jpeg";
+import samsungLogo from "../../assets/partners/sumsung.jpeg";
+import oracleLogo from "../../assets/partners/oracle.jpeg";
+import amrefLogo from "../../assets/partners/amref.png";
 
 const LOGOS: Record<string, string> = {
   JKUAT: jkuatLogo,
@@ -25,6 +28,9 @@ const LOGOS: Record<string, string> = {
   Taimba: taimbaLogo,
   "Yatta Beekeepers": yattaLogo,
   Zoho: zohoLogo,
+  Samsung: samsungLogo,
+  Oracle: oracleLogo,
+  AMREF: amrefLogo,
 };
 
 type Props = {
