@@ -76,7 +76,7 @@ export default function Navbar() {
               to={item.to}
               className="nav-link"
               activeProps={{ className: "nav-link active" }}
-              activeOptions={{ exact: item.to === "/" }}
+              activeOptions={{ exact: (item.to as string) === "/" }}
               onClick={() => {
                 setOpen(false);
               }}

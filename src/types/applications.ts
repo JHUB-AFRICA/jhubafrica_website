@@ -5,6 +5,12 @@ export interface ApplicationRequest {
     role: "Student" | "Innovator" | "Partner" | "Sponsor" | "Volunteer";
     message: string;
     source?: string;
+    innovationTitle?: string;
+    sector?: string;
+    stage?: string;
+    problem?: string;
+    solution?: string;
+    need?: string;
 }
 
 export interface ApplicationItem extends ApplicationRequest {
