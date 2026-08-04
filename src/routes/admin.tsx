@@ -1,23 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import {
-  ADMIN_PASSWORD,
-  ADMIN_SESSION_KEY,
-  type EventItem,
-  type NewsPost,
-} from "@/lib/adminContent";
-import {
-  getNews,
-  getEvents,
-  getInnovations,
-  type InnovationItem,
-} from "@/lib/api";
+import { adminLogin, adminLogout } from "../../axios/api/admin/auth";
+import { getNews } from "../../axios/api/news";
+import { getEvents } from "../../axios/api/events";
+import { getAdminInnovations } from "../../axios/api/admin/innovations";
+import { getAdminCourses } from "../../axios/api/admin/courses";
+import { NewsPost } from "../types/news";
+import { EventItem } from "../types/events";
+import { InnovationItem } from "../types/innovations";
+import { CourseItem } from "../types/courses";
 import {
   dateToLocalYmd,
   localYmdToDate,
   useEventAdmin,
   useInnovationAdmin,
   useNewsAdmin,
+  useCourseAdmin,
 } from "@/features/admin/useAdminContent";
 import { AdminFormActions } from "@/features/admin/components/AdminFormActions";
 import { AdminImageUpload } from "@/features/admin/components/AdminImageUpload";
@@ -37,42 +35,95 @@ export const Route = createFileRoute("/admin")({
     ],
   }),
   loader: async () => {
-    const [news, events, innovations] = await Promise.all([
-      getNews(),
-      getEvents(),
-      getInnovations(),
-    ]);
-    return { news, events, innovations };
+    const hasToken = typeof window !== "undefined" && Boolean(localStorage.getItem("jhub_admin_token"));
+    if (!hasToken) {
+      return { news: [], events: [], innovations: [], courses: [] };
+    }
+
+    try {
+      const [news, events, innovations, courses] = await Promise.all([
+        getNews(),
+        getEvents(),
+        getAdminInnovations(),
+        getAdminCourses(),
+      ]);
+      return { news, events, innovations, courses };
+    } catch (error: any) {
+      console.warn("Loader failed to load admin content, likely expired session:", error);
+      if (error?.response?.status === 401) {
+        localStorage.removeItem("jhub_admin_token");
+        localStorage.removeItem("jhub_admin_refresh_token");
+      }
+      return { news: [], events: [], innovations: [], courses: [] };
+    }
   },
   component: AdminPage,
 });
 
 function AdminPage() {
+  const router = useRouter();
   const [unlocked, setUnlocked] = useState(false);
-  const [pw, setPw] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  const { news, events, innovations } = Route.useLoaderData();
+  const { news, events, innovations, courses } = Route.useLoaderData();
 
   useEffect(() => {
-    if (sessionStorage.getItem(ADMIN_SESSION_KEY) === "1") setUnlocked(true);
+    if (localStorage.getItem("jhub_admin_token")) setUnlocked(true);
   }, []);
 
-  function tryUnlock(e: React.FormEvent) {
+  async function tryUnlock(e: React.FormEvent) {
     e.preventDefault();
-    if (pw === ADMIN_PASSWORD) {
-      sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
+    setLoading(true);
+    setErr("");
+    try {
+      const response = await adminLogin(email, password);
+      localStorage.setItem("jhub_admin_token", response.token);
+      localStorage.setItem("jhub_admin_refresh_token", response.refreshToken);
       setUnlocked(true);
       setErr("");
-    } else {
-      setErr("Incorrect password.");
+      await router.invalidate();
+    } catch (error: any) {
+      console.error(error);
+      const errMsg = error?.response?.data?.error || "Invalid email or password.";
+      setErr(errMsg);
+    } finally {
+      setLoading(false);
     }
   }
 
-  function lock() {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  async function lock() {
+    try {
+      await adminLogout();
+    } catch (e) {
+      console.warn("Sign out request failed:", e);
+    }
+    localStorage.removeItem("jhub_admin_token");
+    localStorage.removeItem("jhub_admin_refresh_token");
     setUnlocked(false);
-    setPw("");
+    setEmail("");
+    setPassword("");
+    await router.invalidate();
   }
+
+  const [confirmDelete, setConfirmDelete] = useState<{
+    isOpen: boolean;
+    title: string;
+    onConfirm: () => Promise<void>;
+  }>({
+    isOpen: false,
+    title: "",
+    onConfirm: async () => {},
+  });
+
+  const requestDelete = (title: string, onConfirm: () => Promise<void>) => {
+    setConfirmDelete({
+      isOpen: true,
+      title,
+      onConfirm,
+    });
+  };
 
   if (!unlocked) {
     return (
@@ -82,7 +133,7 @@ function AdminPage() {
             Admin <span style={{ color: "var(--jhub-green)" }}>Access</span>
           </h1>
           <p>
-            Enter the admin password to manage news, events and innovations.
+            Sign in with your email and password to manage news, events and innovations.
           </p>
         </header>
         <section
@@ -95,10 +146,20 @@ function AdminPage() {
           >
             <input
               autoFocus
+              required
+              type="email"
+              placeholder="Admin email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={inputStyle}
+              aria-label="Admin email"
+            />
+            <input
+              required
               type="password"
               placeholder="Admin password"
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               style={inputStyle}
               aria-label="Admin password"
             />
@@ -107,10 +168,11 @@ function AdminPage() {
             )}
             <button
               type="submit"
+              disabled={loading}
               className="btn-primary"
               style={{ justifySelf: "start" }}
             >
-              Unlock
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
         </section>
@@ -137,9 +199,50 @@ function AdminPage() {
         </button>
       </header>
 
-      <NewsAdmin items={news} />
-      <EventsAdmin items={events} />
-      <InnovationsAdmin items={innovations} />
+      <NewsAdmin items={news} onDeleteRequest={requestDelete} />
+      <EventsAdmin items={events} onDeleteRequest={requestDelete} />
+      <InnovationsAdmin items={innovations} onDeleteRequest={requestDelete} />
+      <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
+
+      {confirmDelete.isOpen && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h3 style={{ margin: "0 0 1rem 0", color: "#1e293b", fontSize: "1.25rem", fontWeight: 700 }}>Confirm Deletion</h3>
+            <p style={{ margin: "0 0 1.5rem 0", color: "#64748b", fontSize: "0.95rem", lineHeight: 1.5 }}>
+              Are you sure you want to delete <strong>{confirmDelete.title}</strong>? This action is permanent and cannot be undone.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+              <button
+                className="btn-outline"
+                type="button"
+                onClick={() => setConfirmDelete({ ...confirmDelete, isOpen: false })}
+                style={{ padding: "0.5rem 1.25rem", borderRadius: "6px", cursor: "pointer", fontSize: "0.9rem" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await confirmDelete.onConfirm();
+                  setConfirmDelete({ ...confirmDelete, isOpen: false });
+                }}
+                style={{
+                  backgroundColor: "#dc2626",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "0.5rem 1.25rem",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                }}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -148,9 +251,10 @@ function AdminPage() {
 
 interface NewsAdminProps {
   items: NewsPost[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
 }
 
-function NewsAdmin({ items }: NewsAdminProps) {
+function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
   const {
     draft,
     setDraft,
@@ -287,7 +391,7 @@ function NewsAdmin({ items }: NewsAdminProps) {
               </button>
               <button
                 className="btn-outline"
-                onClick={() => remove(p.id)}
+                onClick={() => onDeleteRequest(p.title, () => remove(p.id, true))}
                 style={{ color: "#b91c1c" }}
               >
                 Delete
@@ -304,9 +408,10 @@ function NewsAdmin({ items }: NewsAdminProps) {
 
 interface EventsAdminProps {
   items: EventItem[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
 }
 
-function EventsAdmin({ items }: EventsAdminProps) {
+function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
   const {
     draft,
     setDraft,
@@ -423,7 +528,7 @@ function EventsAdmin({ items }: EventsAdminProps) {
               </button>
               <button
                 className="btn-outline"
-                onClick={() => remove(p.id)}
+                onClick={() => onDeleteRequest(p.title, () => remove(p.id, true))}
                 style={{ color: "#b91c1c" }}
               >
                 Delete
@@ -440,9 +545,10 @@ function EventsAdmin({ items }: EventsAdminProps) {
 
 interface InnovationsAdminProps {
   items: InnovationItem[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
 }
 
-function InnovationsAdmin({ items }: InnovationsAdminProps) {
+function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
   const { draft, setDraft, msg, submitting, submit, edit, remove, resetDraft } =
     useInnovationAdmin();
 
@@ -481,6 +587,22 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           <option value="Market entry">Market entry</option>
           <option value="Scale">Scale</option>
         </SelectField>
+        <SelectField
+          value={draft.status || "APPROVED"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              status: e.target.value,
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="DRAFT">Status: Draft</option>
+          <option value="PENDING">Status: Pending</option>
+          <option value="UNDER_REVIEW">Status: Under Review</option>
+          <option value="APPROVED">Status: Approved</option>
+          <option value="REJECTED">Status: Rejected</option>
+        </SelectField>
         <InputField
           required
           placeholder="Support need"
@@ -504,6 +626,104 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           onChange={(e) => setDraft({ ...draft, solution: e.target.value })}
           style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
         />
+
+        {/* Team Members Editor Section */}
+        <div style={{ gridColumn: "1 / -1", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "10px", backgroundColor: "#fafafa" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+            <h3 style={{ margin: 0, fontSize: "1.1rem", color: "#111" }}>Team Members</h3>
+            <button
+              type="button"
+              onClick={() => {
+                const members = draft.teamMembers || [];
+                setDraft({
+                  ...draft,
+                  teamMembers: [...members, { name: "", role: "" }],
+                });
+              }}
+              style={{
+                backgroundColor: "var(--jhub-green)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "6px",
+                padding: "0.4rem 0.8rem",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "0.85rem",
+              }}
+            >
+              + Add Member
+            </button>
+          </div>
+
+          {(draft.teamMembers || []).length === 0 ? (
+            <p style={{ margin: 0, fontSize: "0.9rem", color: "#666", fontStyle: "italic" }}>
+              No team members added yet. Specify team members here to showcase them on the project details view page.
+            </p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              {(draft.teamMembers || []).map((m, idx) => (
+                <div key={idx} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Full Name"
+                    value={m.name}
+                    onChange={(e) => {
+                      const updated = [...(draft.teamMembers || [])];
+                      updated[idx] = { ...updated[idx], name: e.target.value };
+                      setDraft({ ...draft, teamMembers: updated });
+                    }}
+                    style={{
+                      ...inputStyle,
+                      flex: 1,
+                      padding: "0.5rem 0.75rem",
+                      borderRadius: "6px",
+                    }}
+                  />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Role (e.g. Lead Developer)"
+                    value={m.role}
+                    onChange={(e) => {
+                      const updated = [...(draft.teamMembers || [])];
+                      updated[idx] = { ...updated[idx], role: e.target.value };
+                      setDraft({ ...draft, teamMembers: updated });
+                    }}
+                    style={{
+                      ...inputStyle,
+                      flex: 1,
+                      padding: "0.5rem 0.75rem",
+                      borderRadius: "6px",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = (draft.teamMembers || []).filter((_, i) => i !== idx);
+                      setDraft({ ...draft, teamMembers: updated });
+                    }}
+                    style={{
+                      backgroundColor: "#fee2e2",
+                      color: "#991b1b",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.5rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    title="Remove Member"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <AdminFormActions
           submitting={submitting}
           submitLabel={
@@ -525,11 +745,213 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
           <li key={item.id} style={rowStyle}>
             <div>
               <strong>{item.title}</strong>{" "}
+              <span style={{
+                fontSize: "0.75rem",
+                padding: "0.2rem 0.5rem",
+                borderRadius: "999px",
+                marginLeft: "0.5rem",
+                marginRight: "0.5rem",
+                fontWeight: 600,
+                display: "inline-block",
+                verticalAlign: "middle",
+                backgroundColor: 
+                  item.status === "APPROVED" ? "#dcfce7" :
+                  item.status === "REJECTED" ? "#fee2e2" :
+                  item.status === "PENDING" ? "#fef9c3" :
+                  item.status === "UNDER_REVIEW" ? "#dbeafe" :
+                  "#f1f5f9",
+                color:
+                  item.status === "APPROVED" ? "#166534" :
+                  item.status === "REJECTED" ? "#991b1b" :
+                  item.status === "PENDING" ? "#854d0e" :
+                  item.status === "UNDER_REVIEW" ? "#1e40af" :
+                  "#475569"
+              }}>
+                {item.status || "DRAFT"}
+              </span>{" "}
               <span style={{ opacity: 0.6 }}>
                 · {item.sector} · {item.stage}
               </span>
               <div style={{ fontSize: "0.9rem", opacity: 0.8, marginTop: 4 }}>
                 {item.problem}
+              </div>
+              {item.teamMembers && item.teamMembers.length > 0 && (
+                <div style={{ fontSize: "0.8rem", color: "#475569", marginTop: 8, display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                  <span style={{ fontWeight: 600, color: "#1e293b" }}>Team:</span>
+                  {item.teamMembers.map((m, idx) => (
+                    <span key={idx} style={{ background: "#f1f5f9", padding: "0.1rem 0.4rem", borderRadius: "4px" }}>
+                      {m.name} ({m.role})
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button className="btn-outline" onClick={() => edit(item)}>
+                Edit
+              </button>
+              <button
+                className="btn-outline"
+                onClick={() => onDeleteRequest(item.title, () => remove(item.id, true))}
+                style={{ color: "#b91c1c" }}
+              >
+                Delete
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ---------- Courses admin ---------- */
+
+interface CoursesAdminProps {
+  items: CourseItem[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
+}
+
+function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
+  const { draft, setDraft, msg, submitting, submit, edit, remove, resetDraft } =
+    useCourseAdmin();
+
+  return (
+    <section className="content-section">
+      <h2 style={{ marginBottom: "1rem" }}>Courses</h2>
+
+      <form onSubmit={submit} style={formGrid}>
+        <InputField
+          required
+          placeholder="Course Title"
+          value={draft.title}
+          onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+          style={inputStyle}
+        />
+        <InputField
+          required
+          placeholder="Category (e.g. Software, Data)"
+          value={draft.category || ""}
+          onChange={(e) => setDraft({ ...draft, category: e.target.value })}
+          style={inputStyle}
+        />
+        <SelectField
+          value={draft.deliveryMode || "ONLINE"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              deliveryMode: e.target.value as CourseItem["deliveryMode"],
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="ONLINE">Delivery: Online</option>
+          <option value="IN_PERSON">Delivery: In-Person</option>
+          <option value="HYBRID">Delivery: Hybrid</option>
+        </SelectField>
+        <InputField
+          required
+          type="number"
+          placeholder="Duration (Weeks)"
+          value={draft.durationWeeks || ""}
+          onChange={(e) => setDraft({ ...draft, durationWeeks: Number(e.target.value) })}
+          style={inputStyle}
+        />
+        <InputField
+          placeholder="Prerequisites"
+          value={draft.prerequisites || ""}
+          onChange={(e) => setDraft({ ...draft, prerequisites: e.target.value })}
+          style={inputStyle}
+        />
+        <SelectField
+          value={draft.isPublished ? "true" : "false"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              isPublished: e.target.value === "true",
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="true">Status: Published</option>
+          <option value="false">Status: Draft (Hidden)</option>
+        </SelectField>
+        <SelectField
+          value={draft.isFeatured ? "true" : "false"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              isFeatured: e.target.value === "true",
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="false">Featured: No</option>
+          <option value="true">Featured: Yes</option>
+        </SelectField>
+        <TextareaField
+          required
+          rows={3}
+          placeholder="Course Description"
+          value={draft.desc}
+          onChange={(e) => setDraft({ ...draft, desc: e.target.value })}
+          style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
+        />
+        <AdminFormActions
+          submitting={submitting}
+          submitLabel={
+            "id" in draft && draft.id ? "Update course" : "Add course"
+          }
+          isEditing={Boolean("id" in draft && draft.id)}
+          onCancel={resetDraft}
+        >
+          {msg && (
+            <span style={{ color: "var(--jhub-green)", fontSize: "0.9rem" }}>
+              {msg}
+            </span>
+          )}
+        </AdminFormActions>
+      </form>
+
+      <ul style={listStyle}>
+        {items.map((item) => (
+          <li key={item.id} style={rowStyle}>
+            <div>
+              <strong>{item.title}</strong>{" "}
+              <span style={{
+                fontSize: "0.75rem",
+                padding: "0.2rem 0.5rem",
+                borderRadius: "999px",
+                marginLeft: "0.5rem",
+                marginRight: "0.5rem",
+                fontWeight: 600,
+                display: "inline-block",
+                verticalAlign: "middle",
+                backgroundColor: item.isPublished ? "#dcfce7" : "#fee2e2",
+                color: item.isPublished ? "#166534" : "#991b1b"
+              }}>
+                {item.isPublished ? "PUBLISHED" : "DRAFT"}
+              </span>{" "}
+              {item.isFeatured && (
+                <span style={{
+                  fontSize: "0.75rem",
+                  padding: "0.2rem 0.5rem",
+                  borderRadius: "999px",
+                  marginRight: "0.5rem",
+                  fontWeight: 600,
+                  display: "inline-block",
+                  verticalAlign: "middle",
+                  backgroundColor: "#dbeafe",
+                  color: "#1e40af"
+                }}>
+                  FEATURED
+                </span>
+              )}
+              <span style={{ opacity: 0.6 }}>
+                · {item.category} · {item.mode} · {item.duration}
+              </span>
+              <div style={{ fontSize: "0.9rem", opacity: 0.8, marginTop: 4 }}>
+                {item.desc}
               </div>
             </div>
             <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -538,7 +960,7 @@ function InnovationsAdmin({ items }: InnovationsAdminProps) {
               </button>
               <button
                 className="btn-outline"
-                onClick={() => remove(item.id)}
+                onClick={() => onDeleteRequest(item.title, () => remove(item.id, true))}
                 style={{ color: "#b91c1c" }}
               >
                 Delete
@@ -592,4 +1014,28 @@ const rowStyle: React.CSSProperties = {
   border: "1px solid var(--border-color)",
   borderRadius: 10,
   background: "#fff",
+};
+
+const modalOverlayStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.4)",
+  backdropFilter: "blur(4px)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 9999,
+};
+
+const modalContentStyle: React.CSSProperties = {
+  backgroundColor: "#fff",
+  borderRadius: "12px",
+  padding: "2rem",
+  width: "90%",
+  maxWidth: "440px",
+  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+  fontFamily: "inherit",
 };

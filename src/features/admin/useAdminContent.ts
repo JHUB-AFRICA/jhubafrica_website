@@ -1,23 +1,18 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
-import {
-    addEvent,
-    addInnovation,
-    addNews,
-    deleteEvent,
-    deleteInnovation,
-    deleteNews,
-    type EventItem,
-    type InnovationItem,
-    type NewsPost,
-    updateEvent,
-    updateInnovation,
-    updateNews,
-} from "@/lib/api";
+import { addNews, updateNews, deleteNews } from "../../../axios/api/news";
+import { addEvent, updateEvent, deleteEvent } from "../../../axios/api/events";
+import { addInnovation, updateInnovation, deleteInnovation } from "../../../axios/api/innovations";
+import { createCourse, updateCourse, deleteCourse } from "../../../axios/api/admin/courses";
+import { NewsPost } from "../../types/news";
+import { EventItem } from "../../types/events";
+import { InnovationItem } from "../../types/innovations";
+import { CourseItem } from "../../types/courses";
 
 export type NewsDraft = NewsPost | (Omit<NewsPost, "id"> & { id?: string });
 export type EventDraft = EventItem | (Omit<EventItem, "id"> & { id?: string });
 export type InnovationDraft = InnovationItem | (Omit<InnovationItem, "id"> & { id?: string });
+export type CourseDraft = CourseItem | (Omit<CourseItem, "id"> & { id?: string });
 
 export async function fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -81,6 +76,29 @@ export function getEmptyInnovation(): Omit<InnovationItem, "id"> {
         need: "",
         problem: "",
         solution: "",
+        status: "APPROVED",
+        teamMembers: [],
+    };
+}
+
+export function getEmptyCourse(): Omit<CourseItem, "id"> {
+    return {
+        tag: "Software",
+        title: "",
+        desc: "",
+        level: "Beginner → Intermediate",
+        duration: "12 weeks",
+        mode: "Hybrid",
+        cohort: "Open",
+        cert: "Certificate of completion",
+        color: "g",
+        titleColor: "green",
+        prerequisites: "",
+        durationWeeks: 12,
+        deliveryMode: "HYBRID",
+        isFeatured: false,
+        isPublished: true,
+        category: "Software",
     };
 }
 
@@ -124,8 +142,8 @@ export function useNewsAdmin() {
         window.scrollTo({ top: 300, behavior: "smooth" });
     }, []);
 
-    const remove = useCallback(async (id: string) => {
-        if (!confirm("Delete this news post?")) return;
+    const remove = useCallback(async (id: string, bypassConfirm = false) => {
+        if (!bypassConfirm && !confirm("Delete this news post?")) return;
 
         setMsg("Deleting...");
 
@@ -201,8 +219,8 @@ export function useEventAdmin() {
         window.scrollTo({ top: 300, behavior: "smooth" });
     }, []);
 
-    const remove = useCallback(async (id: string) => {
-        if (!confirm("Delete this event?")) return;
+    const remove = useCallback(async (id: string, bypassConfirm = false) => {
+        if (!bypassConfirm && !confirm("Delete this event?")) return;
 
         setMsg("Deleting...");
 
@@ -278,8 +296,8 @@ export function useInnovationAdmin() {
         window.scrollTo({ top: 300, behavior: "smooth" });
     }, []);
 
-    const remove = useCallback(async (id: string) => {
-        if (!confirm("Delete this innovation?")) return;
+    const remove = useCallback(async (id: string, bypassConfirm = false) => {
+        if (!bypassConfirm && !confirm("Delete this innovation?")) return;
 
         setMsg("Deleting...");
 
@@ -295,6 +313,76 @@ export function useInnovationAdmin() {
     }, [router]);
 
     const resetDraft = useCallback(() => setDraft(getEmptyInnovation()), []);
+
+    return {
+        draft,
+        setDraft,
+        msg,
+        submitting,
+        submit,
+        edit,
+        remove,
+        resetDraft,
+    };
+}
+
+export function useCourseAdmin() {
+    const router = useRouter();
+    const [draft, setDraft] = useState<CourseDraft>(getEmptyCourse());
+    const [msg, setMsg] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+
+    const submit = useCallback(
+        async (e: FormEvent) => {
+            e.preventDefault();
+            if (!draft.title.trim() || !draft.desc.trim()) return;
+
+            setSubmitting(true);
+            setMsg("Saving...");
+
+            try {
+                if ("id" in draft && draft.id) {
+                    await updateCourse(draft.id, draft as CourseItem);
+                } else {
+                    await createCourse(draft as Omit<CourseItem, "id">);
+                }
+
+                await router.invalidate();
+                setDraft(getEmptyCourse());
+                setMsg("Saved.");
+                setTimeout(() => setMsg(""), 1500);
+            } catch (err) {
+                console.error(err);
+                setMsg("Error saving changes.");
+            } finally {
+                setSubmitting(false);
+            }
+        },
+        [draft, router],
+    );
+
+    const edit = useCallback((course: CourseItem) => {
+        setDraft(course);
+        window.scrollTo({ top: 300, behavior: "smooth" });
+    }, []);
+
+    const remove = useCallback(async (id: string, bypassConfirm = false) => {
+        if (!bypassConfirm && !confirm("Delete this course?")) return;
+
+        setMsg("Deleting...");
+
+        try {
+            await deleteCourse(id);
+            await router.invalidate();
+            setMsg("Deleted.");
+            setTimeout(() => setMsg(""), 1500);
+        } catch (err) {
+            console.error(err);
+            setMsg("Error deleting course.");
+        }
+    }, [router]);
+
+    const resetDraft = useCallback(() => setDraft(getEmptyCourse()), []);
 
     return {
         draft,

@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 *.ps1
+
+*.env
+.env

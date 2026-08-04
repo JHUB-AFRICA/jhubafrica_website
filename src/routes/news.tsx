@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { getNews, type NewsPost } from "@/lib/api";
+import { getNews } from "../../axios/api/news";
+import { NewsPost } from "../types/news";
 
 export const Route = createFileRoute("/news")({
   head: () => ({
