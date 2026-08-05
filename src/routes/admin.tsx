@@ -22,6 +22,7 @@ import { AdminImageUpload } from "@/features/admin/components/AdminImageUpload";
 import { InputField } from "@/features/admin/components/InputField";
 import { TextareaField } from "@/features/admin/components/TextareaField";
 import { SelectField } from "@/features/admin/components/SelectField";
+import styles from "../styles/Admin.module.css";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -151,7 +152,7 @@ function AdminPage() {
               placeholder="Admin email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={inputStyle}
+              className={styles['input-style']}
               aria-label="Admin email"
             />
             <input
@@ -160,7 +161,7 @@ function AdminPage() {
               placeholder="Admin password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              style={inputStyle}
+              className={styles['input-style']}
               aria-label="Admin password"
             />
             {err && (
@@ -205,8 +206,8 @@ function AdminPage() {
       <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
 
       {confirmDelete.isOpen && (
-        <div style={modalOverlayStyle}>
-          <div style={modalContentStyle}>
+        <div className={styles['modal-overlay-style']}>
+          <div className={styles['modal-content-style']}>
             <h3 style={{ margin: "0 0 1rem 0", color: "#1e293b", fontSize: "1.25rem", fontWeight: 700 }}>Confirm Deletion</h3>
             <p style={{ margin: "0 0 1.5rem 0", color: "#64748b", fontSize: "0.95rem", lineHeight: 1.5 }}>
               Are you sure you want to delete <strong>{confirmDelete.title}</strong>? This action is permanent and cannot be undone.
@@ -271,13 +272,13 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
     <section className="content-section">
       <h2 style={{ marginBottom: "1rem" }}>News posts</h2>
 
-      <form onSubmit={submit} style={formGrid}>
+      <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
           required
           placeholder="Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <div
           style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}
@@ -299,7 +300,7 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
               const d = new Date(draft.date);
               return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
             })()}
-            style={inputStyle}
+            className={styles['input-style']}
             onChange={(e) => {
               if (e.target.value) {
                 const d = localYmdToDate(e.target.value);
@@ -318,14 +319,14 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
           placeholder="Tag (e.g. Announcement)"
           value={draft.tag}
           onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <SelectField
           value={draft.color}
           onChange={(e) =>
             setDraft({ ...draft, color: e.target.value as NewsPost["color"] })
           }
-          style={inputStyle}
+          className={styles['input-style']}
         >
           <option value="g">Tag: Green</option>
           <option value="b">Tag: Blue</option>
@@ -339,7 +340,7 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
               titleColor: e.target.value as NewsPost["titleColor"],
             })
           }
-          style={inputStyle}
+          className={styles['input-style']}
         >
           <option value="">Title: Default</option>
           <option value="green">Title: Green</option>
@@ -351,7 +352,7 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
           placeholder="Body"
           value={draft.body}
           onChange={(e) => setDraft({ ...draft, body: e.target.value })}
-          style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
+          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
         />
         <AdminImageUpload
           onFileSelected={(file) => {
@@ -373,9 +374,9 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
         </AdminFormActions>
       </form>
 
-      <ul style={listStyle}>
+      <ul className={styles['list-style']}>
         {items.map((p) => (
-          <li key={p.id} style={rowStyle}>
+          <li key={p.id} className={styles['row-style']}>
             <div>
               <strong>{p.title}</strong>{" "}
               <span style={{ opacity: 0.6 }}>
@@ -428,13 +429,13 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
     <section className="content-section">
       <h2 style={{ marginBottom: "1rem" }}>Events</h2>
 
-      <form onSubmit={submit} style={formGrid}>
+      <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
           required
           placeholder="Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <div
           style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}
@@ -457,7 +458,7 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
               const d = new Date(`${draft.month} ${draft.day}, ${currentYear}`);
               return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
             })()}
-            style={inputStyle}
+            className={styles['input-style']}
             onChange={(e) => {
               if (e.target.value) {
                 const d = localYmdToDate(e.target.value);
@@ -476,7 +477,7 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
               titleColor: e.target.value as EventItem["titleColor"],
             })
           }
-          style={inputStyle}
+          className={styles['input-style']}
         >
           <option value="">Title: Default</option>
           <option value="green">Title: Green</option>
@@ -488,7 +489,7 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
           placeholder="Description"
           value={draft.desc}
           onChange={(e) => setDraft({ ...draft, desc: e.target.value })}
-          style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
+          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
         />
         <AdminImageUpload
           onFileSelected={(file) => {
@@ -510,9 +511,9 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
         </AdminFormActions>
       </form>
 
-      <ul style={listStyle}>
+      <ul className={styles['list-style']}>
         {items.map((p) => (
-          <li key={p.id} style={rowStyle}>
+          <li key={p.id} className={styles['row-style']}>
             <div>
               <strong>
                 {p.day} {p.month}
@@ -556,20 +557,20 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
     <section className="content-section">
       <h2 style={{ marginBottom: "1rem" }}>Innovations</h2>
 
-      <form onSubmit={submit} style={formGrid}>
+      <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
           required
           placeholder="Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <InputField
           required
           placeholder="Sector"
           value={draft.sector}
           onChange={(e) => setDraft({ ...draft, sector: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <SelectField
           value={draft.stage}
@@ -579,7 +580,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
               stage: e.target.value as InnovationItem["stage"],
             })
           }
-          style={inputStyle}
+          className={styles['input-style']}
         >
           <option value="Concept">Concept</option>
           <option value="Prototype">Prototype</option>
@@ -595,7 +596,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
               status: e.target.value,
             })
           }
-          style={inputStyle}
+          className={styles['input-style']}
         >
           <option value="DRAFT">Status: Draft</option>
           <option value="PENDING">Status: Pending</option>
@@ -608,7 +609,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
           placeholder="Support need"
           value={draft.need}
           onChange={(e) => setDraft({ ...draft, need: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <TextareaField
           required
@@ -616,7 +617,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
           placeholder="Problem"
           value={draft.problem}
           onChange={(e) => setDraft({ ...draft, problem: e.target.value })}
-          style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
+          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
         />
         <TextareaField
           required
@@ -624,7 +625,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
           placeholder="Solution"
           value={draft.solution}
           onChange={(e) => setDraft({ ...draft, solution: e.target.value })}
-          style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
+          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
         />
 
         {/* Team Members Editor Section */}
@@ -673,8 +674,8 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
                       updated[idx] = { ...updated[idx], name: e.target.value };
                       setDraft({ ...draft, teamMembers: updated });
                     }}
+                    className={styles['input-style']}
                     style={{
-                      ...inputStyle,
                       flex: 1,
                       padding: "0.5rem 0.75rem",
                       borderRadius: "6px",
@@ -690,8 +691,8 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
                       updated[idx] = { ...updated[idx], role: e.target.value };
                       setDraft({ ...draft, teamMembers: updated });
                     }}
+                    className={styles['input-style']}
                     style={{
-                      ...inputStyle,
                       flex: 1,
                       padding: "0.5rem 0.75rem",
                       borderRadius: "6px",
@@ -740,9 +741,9 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
         </AdminFormActions>
       </form>
 
-      <ul style={listStyle}>
+      <ul className={styles['list-style']}>
         {items.map((item) => (
-          <li key={item.id} style={rowStyle}>
+          <li key={item.id} className={styles['row-style']}>
             <div>
               <strong>{item.title}</strong>{" "}
               <span style={{
@@ -820,20 +821,20 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
     <section className="content-section">
       <h2 style={{ marginBottom: "1rem" }}>Courses</h2>
 
-      <form onSubmit={submit} style={formGrid}>
+      <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
           required
           placeholder="Course Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <InputField
           required
           placeholder="Category (e.g. Software, Data)"
           value={draft.category || ""}
           onChange={(e) => setDraft({ ...draft, category: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <SelectField
           value={draft.deliveryMode || "ONLINE"}
@@ -843,7 +844,7 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
               deliveryMode: e.target.value as CourseItem["deliveryMode"],
             })
           }
-          style={inputStyle}
+          className={styles['input-style']}
         >
           <option value="ONLINE">Delivery: Online</option>
           <option value="IN_PERSON">Delivery: In-Person</option>
@@ -855,13 +856,13 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
           placeholder="Duration (Weeks)"
           value={draft.durationWeeks || ""}
           onChange={(e) => setDraft({ ...draft, durationWeeks: Number(e.target.value) })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <InputField
           placeholder="Prerequisites"
           value={draft.prerequisites || ""}
           onChange={(e) => setDraft({ ...draft, prerequisites: e.target.value })}
-          style={inputStyle}
+          className={styles['input-style']}
         />
         <SelectField
           value={draft.isPublished ? "true" : "false"}
@@ -871,7 +872,7 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
               isPublished: e.target.value === "true",
             })
           }
-          style={inputStyle}
+          className={styles['input-style']}
         >
           <option value="true">Status: Published</option>
           <option value="false">Status: Draft (Hidden)</option>
@@ -884,7 +885,7 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
               isFeatured: e.target.value === "true",
             })
           }
-          style={inputStyle}
+          className={styles['input-style']}
         >
           <option value="false">Featured: No</option>
           <option value="true">Featured: Yes</option>
@@ -895,7 +896,7 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
           placeholder="Course Description"
           value={draft.desc}
           onChange={(e) => setDraft({ ...draft, desc: e.target.value })}
-          style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
+          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
         />
         <AdminFormActions
           submitting={submitting}
@@ -913,9 +914,9 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
         </AdminFormActions>
       </form>
 
-      <ul style={listStyle}>
+      <ul className={styles['list-style']}>
         {items.map((item) => (
-          <li key={item.id} style={rowStyle}>
+          <li key={item.id} className={styles['row-style']}>
             <div>
               <strong>{item.title}</strong>{" "}
               <span style={{
@@ -973,69 +974,3 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
   );
 }
 
-/* ---------- styles ---------- */
-
-const inputStyle: React.CSSProperties = {
-  padding: "0.7rem 0.9rem",
-  border: "1px solid var(--border-color)",
-  borderRadius: 8,
-  fontSize: "0.95rem",
-  fontFamily: "inherit",
-  background: "#fff",
-  color: "var(--text-main)",
-  outline: "none",
-};
-
-const formGrid: React.CSSProperties = {
-  display: "grid",
-  gap: "0.75rem",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  padding: "1.25rem",
-  border: "1px solid var(--border-color)",
-  borderRadius: 12,
-  background: "#fafafa",
-  marginBottom: "1.5rem",
-};
-
-const listStyle: React.CSSProperties = {
-  listStyle: "none",
-  padding: 0,
-  margin: 0,
-  display: "grid",
-  gap: "0.6rem",
-};
-
-const rowStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "flex-start",
-  gap: "1rem",
-  padding: "0.85rem 1rem",
-  border: "1px solid var(--border-color)",
-  borderRadius: 10,
-  background: "#fff",
-};
-
-const modalOverlayStyle: React.CSSProperties = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, 0.4)",
-  backdropFilter: "blur(4px)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 9999,
-};
-
-const modalContentStyle: React.CSSProperties = {
-  backgroundColor: "#fff",
-  borderRadius: "12px",
-  padding: "2rem",
-  width: "90%",
-  maxWidth: "440px",
-  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-  fontFamily: "inherit",
-};

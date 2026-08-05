@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import ApplyDialog from "./ApplyDialog";
 import logoAsset from "../../assets/jhublogo.jpeg";
 import { ContactModal } from "./ContactModal";
+import styles from "../../styles/Navbar.module.css";
 
 const NAV = [
   { to: "/about", label: "About" },
@@ -41,29 +42,29 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`site-header ${isHidden ? "site-header--hidden" : ""}`}>
-        <Link to="/" className="brand-container" onClick={() => setOpen(false)}>
+      <header className={`${styles['site-header']} ${isHidden ? styles['site-header--hidden'] : ""}`}>
+        <Link to="/" className={styles['brand-container']} onClick={() => setOpen(false)}>
           <img
             src={logoAsset}
             alt="JHUB Africa — Innovations for Transformation"
-            className="brand-logo-img"
+            className={styles['brand-logo-img']}
           />
         </Link>
 
         <button
-          className="mobile-toggle"
+          className={styles['mobile-toggle']}
           aria-label="Toggle navigation"
           onClick={() => setOpen((v) => !v)}
         >
           ☰
         </button>
 
-        <nav className={`site-nav ${open ? "open" : "collapsed"}`}>
-          <div className="mobile-nav-header">
-            <img src={logoAsset} alt="JHUB Logo" className="mobile-nav-logo" />
+        <nav className={`${styles['site-nav']} ${open ? styles.open : styles.collapsed}`}>
+          <div className={styles['mobile-nav-header']}>
+            <img src={logoAsset} alt="JHUB Logo" className={styles['mobile-nav-logo']} />
             <button
               type="button"
-              className="mobile-nav-close"
+              className={styles['mobile-nav-close']}
               onClick={() => setOpen(false)}
               aria-label="Close menu"
             >
@@ -74,8 +75,8 @@ export default function Navbar() {
             <Link
               key={item.to}
               to={item.to}
-              className="nav-link"
-              activeProps={{ className: "nav-link active" }}
+              className={styles['nav-link']}
+              activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
               activeOptions={{ exact: (item.to as string) === "/" }}
               onClick={() => {
                 setOpen(false);
@@ -86,14 +87,14 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="nav-cta">
+        <div className={styles['nav-cta']}>
           <ApplyDialog triggerText="Get Involved" triggerVariant="default" />
         </div>
       </header>
 
       {open && (
         <div
-          className="mobile-nav-backdrop"
+          className={styles['mobile-nav-backdrop']}
           onClick={() => setOpen(false)}
         />
       )}

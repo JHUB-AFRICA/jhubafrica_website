@@ -17,6 +17,7 @@ import afridataImg from "../assets/images/Data-Repo-1.jpg";
 import geoPastureImg from "../assets/images/Geopasture-1.webp";
 import image6 from "../assets/images/images6.jpg";
 import image7 from "../assets/images/images7.jpg";
+import styles from "../styles/Home.module.css";
 
 const HERO_IMAGES = [image1, image2, image3, image4, image5];
 
@@ -168,31 +169,31 @@ function Index() {
 
   return (
     <>
-      <div className="hero-bg">
+      <div className={styles['hero-bg']}>
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className={`hero-bg-layer ${slide.state === "visible"
-              ? "hero-bg-layer--visible"
-              : "hero-bg-layer--entering"
+            className={`${styles['hero-bg-layer']} ${slide.state === "visible"
+              ? styles['hero-bg-layer--visible']
+              : styles['hero-bg-layer--entering']
               }`}
             style={{
               backgroundImage: `linear-gradient(135deg, rgba(8,20,45,0.72), rgba(8,20,45,0.55)), url(${HERO_IMAGES[slide.imageIndex]})`,
             }}
           />
         ))}
-        <section className="hero-section hero-on-image">
-          <div className="hero-kicker">Africa's Innovation Hub</div>
+        <section className={`${styles['hero-section']} ${styles['hero-on-image']}`}>
+          <div className={styles['hero-kicker']}>Africa's Innovation Hub</div>
           {/* eslint-disable-next-line */}
           <h1>
             Africa's Innovation Hub for <span>Turning Ideas into Impact</span>
           </h1>
-          <p className="hero-sub">
+          <p className={styles['hero-sub']}>
             JHUB Africa empowers innovators, builds solutions and partners across
             sectors to address Africa’s most pressing challenges and create
             sustainable economic growth.
           </p>
-          <div className="hero-actions">
+          <div className={styles['hero-actions']}>
             <Link to="/innovation" className="btn-primary">
               Explore Innovations
             </Link>
@@ -202,14 +203,14 @@ function Index() {
           </div>
         </section>
 
-        <div className="stats-bar stats-on-image">
+        <div className={`${styles['stats-bar']} ${styles['stats-on-image']}`}>
           {HOMEPAGE_METRICS.map((m, index) => (
-            <div key={m.l} className="stat metric-card">
-              <div className="stat-n">
+            <div key={m.l} className={`${styles.stat} ${styles['metric-card']}`}>
+              <div className={styles['stat-n']}>
                 {formatCount(counts[index], m)}
                 {m.suffix}
               </div>
-              <div className="stat-l">{m.l}</div>
+              <div className={styles['stat-l']}>{m.l}</div>
             </div>
           ))}
         </div>
@@ -218,8 +219,8 @@ function Index() {
       <section className="content-section">
         <div className="section-eyebrow">Audience-based navigation</div>
         <h2 className="section-h2">Find what matters to you</h2>
-        <div className="cards-grid audience-grid">
-          <Link to="/innovation" className="prog-card audience-card">
+        <div className={`cards-grid ${styles['audience-grid']}`}>
+          <Link to="/innovation" className={`prog-card ${styles['audience-card']}`}>
             <div className="prog-title green">Innovators</div>
             <p className="prog-desc">
               Get support to build, test and scale your solution.
@@ -228,7 +229,7 @@ function Index() {
               <span className="prog-arrow">Start Your Journey →</span>
             </div>
           </Link>
-          <Link to="/for-students" className="prog-card audience-card">
+          <Link to="/for-students" className={`prog-card ${styles['audience-card']}`}>
             <div className="prog-title">Students</div>
             <p className="prog-desc">
               Learn, innovate and grow your ideas with JHUB.
@@ -237,7 +238,7 @@ function Index() {
               <span className="prog-arrow">Explore Programs →</span>
             </div>
           </Link>
-          <Link to="/support" className="prog-card audience-card">
+          <Link to="/support" className={`prog-card ${styles['audience-card']}`}>
             <div className="prog-title red">Funders & Investors</div>
             <p className="prog-desc">
               Discover high-potential innovations ready for support.
@@ -246,7 +247,7 @@ function Index() {
               <span className="prog-arrow">View Opportunities →</span>
             </div>
           </Link>
-          <Link to="/for-partners" className="prog-card audience-card">
+          <Link to="/for-partners" className={`prog-card ${styles['audience-card']}`}>
             <div className="prog-title">Partners & Researchers</div>
             <p className="prog-desc">
               Collaborate on research, pilots and applied innovation.
@@ -264,29 +265,29 @@ function Index() {
           At JHUB Africa, we pride ourselves in fostering groundbreaking solutions that address pressing challenges. Our featured innovations span various sectors, showcasing the creativity and dedication of our innovators. Explore our transformative solutions that are making a real difference.
         </p>
         <h2 className="section-h2">Themes driving our innovation portfolio</h2>
-        <div className="focus-grid">
-          <article className="focus-card">
-            <div className="focus-icon">🌾</div>
+        <div className={styles['focus-grid']}>
+          <article className={styles['focus-card']}>
+            <div className={styles['focus-icon']}>🌾</div>
             <h3>Climate Smart Agriculture</h3>
             <p>Digital tools for resilient, sustainable food systems.</p>
           </article>
-          <article className="focus-card">
-            <div className="focus-icon">🧭</div>
+          <article className={styles['focus-card']}>
+            <div className={styles['focus-icon']}>🧭</div>
             <h3>Digital Twin Models</h3>
             <p>Real-time simulation and monitoring for systems and energy.</p>
           </article>
-          <article className="focus-card">
-            <div className="focus-icon">🌿</div>
+          <article className={styles['focus-card']}>
+            <div className={styles['focus-icon']}>🌿</div>
             <h3>Green Digital Innovation</h3>
             <p>Climate-friendly products that reduce waste and improve efficiency.</p>
           </article>
-          <article className="focus-card">
-            <div className="focus-icon">🌐</div>
+          <article className={styles['focus-card']}>
+            <div className={styles['focus-icon']}>🌐</div>
             <h3>Digital Trade</h3>
             <p>Platforms and tools that enable regional market access.</p>
           </article>
-          <article className="focus-card">
-            <div className="focus-icon">🤖</div>
+          <article className={styles['focus-card']}>
+            <div className={styles['focus-icon']}>🤖</div>
             <h3>AI & Digital Transformation</h3>
             <p>Inclusive AI and automation for African enterprises.</p>
           </article>
@@ -328,7 +329,7 @@ function Index() {
             </div>
           </article>
         </div>
-        <div className="homepage-browse-section">
+        <div className={styles['homepage-browse-section']}>
           <Link to="/innovation" className="btn-outline">Browse full portfolio</Link>
         </div>
       </section>
@@ -336,16 +337,16 @@ function Index() {
       <section className="content-section">
         <div className="section-eyebrow">How JHUB supports innovation</div>
         <h2 className="section-h2">Support at every stage</h2>
-        <div className="support-grid">
+        <div className={styles['support-grid']}>
           {SUPPORT_STEPS.map((step) => (
-            <article key={step.title} className="support-card">
+            <article key={step.title} className={styles['support-card']}>
               <div
-                className="support-card-media"
+                className={styles['support-card-media']}
                 style={{
                   backgroundImage: `${step.overlay}, url(${step.image})`,
                 }}
               />
-              <div className="support-card-body">
+              <div className={styles['support-card-body']}>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
               </div>
@@ -418,14 +419,14 @@ function Index() {
       </section>
 
       <section className="content-section story-section">
-        <div className="story-grid">
-          <article className="story-card">
+        <div className={styles['story-grid']}>
+          <article className={styles['story-card']}>
             <div className="section-eyebrow">Success stories</div>
             <h2 className="section-h2">From idea to impact: EcoBriq</h2>
             <p className="section-p">
               EcoBriq used JHUB's incubation support to refine its product, secure funding and start commercial operations.
             </p>
-            <div className="story-stats">
+            <div className={styles['story-stats']}>
               <div>
                 <strong>25+</strong>
                 <span>Jobs created</span>
@@ -441,12 +442,12 @@ function Index() {
             </div>
             <Link to="/news" className="btn-outline">Read full story</Link>
           </article>
-          <article className="quote-card">
-            <div className="quote-mark">“</div>
+          <article className={styles['quote-card']}>
+            <div className={styles['quote-mark']}>“</div>
             <p>
               JHUB's mentorship and incubation support helped us refine our solution and secure our first investment.
             </p>
-            <div className="quote-author">Carolyne W., Founder, EcoBriq</div>
+            <div className={styles['quote-author']}>Carolyne W., Founder, EcoBriq</div>
           </article>
         </div>
       </section>
@@ -454,16 +455,16 @@ function Index() {
       <section className="content-section">
         <div className="section-eyebrow">Visibility</div>
         <h2 className="section-h2">Upcoming events and latest news</h2>
-        <div className="event-news-grid">
+        <div className={styles['event-news-grid']}>
           <div>
-            <div className="section-subtitle">Upcoming events</div>
-            <div className="cards-grid news-grid">
+            <div className={styles['section-subtitle']}>Upcoming events</div>
+            <div className={`cards-grid ${styles['news-grid']}`}>
               {events.slice(0, 3).map((event) => (
                 <article key={event.id} className="prog-card news-card-compact">
-                  <div className="event-card-inner">
-                    <div className="event-date">
-                      <div className="event-day">{event.day}</div>
-                      <div className="event-month">{event.month}</div>
+                  <div className={styles['event-card-inner']}>
+                    <div className={styles['event-date']}>
+                      <div className={styles['event-day']}>{event.day}</div>
+                      <div className={styles['event-month']}>{event.month}</div>
                     </div>
                     <div>
                       <div className={`prog-title ${event.titleColor}`}>{event.title}</div>
@@ -480,8 +481,8 @@ function Index() {
           </div>
 
           <div>
-            <div className="section-subtitle">Latest news</div>
-            <div className="cards-grid news-grid">
+            <div className={styles['section-subtitle']}>Latest news</div>
+            <div className={`cards-grid ${styles['news-grid']}`}>
               {news.slice(0, 3).map((post) => (
                 <article key={post.id} className="prog-card news-card-compact">
                   <div className={`prog-title ${post.titleColor}`}>{post.title}</div>
@@ -500,8 +501,8 @@ function Index() {
 
       <PartnersSection compact />
 
-      <section className="content-section newsletter-section">
-        <div className="newsletter-copy">
+      <section className={`content-section ${styles['newsletter-section']}`}>
+        <div className={styles['newsletter-copy']}>
           <div className="section-eyebrow">Stay connected</div>
           <h2 className="section-h2">Get updates on innovations, events and opportunities</h2>
           <p className="section-p">
@@ -509,13 +510,13 @@ function Index() {
             opportunities.
           </p>
         </div>
-        <form className="newsletter-form" onSubmit={(event) => event.preventDefault()}>
+        <form className={styles['newsletter-form']} onSubmit={(event) => event.preventDefault()}>
           <label className="sr-only" htmlFor="newsletter-email">Email address</label>
           <input
             id="newsletter-email"
             type="email"
             placeholder="Enter your email address"
-            className="newsletter-input"
+            className={styles['newsletter-input']}
             aria-label="Newsletter email"
           />
           <button type="submit" className="btn-primary">Subscribe</button>

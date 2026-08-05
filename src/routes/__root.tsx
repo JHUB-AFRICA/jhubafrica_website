@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import appCss from "../styles.css?url";
+import appCss from "../styles/global.css?url";
 import { reportLovableError } from "../lib/lovable-error";
 import Navbar from "../components/site/Navbar";
 import Footer from "../components/site/Footer";
