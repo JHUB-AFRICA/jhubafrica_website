@@ -14,6 +14,7 @@ import zohoLogo from "../../assets/partners/zoho.jpeg";
 import samsungLogo from "../../assets/partners/sumsung.jpeg";
 import oracleLogo from "../../assets/partners/oracle.jpeg";
 import amrefLogo from "../../assets/partners/amref.png";
+import styles from "../../styles/PartnersSection.module.css";
 
 const LOGOS: Record<string, string> = {
   JKUAT: jkuatLogo,
@@ -52,7 +53,7 @@ export default function PartnersSection({
       <h2 className="section-h2">{title}</h2>
       <p className="section-p">{intro}</p>
 
-      <div className="partner-logos" aria-label="Partner organisations">
+      <div className={styles['partner-logos']} aria-label="Partner organisations">
         {PARTNERS.map((p) => {
           const partnerContent = (
             <>
@@ -60,11 +61,11 @@ export default function PartnersSection({
                 <img
                   src={LOGOS[p.name]}
                   alt={`${p.name} logo`}
-                  className="partner-logo-img"
+                  className={styles['partner-logo-img']}
                   loading="lazy"
                 />
               ) : (
-                <span className="partner-logo-mark" aria-hidden="true">
+                <span className={styles['partner-logo-mark']} aria-hidden="true">
                   {p.name
                     .split(/\s+/)
                     .slice(0, 2)
@@ -72,7 +73,7 @@ export default function PartnersSection({
                     .join("")}
                 </span>
               )}
-              <span className="partner-logo-name">{p.name}</span>
+              <span className={styles['partner-logo-name']}>{p.name}</span>
             </>
           );
 
@@ -82,12 +83,12 @@ export default function PartnersSection({
               href={p.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="partner-logo"
+              className={styles['partner-logo']}
             >
               {partnerContent}
             </a>
           ) : (
-            <div key={p.name} className="partner-logo">
+            <div key={p.name} className={styles['partner-logo']}>
               {partnerContent}
             </div>
           );
