@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { getInnovations } from "../../axios/api/innovations";
 import { InnovationItem } from "../types/innovations";
+import styles from "../styles/Innovations.module.css";
 
 export const Route = createFileRoute("/innovation/")({
   head: () => ({
@@ -71,19 +72,19 @@ function InnovationPage() {
       </header>
 
       <section className="content-section">
-        <div className="filter-bar">
+        <div className={styles['filter-bar']}>
           <input
             type="search"
             placeholder="Search innovations..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="filter-input"
+            className={styles['filter-input']}
             aria-label="Search innovations"
           />
           <select
             value={stage}
             onChange={(e) => setStage(e.target.value as typeof stage)}
-            className="filter-select"
+            className={styles['filter-select']}
             aria-label="Filter by stage"
           >
             {STAGES.map((s) => (
@@ -95,7 +96,7 @@ function InnovationPage() {
           <select
             value={sector}
             onChange={(e) => setSector(e.target.value)}
-            className="filter-select"
+            className={styles['filter-select']}
             aria-label="Filter by sector"
           >
             {sectors.map((s) => (
@@ -106,7 +107,7 @@ function InnovationPage() {
           </select>
         </div>
 
-        <div className="filter-meta">
+        <div className={styles['filter-meta']}>
           Showing {filtered.length} of {innovations.length} innovations
         </div>
 

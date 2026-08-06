@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import ApplyDialog from "../components/site/ApplyDialog";
 import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
 import ContactStrip from "../components/site/ContactStrip";
+import styles from "../styles/About.module.css";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -27,7 +28,7 @@ function AboutPage() {
     <>
       <header className="page-header">
         <h1>
-          About <span className="about-header-span">JHUB Africa</span>
+          About <span className={styles['about-header-span']}>JHUB Africa</span>
         </h1>
         <p>
           Founded in {FOUNDED_YEAR} at Jomo Kenyatta University of Agriculture
@@ -47,11 +48,11 @@ function AboutPage() {
           continent.
         </p>
 
-        <div className="stats-bar">
+        <div className={styles['stats-bar']}>
           {IMPACT_METRICS.map((m) => (
-            <div key={m.l} className="stat">
-              <div className="stat-n">{m.n}</div>
-              <div className="stat-l">{m.l}</div>
+            <div key={m.l} className={styles.stat}>
+              <div className={styles['stat-n']}>{m.n}</div>
+              <div className={styles['stat-l']}>{m.l}</div>
             </div>
           ))}
         </div>
@@ -100,7 +101,7 @@ function AboutPage() {
       <section className="content-section">
         <div className="section-eyebrow">Milestones</div>
         <h2 className="section-h2">Key moments in our journey</h2>
-        <ul className="flow-list">
+        <ul className={styles['flow-list']}>
           <li>
             <strong>2023 JHUB Africa Founded</strong> — Established at JKUAT as
             a digital innovation hub to bridge academia and industry.
@@ -127,8 +128,15 @@ function AboutPage() {
         </ul>
       </section>
 
-      <section className="content-section about-section-center">
-        <ApplyDialog triggerText="Contact the team" source="About page" />
+      <section className="content-section" style={{ paddingTop: 0 }}>
+        <div className={styles['cta-banner']}>
+          <h2>Ready to Build the Future?</h2>
+          <p>
+            Whether you want to sponsor a project, volunteer your technical expertise,
+            or establish a strategic partnership, our doors are open. Let's talk.
+          </p>
+          <ApplyDialog triggerText="Contact the team" source="About page" />
+        </div>
       </section>
 
       <ContactStrip />

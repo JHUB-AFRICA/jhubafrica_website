@@ -1,0 +1,115 @@
+.contact-page-header {
+  background: linear-gradient(135deg, #001f5c 0%, #003d99 100%);
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.contact-page-header h1 {
+  color: #ffffff;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+}
+.contact-page-header h1 span {
+  color: var(--jhub-green);
+}
+.contact-page-header p {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.contact-form-container {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+.contact-form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.contact-form-label-required {
+  color: var(--jhub-blue);
+}
+.contact-form-label-optional {
+  color: var(--text-muted);
+}
+.contact-form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  background: #ffffff;
+  color: var(--text-main);
+  transition: border-color 0.2s;
+}
+.contact-form-input:focus {
+  border-color: var(--jhub-green);
+}
+.contact-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+@media (max-width: 640px) {
+  .contact-form-row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+.contact-form-submit {
+  justify-self: start;
+  margin-top: 0.5rem;
+}
+.contact-split-panel {
+  background-color: #f8fafc;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+.contact-panel-h3 {
+  color: var(--jhub-blue);
+  margin: 0 0 1.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+.contact-panel-p {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+.contact-panel-p-muted {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
+.contact-panel-link {
+  color: var(--jhub-blue);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+.contact-panel-link:hover {
+  color: var(--jhub-green);
+}
+.contact-panel-map-link {
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
+.contact-panel-map-link a {
+  color: #0ea5e9;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+.contact-panel-map-link a:hover {
+  text-decoration: underline;
+  color: var(--jhub-blue);
+}
