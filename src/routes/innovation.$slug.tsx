@@ -13,13 +13,44 @@ export const Route = createFileRoute("/innovation/$slug")({
     ],
   }),
   loader: async ({ params }) => {
-    return getInnovationBySlug(params.slug);
+    try {
+      return await getInnovationBySlug(params.slug);
+    } catch (err) {
+      console.warn("Failed to load innovation details for slug:", params.slug, err);
+      return null;
+    }
   },
   component: InnovationDetailPage,
 });
 
 function InnovationDetailPage() {
-  const innovation: InnovationItem = Route.useLoaderData() as any;
+  const innovation = Route.useLoaderData() as InnovationItem | null;
+
+  if (!innovation) {
+    return (
+      <div style={{ padding: "6rem 2rem", textAlign: "center", maxWidth: "600px", margin: "0 auto" }}>
+        <h2 style={{ fontSize: "2rem", color: "var(--jhub-blue)", marginBottom: "1rem" }}>
+          Innovation Project Not Found
+        </h2>
+        <p style={{ color: "var(--text-muted)", fontSize: "1.05rem", lineHeight: "1.6" }}>
+          The innovation project you are trying to view does not exist, has been removed, or there was a connection error.
+        </p>
+        <Link
+          to="/innovation"
+          style={{
+            display: "inline-block",
+            marginTop: "2rem",
+            color: "var(--jhub-green)",
+            fontWeight: 700,
+            textDecoration: "none",
+            fontSize: "1.05rem",
+          }}
+        >
+          ← Back to Portfolio
+        </Link>
+      </div>
+    );
+  }
 
   // Render initials for team member profile circles
   const getInitials = (name: string) => {
