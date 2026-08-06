@@ -17,32 +17,11 @@ const NAV = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down
-        setIsHidden(true);
-      } else {
-        // Scrolling up
-        setIsHidden(false);
-      }
-
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
 
   return (
     <>
-      <header className={`${styles['site-header']} ${isHidden ? styles['site-header--hidden'] : ""}`}>
+      <header className={styles['site-header']}>
         <Link to="/" className={styles['brand-container']} onClick={() => setOpen(false)}>
           <img
             src={logoAsset}
@@ -59,94 +38,118 @@ export default function Navbar() {
           ☰
         </button>
 
-        <nav className={`${styles['site-nav']} ${open ? styles.open : styles.collapsed}`}>
-          <div className={styles['mobile-nav-header']}>
-            <button
-              type="button"
-              className={styles['mobile-nav-close']}
-              onClick={() => setOpen(false)}
-              aria-label="Close menu"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className={styles['sidebar-section-title']}>JHUB AFRICA</div>
-          <div className={styles['sidebar-links-group']}>
+        {/* Desktop Navigation (visible only on desktop) */}
+        <nav className={`${styles['site-nav']} ${styles['desktop-nav']}`}>
+          {NAV.map((item) => (
             <Link
-              to="/"
-              className={`${styles['nav-link']} ${styles['sidebar-home-link']}`}
+              key={item.to}
+              to={item.to}
+              className={styles['nav-link']}
               activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
-              activeOptions={{ exact: true }}
-              onClick={() => setOpen(false)}
+              activeOptions={{ exact: (item.to as string) === "/" }}
+              onClick={() => {
+                setOpen(false);
+              }}
             >
-              Home
+              {item.label}
             </Link>
-            {NAV.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={styles['nav-link']}
-                activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
-                activeOptions={{ exact: (item.to as string) === "/" }}
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-
-          <div className={styles['sidebar-section-title']}>FOLLOW US</div>
-          <div className={styles['sidebar-links-group']}>
-            <a
-              href="https://linkedin.com/company/jhub-africa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles['sidebar-social-link']}
-            >
-              LinkedIn
-            </a>
-            <a
-              href="https://x.com/jhubafrica"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles['sidebar-social-link']}
-            >
-              X
-            </a>
-            <a
-              href="https://github.com/JHUB-AFRICA"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles['sidebar-social-link']}
-            >
-              GitHub
-            </a>
-            <a
-              href="https://youtube.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles['sidebar-social-link']}
-            >
-              YouTube
-            </a>
-            <a
-              href="https://facebook.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles['sidebar-social-link']}
-            >
-              Facebook
-            </a>
-          </div>
+          ))}
         </nav>
 
+        {/* Global CTA inside sticky header (visible only on desktop) */}
         <div className={styles['nav-cta']}>
           <ApplyDialog triggerText="Get Involved" triggerVariant="default" />
         </div>
       </header>
+
+      {/* Mobile/Tablet Drawer Sidebar (visible only on mobile/tablet) */}
+      <nav className={`${styles['mobile-sidebar']} ${open ? styles.open : styles.collapsed}`}>
+        <div className={styles['mobile-nav-header']}>
+          <button
+            type="button"
+            className={styles['mobile-nav-close']}
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className={styles['sidebar-section-title']}>JHUB AFRICA</div>
+        <div className={styles['sidebar-links-group']}>
+          <Link
+            to="/"
+            className={`${styles['nav-link']} ${styles['sidebar-home-link']}`}
+            activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
+            activeOptions={{ exact: true }}
+            onClick={() => setOpen(false)}
+          >
+            Home
+          </Link>
+          {NAV.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={styles['nav-link']}
+              activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
+              activeOptions={{ exact: (item.to as string) === "/" }}
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className={styles['sidebar-section-title']}>FOLLOW US</div>
+        <div className={styles['sidebar-links-group']}>
+          <a
+            href="https://linkedin.com/company/jhub-africa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles['sidebar-social-link']}
+          >
+            LinkedIn
+          </a>
+          <a
+            href="https://x.com/jhubafrica"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles['sidebar-social-link']}
+          >
+            X
+          </a>
+          <a
+            href="https://github.com/JHUB-AFRICA"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles['sidebar-social-link']}
+          >
+            GitHub
+          </a>
+          <a
+            href="https://youtube.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles['sidebar-social-link']}
+          >
+            YouTube
+          </a>
+          <a
+            href="https://facebook.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles['sidebar-social-link']}
+          >
+            Facebook
+          </a>
+        </div>
+
+        <div className={styles['sidebar-cta-container']}>
+          <ApplyDialog triggerText="Get Involved" triggerVariant="default" />
+        </div>
+      </nav>
 
       {open && (
         <div
