@@ -61,7 +61,6 @@ export default function Navbar() {
 
         <nav className={`${styles['site-nav']} ${open ? styles.open : styles.collapsed}`}>
           <div className={styles['mobile-nav-header']}>
-            <img src={logoAsset} alt="JHUB Logo" className={styles['mobile-nav-logo']} />
             <button
               type="button"
               className={styles['mobile-nav-close']}
@@ -71,20 +70,77 @@ export default function Navbar() {
               ✕
             </button>
           </div>
-          {NAV.map((item) => (
+
+          <div className={styles['sidebar-section-title']}>JHUB AFRICA</div>
+          <div className={styles['sidebar-links-group']}>
             <Link
-              key={item.to}
-              to={item.to}
-              className={styles['nav-link']}
+              to="/"
+              className={`${styles['nav-link']} ${styles['sidebar-home-link']}`}
               activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
-              activeOptions={{ exact: (item.to as string) === "/" }}
-              onClick={() => {
-                setOpen(false);
-              }}
+              activeOptions={{ exact: true }}
+              onClick={() => setOpen(false)}
             >
-              {item.label}
+              Home
             </Link>
-          ))}
+            {NAV.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={styles['nav-link']}
+                activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
+                activeOptions={{ exact: (item.to as string) === "/" }}
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className={styles['sidebar-section-title']}>FOLLOW US</div>
+          <div className={styles['sidebar-links-group']}>
+            <a
+              href="https://linkedin.com/company/jhub-africa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles['sidebar-social-link']}
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://x.com/jhubafrica"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles['sidebar-social-link']}
+            >
+              X
+            </a>
+            <a
+              href="https://github.com/JHUB-AFRICA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles['sidebar-social-link']}
+            >
+              GitHub
+            </a>
+            <a
+              href="https://youtube.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles['sidebar-social-link']}
+            >
+              YouTube
+            </a>
+            <a
+              href="https://facebook.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles['sidebar-social-link']}
+            >
+              Facebook
+            </a>
+          </div>
         </nav>
 
         <div className={styles['nav-cta']}>
