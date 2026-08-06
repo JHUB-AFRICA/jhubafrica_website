@@ -10,6 +10,7 @@
   --jhub-green: #10b981;
   --jhub-red: #ef4444;
   --border-color: #e5e7eb;
+  --fluid-padding: clamp(1.25rem, 5vw, 3rem);
 }
 
 * {
@@ -91,7 +92,7 @@ main {
 
 /* SECTIONS & HEADERS */
 .content-section {
-  padding: 3.5rem 2rem;
+  padding: var(--fluid-padding) 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -523,7 +524,7 @@ main {
 }
 
 /* RESPONSIVE LAYOUT */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .feature-split {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -536,6 +537,6 @@ main {
   }
 
   .content-section {
-    padding: 2.5rem 1rem;
+    padding: var(--fluid-padding) 1rem;
   }
 }

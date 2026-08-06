@@ -475,7 +475,7 @@
 }
 
 /* RESPONSIVE */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .stats-bar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
@@ -512,5 +512,16 @@
   }
   .newsletter-form {
     grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .stats-bar {
+    grid-template-columns: 1fr;
+  }
+  .stat:nth-child(2n) {
+    border-bottom: 1px solid var(--border-color);
+  }
+  .stat:last-child {
+    border-bottom: none;
   }
 }
