@@ -11,7 +11,8 @@ const NAV = [
   { to: "/for-innovators", label: "For Innovators" },
   { to: "/for-partners", label: "For Partners & Funders" },
   { to: "/courses", label: "Courses & Programs" },
-  { to: "/news", label: "News & Events" },
+  { to: "/news", label: "News" },
+  { to: "/events", label: "Events" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
