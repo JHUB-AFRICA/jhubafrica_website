@@ -436,9 +436,8 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
           type="date"
           label="Event Date"
           value={(() => {
-            if (!draft.day || !draft.month) return "";
-            const currentYear = new Date().getFullYear();
-            const d = new Date(`${draft.month} ${draft.day}, ${currentYear}`);
+            if (!draft.startDateISO) return "";
+            const d = new Date(draft.startDateISO);
             return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
           })()}
           className={styles['input-style']}
@@ -447,7 +446,7 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
               const d = localYmdToDate(e.target.value);
               const day = d.getDate().toString().padStart(2, "0");
               const month = d.toLocaleDateString("en-US", { month: "short" });
-              setDraft({ ...draft, day, month });
+              setDraft({ ...draft, day, month, startDateISO: d.toISOString() });
             }
           }}
         />

@@ -61,6 +61,7 @@ export function getEmptyEvent(): Omit<EventItem, "id"> {
     return {
         day,
         month,
+        startDateISO: today.toISOString(),
         title: "",
         desc: "",
         titleColor: "",

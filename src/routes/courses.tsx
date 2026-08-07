@@ -4,27 +4,65 @@ import { getPublicCourses } from "../../axios/api/courses";
 import { CourseItem } from "../types/courses";
 
 export const Route = createFileRoute("/courses")({
-  head: () => ({
-    meta: [
-      { title: "Courses — JHUB Africa" },
-      {
-        name: "description",
-        content:
-          "Industry-aligned short courses in software, data, design and emerging technologies.",
-      },
-      { property: "og:title", content: "Courses — JHUB Africa" },
-      {
-        property: "og:description",
-        content: "Skills programs designed for the African job market.",
-      },
-    ],
-  }),
+  head: (ctx: { loaderData?: CourseItem[] }) => {
+    const courses = ctx.loaderData || [];
+    const validCourses = courses.filter(c => c && c.title && c.desc);
+
+    const coursesSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "numberOfItems": validCourses.length,
+      "itemListElement": validCourses.map((c: CourseItem, idx: number) => ({
+        "@type": "ListItem",
+        "position": idx + 1,
+        "item": {
+          "@type": "Course",
+          "name": c.title,
+          "description": c.desc,
+          "provider": {
+            "@type": "Organization",
+            "name": "JHUB Africa",
+            "url": "https://jhubafrica.com"
+          },
+          "hasCourseInstance": {
+            "@type": "CourseInstance",
+            "courseMode": c.deliveryMode === "ONLINE" ? "Online" : c.deliveryMode === "IN_PERSON" ? "In-Person" : "Hybrid",
+            "duration": c.durationWeeks ? `P${c.durationWeeks}W` : "P6W",
+            "courseWorkload": "Part-Time"
+          }
+        }
+      }))
+    };
+
+    return {
+      meta: [
+        { title: "Courses — JHUB Africa" },
+        {
+          name: "description",
+          content:
+            "Industry-aligned short courses in software, data, design and emerging technologies.",
+        },
+        { property: "og:title", content: "Courses — JHUB Africa" },
+        {
+          property: "og:description",
+          content: "Skills programs designed for the African job market.",
+        },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(coursesSchema)
+        }
+      ]
+    };
+  },
   loader: () => getPublicCourses(),
   component: CoursesPage,
 });
 
 function CoursesPage() {
   const courses = Route.useLoaderData();
+
   return (
     <>
       <header className="page-header">

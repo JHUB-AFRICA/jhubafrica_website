@@ -4,14 +4,61 @@ import { getEvents } from "../../axios/api/events";
 import { EventItem } from "../types/events";
 
 export const Route = createFileRoute("/events")({
-  head: () => ({
-    meta: [
-      { title: "Events — JHUB Africa" },
-      { name: "description", content: "Upcoming hackathons, demo days, workshops and meetups at JHUB Africa." },
-      { property: "og:title", content: "Events — JHUB Africa" },
-      { property: "og:description", content: "Hackathons, demo days, workshops and meetups." },
-    ],
-  }),
+  head: (ctx: { loaderData?: EventItem[] }) => {
+    const events = ctx.loaderData || [];
+    const validEvents = events.filter(e => e && e.title && e.day && e.month);
+
+    const eventsSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "numberOfItems": validEvents.length,
+      "itemListElement": validEvents.map((e: EventItem, idx: number) => {
+        return {
+          "@type": "ListItem",
+          "position": idx + 1,
+          "item": {
+            "@type": "Event",
+            "name": e.title,
+            "description": e.desc || "JHUB Africa upcoming event details.",
+            "startDate": e.startDateISO,
+            "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+            "eventStatus": "https://schema.org/EventScheduled",
+            "location": {
+              "@type": "Place",
+              "name": "JHUB Africa, JKUAT",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Juja Campus",
+                "addressLocality": "Nairobi",
+                "addressCountry": "KE"
+              }
+            },
+            "organizer": {
+              "@type": "Organization",
+              "name": "JHUB Africa",
+              "url": "https://jhubafrica.com"
+            },
+            ...(e.image ? { "image": e.image } : {})
+          }
+        };
+      })
+    };
+
+    return {
+      meta: [
+        { title: "Events — JHUB Africa" },
+        { name: "description", content: "Upcoming hackathons, demo days, workshops and meetups at JHUB Africa." },
+        { property: "og:title", content: "Events — JHUB Africa" },
+        { property: "og:description", content: "Hackathons, demo days, workshops and meetups." },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(eventsSchema)
+        }
+      ]
+    };
+  },
   loader: async () => {
     return getEvents();
   },

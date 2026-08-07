@@ -17,6 +17,7 @@ const mapEvent = (item: any): EventItem => {
     id: item.id,
     day,
     month,
+    startDateISO: item.start_date || item.startDate || new Date().toISOString(),
     title: item.title,
     desc: item.description || item.desc || "",
     titleColor: item.titleColor || "",

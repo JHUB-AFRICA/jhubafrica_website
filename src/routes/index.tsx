@@ -55,25 +55,52 @@ const SUPPORT_STEPS = [
 ] as const;
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "JHUB Africa — Innovation Hub at JKUAT" },
-      {
-        name: "description",
-        content:
-          "JHUB Africa empowers innovators, builds solutions and partners across sectors to address Africa's most pressing challenges.",
+  head: () => {
+    const organizationSchema = {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "JHUB Africa",
+      "url": "https://jhubafrica.com",
+      "logo": "https://jhubafrica.com/assets/jhublogo.jpeg",
+      "description": "JHUB Africa is the innovation hub of JKUAT, empowering researchers, students and entrepreneurs to build technology for Africa.",
+      "parentOrganization": {
+        "@type": "CollegeOrUniversity",
+        "name": "Jomo Kenyatta University of Agriculture and Technology",
+        "alternateName": "JKUAT",
+        "url": "https://www.jkuat.ac.ke"
       },
-      {
-        property: "og:title",
-        content: "JHUB Africa — Innovation Hub at JKUAT",
-      },
-      {
-        property: "og:description",
-        content:
-          "Explore innovations, events, partner opportunities and impact stories from JHUB Africa.",
-      },
-    ],
-  }),
+      "sameAs": [
+        "https://twitter.com/JHUB_Africa",
+        "https://www.linkedin.com/company/jhub-africa"
+      ]
+    };
+
+    return {
+      meta: [
+        { title: "JHUB Africa — Innovation Hub at JKUAT" },
+        {
+          name: "description",
+          content:
+            "JHUB Africa empowers innovators, builds solutions and partners across sectors to address Africa's most pressing challenges.",
+        },
+        {
+          property: "og:title",
+          content: "JHUB Africa — Innovation Hub at JKUAT",
+        },
+        {
+          property: "og:description",
+          content:
+            "Explore innovations, events, partner opportunities and impact stories from JHUB Africa.",
+        },
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(organizationSchema)
+        }
+      ]
+    };
+  },
   loader: async () => {
     const [events, news] = await Promise.all([getEvents(), getNews()]);
     return { events, news };
@@ -100,6 +127,7 @@ function formatCount(value: number, metric: { n: number | string }) {
 function Index() {
   const { events, news }: { events: EventItem[]; news: NewsPost[] } =
     Route.useLoaderData();
+
   const [slides, setSlides] = useState<
     { id: number; imageIndex: number; state: "visible" | "entering" }[]
   >([{ id: 0, imageIndex: 0, state: "visible" }]);
