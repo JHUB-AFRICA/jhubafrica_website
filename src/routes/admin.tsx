@@ -275,53 +275,44 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
           required
+          label="Title"
           placeholder="Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
           className={styles['input-style']}
         />
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}
-        >
-          <label
-            style={{
-              fontSize: "0.75rem",
-              color: "var(--text-muted)",
-              fontWeight: 600,
-            }}
-          >
-            Publish Date
-          </label>
-          <input
-            required
-            type="date"
-            value={(() => {
-              if (!draft.date) return "";
-              const d = new Date(draft.date);
-              return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
-            })()}
-            className={styles['input-style']}
-            onChange={(e) => {
-              if (e.target.value) {
-                const d = localYmdToDate(e.target.value);
-                const formatted = d.toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                });
-                setDraft({ ...draft, date: formatted });
-              }
-            }}
-          />
-        </div>
         <InputField
           required
+          type="date"
+          label="Publish Date"
+          value={(() => {
+            if (!draft.date) return "";
+            const d = new Date(draft.date);
+            return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
+          })()}
+          className={styles['input-style']}
+          onChange={(e) => {
+            if (e.target.value) {
+              const d = localYmdToDate(e.target.value);
+              const formatted = d.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              });
+              setDraft({ ...draft, date: formatted });
+            }
+          }}
+        />
+        <InputField
+          required
+          label="Tag"
           placeholder="Tag (e.g. Announcement)"
           value={draft.tag}
           onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
           className={styles['input-style']}
         />
         <SelectField
+          label="Tag Color"
           value={draft.color}
           onChange={(e) =>
             setDraft({ ...draft, color: e.target.value as NewsPost["color"] })
@@ -332,7 +323,8 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
           <option value="b">Tag: Blue</option>
           <option value="p">Tag: Pink/Red</option>
         </SelectField>
-        <select
+        <SelectField
+          label="Title Color"
           value={draft.titleColor}
           onChange={(e) =>
             setDraft({
@@ -345,10 +337,11 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
           <option value="">Title: Default</option>
           <option value="green">Title: Green</option>
           <option value="red">Title: Red</option>
-        </select>
+        </SelectField>
         <TextareaField
           required
           rows={4}
+          label="Body Content"
           placeholder="Body"
           value={draft.body}
           onChange={(e) => setDraft({ ...draft, body: e.target.value })}
@@ -432,44 +425,34 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
           required
+          label="Title"
           placeholder="Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
           className={styles['input-style']}
         />
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}
-        >
-          <label
-            style={{
-              fontSize: "0.75rem",
-              color: "var(--text-muted)",
-              fontWeight: 600,
-            }}
-          >
-            Event Date
-          </label>
-          <input
-            required
-            type="date"
-            value={(() => {
-              if (!draft.day || !draft.month) return "";
-              const currentYear = new Date().getFullYear();
-              const d = new Date(`${draft.month} ${draft.day}, ${currentYear}`);
-              return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
-            })()}
-            className={styles['input-style']}
-            onChange={(e) => {
-              if (e.target.value) {
-                const d = localYmdToDate(e.target.value);
-                const day = d.getDate().toString().padStart(2, "0");
-                const month = d.toLocaleDateString("en-US", { month: "short" });
-                setDraft({ ...draft, day, month });
-              }
-            }}
-          />
-        </div>
+        <InputField
+          required
+          type="date"
+          label="Event Date"
+          value={(() => {
+            if (!draft.day || !draft.month) return "";
+            const currentYear = new Date().getFullYear();
+            const d = new Date(`${draft.month} ${draft.day}, ${currentYear}`);
+            return isNaN(d.getTime()) ? "" : dateToLocalYmd(d);
+          })()}
+          className={styles['input-style']}
+          onChange={(e) => {
+            if (e.target.value) {
+              const d = localYmdToDate(e.target.value);
+              const day = d.getDate().toString().padStart(2, "0");
+              const month = d.toLocaleDateString("en-US", { month: "short" });
+              setDraft({ ...draft, day, month });
+            }
+          }}
+        />
         <SelectField
+          label="Theme Color"
           value={draft.titleColor}
           onChange={(e) =>
             setDraft({
@@ -486,6 +469,7 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
         <TextareaField
           required
           rows={3}
+          label="Description"
           placeholder="Description"
           value={draft.desc}
           onChange={(e) => setDraft({ ...draft, desc: e.target.value })}
@@ -560,6 +544,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
           required
+          label="Title"
           placeholder="Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
@@ -567,12 +552,14 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
         />
         <InputField
           required
+          label="Sector"
           placeholder="Sector"
           value={draft.sector}
           onChange={(e) => setDraft({ ...draft, sector: e.target.value })}
           className={styles['input-style']}
         />
         <SelectField
+          label="Development Stage"
           value={draft.stage}
           onChange={(e) =>
             setDraft({
@@ -589,6 +576,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
           <option value="Scale">Scale</option>
         </SelectField>
         <SelectField
+          label="Approval Status"
           value={draft.status || "APPROVED"}
           onChange={(e) =>
             setDraft({
@@ -606,6 +594,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
         </SelectField>
         <InputField
           required
+          label="Support Need"
           placeholder="Support need"
           value={draft.need}
           onChange={(e) => setDraft({ ...draft, need: e.target.value })}
@@ -614,6 +603,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
         <TextareaField
           required
           rows={3}
+          label="Problem Statement"
           placeholder="Problem"
           value={draft.problem}
           onChange={(e) => setDraft({ ...draft, problem: e.target.value })}
@@ -622,6 +612,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
         <TextareaField
           required
           rows={3}
+          label="Proposed Solution"
           placeholder="Solution"
           value={draft.solution}
           onChange={(e) => setDraft({ ...draft, solution: e.target.value })}
@@ -629,7 +620,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
         />
 
         {/* Team Members Editor Section */}
-        <div style={{ gridColumn: "1 / -1", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "10px", backgroundColor: "#fafafa" }}>
+        <div style={{ gridColumn: "1 / -1", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "10px", backgroundColor: "#ffffff" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
             <h3 style={{ margin: 0, fontSize: "1.1rem", color: "#111" }}>Team Members</h3>
             <button
@@ -824,6 +815,7 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
           required
+          label="Course Title"
           placeholder="Course Title"
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
@@ -831,12 +823,14 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
         />
         <InputField
           required
+          label="Category"
           placeholder="Category (e.g. Software, Data)"
           value={draft.category || ""}
           onChange={(e) => setDraft({ ...draft, category: e.target.value })}
           className={styles['input-style']}
         />
         <SelectField
+          label="Delivery Mode"
           value={draft.deliveryMode || "ONLINE"}
           onChange={(e) =>
             setDraft({
@@ -853,18 +847,21 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
         <InputField
           required
           type="number"
+          label="Duration (Weeks)"
           placeholder="Duration (Weeks)"
           value={draft.durationWeeks || ""}
           onChange={(e) => setDraft({ ...draft, durationWeeks: Number(e.target.value) })}
           className={styles['input-style']}
         />
         <InputField
+          label="Prerequisites"
           placeholder="Prerequisites"
           value={draft.prerequisites || ""}
           onChange={(e) => setDraft({ ...draft, prerequisites: e.target.value })}
           className={styles['input-style']}
         />
         <SelectField
+          label="Publication Status"
           value={draft.isPublished ? "true" : "false"}
           onChange={(e) =>
             setDraft({
@@ -878,6 +875,7 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
           <option value="false">Status: Draft (Hidden)</option>
         </SelectField>
         <SelectField
+          label="Featured Status"
           value={draft.isFeatured ? "true" : "false"}
           onChange={(e) =>
             setDraft({
@@ -893,6 +891,7 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
         <TextareaField
           required
           rows={3}
+          label="Course Description"
           placeholder="Course Description"
           value={draft.desc}
           onChange={(e) => setDraft({ ...draft, desc: e.target.value })}
