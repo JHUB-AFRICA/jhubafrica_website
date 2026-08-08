@@ -78,6 +78,7 @@ export function getEmptyInnovation(): Omit<InnovationItem, "id"> {
         problem: "",
         solution: "",
         status: "APPROVED",
+        coverImageUrl: "",
         teamMembers: [],
     };
 }
@@ -313,6 +314,12 @@ export function useInnovationAdmin() {
         }
     }, [router]);
 
+    const handleImageUpload = useCallback(async (file: File | null) => {
+        if (!file) return;
+        const base64 = await fileToBase64(file);
+        setDraft((prev) => ({ ...prev, coverImageUrl: base64 }));
+    }, []);
+
     const resetDraft = useCallback(() => setDraft(getEmptyInnovation()), []);
 
     return {
@@ -323,6 +330,7 @@ export function useInnovationAdmin() {
         submit,
         edit,
         remove,
+        handleImageUpload,
         resetDraft,
     };
 }

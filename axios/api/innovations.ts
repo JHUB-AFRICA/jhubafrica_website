@@ -86,6 +86,7 @@ export const addInnovation = async (innovation: Omit<InnovationItem, "id">): Pro
     supportRequired: innovation.need || "None",
     ownerId,
     teamMembers: innovation.teamMembers || [],
+    coverImageUrl: innovation.coverImageUrl || "",
   };
   const response = await api.post<{ data: any }>("/api/v1/innovations", payload);
   const created = response.data.data;
@@ -116,6 +117,7 @@ export const updateInnovation = async (innovation: InnovationItem): Promise<Inno
     supportRequired: innovation.need || "None",
     ownerId,
     teamMembers: innovation.teamMembers || [],
+    coverImageUrl: innovation.coverImageUrl || "",
   };
   const response = await api.patch<{ data: any }>(`/api/v1/innovations/${innovation.id}`, payload);
   const updated = response.data.data;

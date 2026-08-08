@@ -533,7 +533,7 @@ interface InnovationsAdminProps {
 }
 
 function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
-  const { draft, setDraft, msg, submitting, submit, edit, remove, resetDraft } =
+  const { draft, setDraft, msg, submitting, submit, edit, remove, handleImageUpload, resetDraft } =
     useInnovationAdmin();
 
   return (
@@ -616,6 +616,12 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
           value={draft.solution}
           onChange={(e) => setDraft({ ...draft, solution: e.target.value })}
           className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
+        />
+        <AdminImageUpload
+          onFileSelected={(file) => {
+            void handleImageUpload(file);
+          }}
+          previewUrl={draft.coverImageUrl}
         />
 
         {/* Team Members Editor Section */}

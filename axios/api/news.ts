@@ -50,10 +50,7 @@ const mapToBackendNews = (post: Omit<NewsPost, "id">) => {
 
   const category = tagToCategory[post.tag] || "announcement";
 
-  let coverImageUrl = post.image || "";
-  if (coverImageUrl && !coverImageUrl.startsWith("http://") && !coverImageUrl.startsWith("https://")) {
-    coverImageUrl = "";
-  }
+  const coverImageUrl = post.image || "";
 
   return {
     title: post.title,

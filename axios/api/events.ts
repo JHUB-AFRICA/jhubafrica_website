@@ -49,12 +49,7 @@ const mapToBackendEvent = (event: Omit<EventItem, "id">) => {
     eventType = "NETWORKING";
   }
 
-  // Ensure coverImageUrl is a valid URL or empty string (Zod URL validation)
-  let coverImageUrl = event.image || "";
-  if (coverImageUrl && !coverImageUrl.startsWith("http://") && !coverImageUrl.startsWith("https://")) {
-    // If it's a local/base64 asset, default to empty to satisfy backend Zod URL validation
-    coverImageUrl = "";
-  }
+  const coverImageUrl = event.image || "";
 
   return {
     title: event.title,
