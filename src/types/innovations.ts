@@ -6,6 +6,7 @@ export interface InnovationItem {
     need: string;
     problem: string;
     solution: string;
+    description?: string;
     status?: string;
     slug?: string;
     coverImageUrl?: string;

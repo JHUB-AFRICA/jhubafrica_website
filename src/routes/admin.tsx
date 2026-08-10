@@ -549,14 +549,20 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
           className={styles['input-style']}
         />
-        <InputField
-          required
+        <SelectField
           label="Sector"
-          placeholder="Sector"
-          value={draft.sector}
+          value={draft.sector || "Big AI Ideas"}
           onChange={(e) => setDraft({ ...draft, sector: e.target.value })}
           className={styles['input-style']}
-        />
+        >
+          <option value="Big AI Ideas">Big AI Ideas</option>
+          <option value="Climate Smart Agriculture">Climate Smart Agriculture</option>
+          <option value="Digital Trade">Digital Trade</option>
+          <option value="Digital Tranformation">Digital Tranformation</option>
+          <option value="Digital Twin Models">Digital Twin Models</option>
+          <option value="Gaming">Gaming</option>
+          <option value="Green Digital Innovationt">Green Digital Innovationt</option>
+        </SelectField>
         <SelectField
           label="Development Stage"
           value={draft.stage}
@@ -598,6 +604,15 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
           value={draft.need}
           onChange={(e) => setDraft({ ...draft, need: e.target.value })}
           className={styles['input-style']}
+        />
+        <TextareaField
+          required
+          rows={3}
+          label="Description"
+          placeholder="Short project description for the card overview"
+          value={draft.description || ""}
+          onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
         />
         <TextareaField
           required

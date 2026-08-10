@@ -35,16 +35,22 @@ const STAGES = [
   "Scale",
 ] as const;
 
+const SECTORS = [
+  "All",
+  "Big AI Ideas",
+  "Climate Smart Agriculture",
+  "Digital Trade",
+  "Digital Tranformation",
+  "Digital Twin Models",
+  "Gaming",
+  "Green Digital Innovationt"
+] as const;
+
 function InnovationPage() {
   const innovations: InnovationItem[] = Route.useLoaderData();
   const [q, setQ] = useState("");
   const [stage, setStage] = useState<(typeof STAGES)[number]>("All");
   const [sector, setSector] = useState<string>("All");
-
-  const sectors = useMemo(
-    () => ["All", ...Array.from(new Set(innovations.map((p) => p.sector)))],
-    [innovations],
-  );
 
   const filtered = innovations.filter((p) => {
     const matchQ =
@@ -99,7 +105,7 @@ function InnovationPage() {
             className={styles['filter-select']}
             aria-label="Filter by sector"
           >
-            {sectors.map((s) => (
+            {SECTORS.map((s) => (
               <option key={s} value={s}>
                 Sector: {s}
               </option>
@@ -119,30 +125,48 @@ function InnovationPage() {
               params={{ slug: p.slug || "" }}
               style={{ textDecoration: "none", color: "inherit", display: "block" }}
             >
-              <article className="prog-card" style={{ height: "100%", cursor: "pointer", display: "flex", flexDirection: "column" }}>
-                <div className="prog-title">{p.title}</div>
-                <p className="prog-desc" style={{ flexGrow: 1 }}>
-                  <strong style={{ color: "var(--jhub-blue)" }}>Problem:</strong>{" "}
-                  {p.problem}
-                </p>
-                <p className="prog-desc" style={{ marginTop: "0.4rem" }}>
-                  <strong style={{ color: "var(--jhub-green)" }}>
-                    Solution:
-                  </strong>{" "}
-                  {p.solution}
-                </p>
-                <div className="quick-facts">
-                  <span className="qf-pill">
-                    <strong>Stage</strong> {p.stage}
-                  </span>
-                  <span className="qf-pill">
-                    <strong>Needs</strong> {p.need}
-                  </span>
-                </div>
-                <div className="prog-meta" style={{ marginTop: "auto" }}>
-                  <span className="prog-arrow">
-                    View project details →
-                  </span>
+              <article className="prog-card" style={{ height: "100%", cursor: "pointer", display: "flex", flexDirection: "column", padding: 0, overflow: "hidden" }}>
+                {p.coverImageUrl ? (
+                  <div style={{ height: "180px", overflow: "hidden", borderBottom: "1px solid var(--border-color)" }}>
+                    <img 
+                      src={p.coverImageUrl} 
+                      alt={p.title} 
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                    />
+                  </div>
+                ) : (
+                  <div style={{ height: "180px", background: "linear-gradient(135deg, rgba(8, 20, 45, 0.05), rgba(16, 185, 129, 0.05))", borderBottom: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ color: "var(--jhub-green)", fontSize: "2rem", fontWeight: "bold" }}>JHUB</span>
+                  </div>
+                )}
+                <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                  <div className="prog-title" style={{ marginTop: 0, fontSize: "1.25rem" }}>{p.title}</div>
+                  
+                  {p.description && (
+                    <p className="prog-desc" style={{ marginTop: "0.5rem", color: "#475569", fontSize: "0.95rem" }}>
+                      {p.description}
+                    </p>
+                  )}
+
+                  <p className="prog-desc" style={{ marginTop: "0.75rem", flexGrow: 1 }}>
+                    <strong style={{ color: "var(--jhub-blue)" }}>Problem:</strong>{" "}
+                    {p.problem.length > 120 ? `${p.problem.substring(0, 120)}...` : p.problem}
+                  </p>
+
+                  <div className="quick-facts" style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+                    <span className="qf-pill">
+                      <strong>Stage</strong> {p.stage}
+                    </span>
+                    <span className="qf-pill">
+                      <strong>Sector</strong> {p.sector}
+                    </span>
+                  </div>
+                  
+                  <div className="prog-meta" style={{ marginTop: "auto", paddingTop: "0.5rem" }}>
+                    <span className="prog-arrow">
+                      View project details →
+                    </span>
+                  </div>
                 </div>
               </article>
             </Link>

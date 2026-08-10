@@ -72,11 +72,12 @@ export function getEmptyEvent(): Omit<EventItem, "id"> {
 export function getEmptyInnovation(): Omit<InnovationItem, "id"> {
     return {
         title: "",
-        sector: "",
+        sector: "Big AI Ideas",
         stage: "Concept",
         need: "",
         problem: "",
         solution: "",
+        description: "",
         status: "APPROVED",
         coverImageUrl: "",
         teamMembers: [],

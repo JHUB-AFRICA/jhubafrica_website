@@ -98,6 +98,11 @@ function InnovationDetailPage() {
           ← Back to Portfolio
         </Link>
         <h1 style={{ marginTop: 0 }}>{innovation.title}</h1>
+        {innovation.description && (
+          <p style={{ fontSize: "1.2rem", color: "#475569", lineHeight: "1.6", marginBottom: "1.5rem", maxWidth: "800px" }}>
+            {innovation.description}
+          </p>
+        )}
         <p>
           Discover how this project is addressing critical needs in the{" "}
           <strong>{innovation.sector}</strong> sector.
