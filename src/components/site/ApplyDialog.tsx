@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { submitApplication } from "../../../axios/api/applications";
+import { submitApplication, submitInnovationSubmission } from "../../../axios/api/applications";
 
 const ROLES = ["Student", "Innovator", "Partner", "Sponsor", "Volunteer"] as const;
 
@@ -45,7 +45,7 @@ const initialForm: ApplyFormData = {
   role: "Student",
   message: "",
   innovationTitle: "",
-  sector: "",
+  sector: "Big AI Ideas",
   stage: "Concept",
   problem: "",
   solution: "",
@@ -209,7 +209,7 @@ export default function ApplyDialog({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.message.trim()) {
-      setFeedback("Please fill out all fields.");
+      setFeedback("Please fill out all required fields.");
       setStatus("error");
       return;
     }
@@ -217,29 +217,103 @@ export default function ApplyDialog({
     setStatus("submitting");
     setFeedback("Sending your request...");
 
-    try {
-      await submitApplication({
-        fullName: formData.fullName.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim(),
-        role: formData.role,
-        message: formData.message.trim(),
-        source,
-        // optional innovation details
-        innovationTitle: formData.innovationTitle?.trim(),
-        sector: formData.sector?.trim(),
-        stage: formData.stage,
-        problem: formData.problem?.trim(),
-        solution: formData.solution?.trim(),
-        need: formData.need?.trim(),
-      });
-      setStatus("success");
-      setFeedback("Thanks! We received your request and will respond soon.");
-      setTimeout(() => setOpen(false), 1400);
-    } catch (error) {
-      console.error(error);
-      setStatus("error");
-      setFeedback("Unable to send your request right now. Please try again later.");
+    const isInnovator = formData.role === "Innovator" || source === "For Innovators Page";
+
+    if (isInnovator) {
+      const STAGE_MAP_FE_TO_BE = {
+        Concept: "IDEA",
+        Prototype: "PROTOTYPE",
+        Pilot: "PILOT",
+        "Market entry": "SCALING",
+        Scale: "MATURE",
+      } as const;
+
+      const mappedStage = STAGE_MAP_FE_TO_BE[formData.stage || "Concept"];
+      const title = formData.innovationTitle?.trim() || "";
+      const sector = formData.sector?.trim() || "";
+      const problem = formData.problem?.trim() || "";
+      const solution = formData.solution?.trim() || "";
+      const need = formData.need?.trim() || "";
+      const teamInfo = formData.message.trim();
+
+      if (title.length < 3) {
+        setFeedback("Innovation Title must be at least 3 characters long.");
+        setStatus("error");
+        return;
+      }
+      if (!sector) {
+        setFeedback("Please specify a Sector.");
+        setStatus("error");
+        return;
+      }
+      if (problem.length < 10) {
+        setFeedback("Problem description must be at least 10 characters long.");
+        setStatus("error");
+        return;
+      }
+      if (solution.length < 10) {
+        setFeedback("Solution summary must be at least 10 characters long.");
+        setStatus("error");
+        return;
+      }
+      if (need.length < 5) {
+        setFeedback("Support requirements details must be at least 5 characters long.");
+        setStatus("error");
+        return;
+      }
+      if (teamInfo.length < 5) {
+        setFeedback("Message (team info) must be at least 5 characters long.");
+        setStatus("error");
+        return;
+      }
+
+      try {
+        await submitInnovationSubmission({
+          contactName: formData.fullName.trim(),
+          contactEmail: formData.email.trim(),
+          phone: formData.phone.trim(),
+          title,
+          sector,
+          stage: mappedStage,
+          problem,
+          solution,
+          supportRequired: need,
+          teamInfo,
+          projectLinks: "",
+          attachmentUrl: "",
+        });
+        setStatus("success");
+        setFeedback("Thanks! Your innovation proposal has been submitted successfully.");
+        setTimeout(() => setOpen(false), 1400);
+      } catch (error) {
+        console.error(error);
+        setStatus("error");
+        setFeedback("Unable to submit your proposal. Please try again later.");
+      }
+    } else {
+      try {
+        await submitApplication({
+          fullName: formData.fullName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          role: formData.role,
+          message: formData.message.trim(),
+          source,
+          innovationTitle: formData.innovationTitle?.trim(),
+          sector: formData.sector?.trim(),
+          stage: formData.stage,
+          problem: formData.problem?.trim(),
+          solution: formData.solution?.trim(),
+          need: formData.need?.trim(),
+        });
+        setStatus("success");
+        setFeedback("Thanks! We received your request and will respond soon.");
+        setTimeout(() => setOpen(false), 1400);
+      } catch (error) {
+        console.error(error);
+        setStatus("error");
+        setFeedback("Unable to send your request right now. Please try again later.");
+      }
     }
   }
 
@@ -334,13 +408,20 @@ export default function ApplyDialog({
               <div style={twoColumnGridStyle}>
                 <label style={{ display: "grid", gap: "0.5rem" }}>
                   <span style={fieldLabelStyle}>Sector</span>
-                  <input
+                  <select
                     name="sector"
-                    value={formData.sector}
+                    value={formData.sector || "Big AI Ideas"}
                     onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
-                    placeholder="e.g., Climate Smart Agriculture"
                     style={inputStyle}
-                  />
+                  >
+                    <option value="Big AI Ideas">Big AI Ideas</option>
+                    <option value="Climate Smart Agriculture">Climate Smart Agriculture</option>
+                    <option value="Digital Trade">Digital Trade</option>
+                    <option value="Digital Tranformation">Digital Tranformation</option>
+                    <option value="Digital Twin Models">Digital Twin Models</option>
+                    <option value="Gaming">Gaming</option>
+                    <option value="Green Digital Innovationt">Green Digital Innovationt</option>
+                  </select>
                 </label>
 
                 <label style={{ display: "grid", gap: "0.5rem" }}>
