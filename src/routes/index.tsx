@@ -4,17 +4,15 @@ import ContactStrip from "../components/site/ContactStrip";
 import PartnersSection from "../components/site/PartnersSection";
 import { getEvents } from "../../axios/api/events";
 import { getNews } from "../../axios/api/news";
+import { getInnovations } from "../../axios/api/innovations";
 import { EventItem } from "../types/events";
 import { NewsPost } from "../types/news";
+import { InnovationItem } from "../types/innovations";
 import image1 from "../assets/images/image1.jpg";
 import image2 from "../assets/images/image2.jpeg";
 import image3 from "../assets/images/image3.jpeg";
 import image4 from "../assets/images/image4.jpeg";
 import image5 from "../assets/images/image5.jpeg";
-import smartNyuki from "../assets/images/smart-nyuki-1.jpg";
-import poliagentx from "../assets/images/poliagentx.png";
-import afridataImg from "../assets/images/Data-Repo-1.jpg";
-import geoPastureImg from "../assets/images/Geopasture-1.webp";
 import image6 from "../assets/images/images6.jpg";
 import image7 from "../assets/images/images7.jpg";
 import styles from "../styles/Home.module.css";
@@ -102,8 +100,12 @@ export const Route = createFileRoute("/")({
     };
   },
   loader: async () => {
-    const [events, news] = await Promise.all([getEvents(), getNews()]);
-    return { events, news };
+    const [events, news, innovations] = await Promise.all([
+      getEvents(),
+      getNews(),
+      getInnovations()
+    ]);
+    return { events, news, innovations: innovations.slice(0, 4) };
   },
   component: Index,
 });
@@ -125,7 +127,7 @@ function formatCount(value: number, metric: { n: number | string }) {
 }
 
 function Index() {
-  const { events, news }: { events: EventItem[]; news: NewsPost[] } =
+  const { events, news, innovations }: { events: EventItem[]; news: NewsPost[]; innovations: InnovationItem[] } =
     Route.useLoaderData();
 
   const [slides, setSlides] = useState<
@@ -386,63 +388,70 @@ function Index() {
       <section className="content-section section-innovations">
         <div className="section-eyebrow">Learn more about our innovations</div>
         <h2 className="section-h2">From groundbreaking ideas to community impact</h2>
-        <div className="cards-grid">
-          <article className="prog-card">
-            <div className="prog-card-image">
-              <span className="prog-card-badge">Climate Smart Agriculture</span>
-              <img src={smartNyuki} alt="Smart Nyuki" />
+        <div className="cards-grid" style={{ marginTop: "1.25rem" }}>
+          {innovations.map((p) => (
+            <Link
+              key={p.id}
+              to="/innovation/$slug"
+              params={{ slug: p.slug || "" }}
+              style={{ textDecoration: "none", color: "inherit", display: "block" }}
+            >
+              <article className="prog-card" style={{ height: "100%", cursor: "pointer", display: "flex", flexDirection: "column", padding: 0, overflow: "hidden" }}>
+                {p.coverImageUrl ? (
+                  <div style={{ height: "180px", overflow: "hidden", borderBottom: "1px solid var(--border-color)" }}>
+                    <img 
+                      src={p.coverImageUrl} 
+                      alt={p.title} 
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                    />
+                  </div>
+                ) : (
+                  <div style={{ height: "180px", background: "linear-gradient(135deg, rgba(8, 20, 45, 0.05), rgba(16, 185, 129, 0.05))", borderBottom: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ color: "var(--jhub-green)", fontSize: "2rem", fontWeight: "bold" }}>JHUB</span>
+                  </div>
+                )}
+                <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                  <div className="prog-title" style={{ marginTop: 0, fontSize: "1.25rem" }}>{p.title}</div>
+                  
+                  {p.description && (
+                    <p className="prog-desc" style={{ marginTop: "0.5rem", color: "#475569", fontSize: "0.95rem" }}>
+                      {p.description}
+                    </p>
+                  )}
+
+                  <p className="prog-desc" style={{ marginTop: "0.75rem", flexGrow: 1 }}>
+                    <strong style={{ color: "var(--jhub-blue)" }}>Problem:</strong>{" "}
+                    {p.problem.length > 120 ? `${p.problem.substring(0, 120)}...` : p.problem}
+                  </p>
+
+                  <div className="quick-facts" style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+                    <span className="qf-pill">
+                      <strong>Stage</strong> {p.stage}
+                    </span>
+                    <span className="qf-pill">
+                      <strong>Sector</strong> {p.sector}
+                    </span>
+                  </div>
+                  
+                  <div className="prog-meta" style={{ marginTop: "auto", paddingTop: "0.5rem" }}>
+                    <span className="prog-arrow">
+                      View project details →
+                    </span>
+                  </div>
+                </div>
+              </article>
+            </Link>
+          ))}
+          {innovations.length === 0 && (
+            <div
+              className="prog-card"
+              style={{ gridColumn: "1 / -1", textAlign: "center" }}
+            >
+              <p className="prog-desc">
+                No innovations found.
+              </p>
             </div>
-            <div className="prog-title green">Smart Nyuki</div>
-            <p className="prog-desc">
-              A tech-driven beekeeping initiative that empowers African farmers through IoT-enabled hive monitoring and real-time insights.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-slots">Climate Smart Agriculture</span>
-              <Link to="/innovation" className="prog-arrow">Learn More →</Link>
-            </div>
-          </article>
-          <article className="prog-card">
-            <div className="prog-card-image">
-              <span className="prog-card-badge">Big AI Ideas</span>
-              <img src={poliagentx} alt="PoliagentX" />
-            </div>
-            <div className="prog-title">PoliagentX</div>
-            <p className="prog-desc">
-              A dynamic policy visualization platform that helps decision makers test scenarios and strengthen evidence-based governance.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-slots">Big AI Ideas</span>
-              <Link to="/innovation" className="prog-arrow">Learn More →</Link>
-            </div>
-          </article>
-          <article className="prog-card">
-            <div className="prog-card-image">
-              <span className="prog-card-badge">Digital Transformation</span>
-              <img src={afridataImg} alt="AfriData" />
-            </div>
-            <div className="prog-title red">AfriData</div>
-            <p className="prog-desc">
-              Africa’s first community-driven open data platform built to bridge the continent’s information gaps and support research.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-slots">Digital Transformation</span>
-              <Link to="/innovation" className="prog-arrow">Learn More →</Link>
-            </div>
-          </article>
-          <article className="prog-card">
-            <div className="prog-card-image">
-              <span className="prog-card-badge">Green Digital Innovation</span>
-              <img src={geoPastureImg} alt="GeoPasture" />
-            </div>
-            <div className="prog-title">GeoPasture</div>
-            <p className="prog-desc">
-              A mobile solution for peaceful coexistence between pastoralists and agricultural communities through resource-sharing tools.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-slots">Green Digital Innovation</span>
-              <Link to="/innovation" className="prog-arrow">Learn More →</Link>
-            </div>
-          </article>
+          )}
         </div>
       </section>
 
