@@ -27,7 +27,6 @@ COPY --from=builder --chown=nodejs:nodejs /app/vite.config.ts ./vite.config.ts
 COPY --from=builder --chown=nodejs:nodejs /app/tsconfig.json ./tsconfig.json
 COPY --from=builder --chown=nodejs:nodejs /app/index.html ./index.html
 COPY --from=builder --chown=nodejs:nodejs /app/public ./public
-COPY --from=builder --chown=nodejs:nodejs /app/data ./data
 COPY --from=builder --chown=nodejs:nodejs /app/src ./src
 COPY --from=builder --chown=nodejs:nodejs /app/tsconfig.app.json ./tsconfig.app.json
 COPY --from=builder --chown=nodejs:nodejs /app/tsconfig.node.json ./tsconfig.node.json
