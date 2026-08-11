@@ -4,6 +4,8 @@ COPY package*.json ./
 RUN npm install --no-audit --no-fund
 
 FROM node:22-alpine AS builder
+ARG VITE_APP_API_URL
+ENV VITE_APP_API_URL=$VITE_APP_API_URL
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -40,6 +42,3 @@ EXPOSE 4173
 VOLUME ["/app/data"]
 
 CMD ["sh", "-c", "npm run preview -- --host 0.0.0.0 --port ${PORT:-4173}"]
-
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL

@@ -24,5 +24,11 @@ dist-ssr
 *.sw?
 *.ps1
 
-*.env
+# Environment files and local configurations (DO NOT COMMIT SECRETS)
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.sample
+*.env
