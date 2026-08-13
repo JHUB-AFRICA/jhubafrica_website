@@ -41,7 +41,8 @@ services:
     dns:
       - 8.8.8.8
     env_file:
-      - ../jhub-backend/.env
+      - path: ../jhub-backend/.env
+        required: false
     restart: unless-stopped
     networks:
       - jhub-network
