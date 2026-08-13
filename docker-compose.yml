@@ -27,6 +27,27 @@ services:
       start_period: 15s
     networks:
       - jhub-network
+    profiles:
+      - frontend
+      - all
+
+  backend:
+    build:
+      context: ../jhub-backend
+      dockerfile: Dockerfile
+    container_name: jhub-backend
+    ports:
+      - "4001:4000"
+    dns:
+      - 8.8.8.8
+    env_file:
+      - ../jhub-backend/.env
+    restart: unless-stopped
+    networks:
+      - jhub-network
+    profiles:
+      - backend
+      - all
 
 volumes:
   jhub-data:
