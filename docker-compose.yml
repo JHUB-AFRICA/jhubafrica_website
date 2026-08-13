@@ -1,21 +1,16 @@
 services:
   web:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_APP_API_URL: ${VITE_APP_API_URL}
     container_name: jhub-website
     ports:
       - "${PORT:-4173}:4173"
     environment:
       - NODE_ENV=production
       - PORT=4173
-      - EMAIL_TO=${EMAIL_TO:-info.jhub@jkuat.ac.ke}
-      - EMAIL_FROM=${EMAIL_FROM:-no-reply@jhub.africa}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_SECURE=${SMTP_SECURE:-false}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
     volumes:
       - jhub-data:/app/data
     restart: unless-stopped
@@ -33,7 +28,7 @@ services:
 
   backend:
     build:
-      context: ../jhub-backend
+      context: ./backend
       dockerfile: Dockerfile
     container_name: jhub-backend
     ports:
@@ -41,7 +36,7 @@ services:
     dns:
       - 8.8.8.8
     env_file:
-      - path: ../jhub-backend/.env
+      - path: ./backend/.env
         required: false
     restart: unless-stopped
     networks:
