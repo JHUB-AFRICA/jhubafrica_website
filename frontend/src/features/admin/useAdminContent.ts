@@ -47,6 +47,7 @@ export function getEmptyNews(): Omit<NewsPost, "id"> {
         title: "",
         date: today,
         body: "",
+        excerpt: "",
         color: "g",
         titleColor: "green",
         image: "",
@@ -114,7 +115,7 @@ export function useNewsAdmin() {
     const submit = useCallback(
         async (e: FormEvent) => {
             e.preventDefault();
-            if (!draft.title.trim() || !draft.body.trim()) return;
+            if (!draft.title.trim() || !draft.body.trim() || !draft.excerpt.trim()) return;
 
             setSubmitting(true);
             setMsg("Saving...");

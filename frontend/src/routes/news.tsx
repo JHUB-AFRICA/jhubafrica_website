@@ -88,7 +88,7 @@ function NewsPage() {
                   </div>
                 )}
                 <div className={`prog-title ${p.titleColor}`}>{p.title}</div>
-                <p className="prog-desc">{p.body}</p>
+                <p className="prog-desc">{p.excerpt}</p>
                 <div className="prog-meta">
                   <span className="prog-slots">{p.date}</span>
                   <button

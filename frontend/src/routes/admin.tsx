@@ -340,9 +340,18 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
         </SelectField>
         <TextareaField
           required
-          rows={4}
-          label="Body Content"
-          placeholder="Body"
+          rows={2}
+          label="Summary (Excerpt)"
+          placeholder="Brief summary displayed on the card (max 150 chars)"
+          value={draft.excerpt}
+          onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })}
+          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
+        />
+        <TextareaField
+          required
+          rows={6}
+          label="Full Story (Content)"
+          placeholder="Write the full story here"
           value={draft.body}
           onChange={(e) => setDraft({ ...draft, body: e.target.value })}
           className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
@@ -376,7 +385,9 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
                 · {p.date} · {p.tag}
               </span>
               <div style={{ fontSize: "0.9rem", opacity: 0.8, marginTop: 4 }}>
-                {p.body}
+                <strong>Summary:</strong> {p.excerpt}
+                <br />
+                <strong>Full Story:</strong> {p.body}
               </div>
             </div>
             <div style={{ display: "flex", gap: "0.5rem" }}>

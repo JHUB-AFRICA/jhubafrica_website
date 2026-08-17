@@ -32,7 +32,8 @@ const mapNews = (item: any): NewsPost => {
     tag,
     title: item.title,
     date: formattedDate,
-    body: item.content || item.excerpt || "",
+    body: item.content || "",
+    excerpt: item.excerpt || "",
     color,
     titleColor: item.is_featured ? "red" : "",
     image: item.cover_image_url || item.coverImageUrl || "",
@@ -55,7 +56,7 @@ const mapToBackendNews = (post: Omit<NewsPost, "id">) => {
   return {
     title: post.title,
     content: post.body.length >= 10 ? post.body : post.body.padEnd(10, " "),
-    excerpt: post.body.substring(0, 150),
+    excerpt: post.excerpt || "",
     category,
     isPublished: true,
     isFeatured: post.titleColor === "red",
