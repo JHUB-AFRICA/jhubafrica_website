@@ -89,3 +89,14 @@ Compile and bundle the production assets:
 npm run build
 ```
 Production assets will be built inside the `/dist` directory.
+
+---
+
+## 📖 Documentation
+
+For detailed guides, local setup, and deployment instructions, visit our [Docs Directory](./Docs/README.md):
+*   [Frontend Setup Guide](./Docs/FRONTEND_SETUP.md)
+*   [Backend Local Setup Guide](./Docs/BACKEND_LOCAL_SETUP.md)
+*   [Docker Deployment Guide](./Docs/DOCKER_DEPLOYMENT.md)
+
+
