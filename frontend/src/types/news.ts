@@ -1,5 +1,6 @@
 export interface NewsPost {
     id: string;
+    slug: string;
     tag: string;
     title: string;
     date: string;

@@ -29,6 +29,7 @@ const mapNews = (item: any): NewsPost => {
 
   return {
     id: item.id,
+    slug: item.slug || "",
     tag,
     title: item.title,
     date: formattedDate,
@@ -83,4 +84,9 @@ export const updateNews = async (post: NewsPost): Promise<NewsPost> => {
 
 export const deleteNews = async (id: string): Promise<void> => {
   await api.delete(`/api/v1/admin/news/${id}`);
+};
+
+export const getNewsBySlug = async (slug: string): Promise<NewsPost> => {
+  const response = await api.get<{ data: any }>(`/api/v1/news/${slug}`);
+  return mapNews(response.data.data);
 };

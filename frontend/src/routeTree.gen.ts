@@ -23,7 +23,9 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as InnovationIndexRouteImport } from './routes/innovation.index'
+import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as InnovationSlugRouteImport } from './routes/innovation.$slug'
 
 const SupportRoute = SupportRouteImport.update({
@@ -96,10 +98,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NewsIndexRoute = NewsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NewsRoute,
+} as any)
 const InnovationIndexRoute = InnovationIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => InnovationRoute,
+} as any)
+const NewsSlugRoute = NewsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => NewsRoute,
 } as any)
 const InnovationSlugRoute = InnovationSlugRouteImport.update({
   id: '/$slug',
@@ -118,12 +130,14 @@ export interface FileRoutesByFullPath {
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
   '/innovation': typeof InnovationRouteWithChildren
-  '/news': typeof NewsRoute
+  '/news': typeof NewsRouteWithChildren
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
   '/innovation/$slug': typeof InnovationSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/innovation/': typeof InnovationIndexRoute
+  '/news/': typeof NewsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -135,12 +149,13 @@ export interface FileRoutesByTo {
   '/for-innovators': typeof ForInnovatorsRoute
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
-  '/news': typeof NewsRoute
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
   '/innovation/$slug': typeof InnovationSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/innovation': typeof InnovationIndexRoute
+  '/news': typeof NewsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,12 +169,14 @@ export interface FileRoutesById {
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
   '/innovation': typeof InnovationRouteWithChildren
-  '/news': typeof NewsRoute
+  '/news': typeof NewsRouteWithChildren
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
   '/innovation/$slug': typeof InnovationSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/innovation/': typeof InnovationIndexRoute
+  '/news/': typeof NewsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,7 +196,9 @@ export interface FileRouteTypes {
     | '/resources'
     | '/support'
     | '/innovation/$slug'
+    | '/news/$slug'
     | '/innovation/'
+    | '/news/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -191,12 +210,13 @@ export interface FileRouteTypes {
     | '/for-innovators'
     | '/for-partners'
     | '/for-students'
-    | '/news'
     | '/programs'
     | '/resources'
     | '/support'
     | '/innovation/$slug'
+    | '/news/$slug'
     | '/innovation'
+    | '/news'
   id:
     | '__root__'
     | '/'
@@ -214,7 +234,9 @@ export interface FileRouteTypes {
     | '/resources'
     | '/support'
     | '/innovation/$slug'
+    | '/news/$slug'
     | '/innovation/'
+    | '/news/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -228,7 +250,7 @@ export interface RootRouteChildren {
   ForPartnersRoute: typeof ForPartnersRoute
   ForStudentsRoute: typeof ForStudentsRoute
   InnovationRoute: typeof InnovationRouteWithChildren
-  NewsRoute: typeof NewsRoute
+  NewsRoute: typeof NewsRouteWithChildren
   ProgramsRoute: typeof ProgramsRoute
   ResourcesRoute: typeof ResourcesRoute
   SupportRoute: typeof SupportRoute
@@ -334,12 +356,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/news/': {
+      id: '/news/'
+      path: '/'
+      fullPath: '/news/'
+      preLoaderRoute: typeof NewsIndexRouteImport
+      parentRoute: typeof NewsRoute
+    }
     '/innovation/': {
       id: '/innovation/'
       path: '/'
       fullPath: '/innovation/'
       preLoaderRoute: typeof InnovationIndexRouteImport
       parentRoute: typeof InnovationRoute
+    }
+    '/news/$slug': {
+      id: '/news/$slug'
+      path: '/$slug'
+      fullPath: '/news/$slug'
+      preLoaderRoute: typeof NewsSlugRouteImport
+      parentRoute: typeof NewsRoute
     }
     '/innovation/$slug': {
       id: '/innovation/$slug'
@@ -365,6 +401,18 @@ const InnovationRouteWithChildren = InnovationRoute._addFileChildren(
   InnovationRouteChildren,
 )
 
+interface NewsRouteChildren {
+  NewsSlugRoute: typeof NewsSlugRoute
+  NewsIndexRoute: typeof NewsIndexRoute
+}
+
+const NewsRouteChildren: NewsRouteChildren = {
+  NewsSlugRoute: NewsSlugRoute,
+  NewsIndexRoute: NewsIndexRoute,
+}
+
+const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -376,7 +424,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForPartnersRoute: ForPartnersRoute,
   ForStudentsRoute: ForStudentsRoute,
   InnovationRoute: InnovationRouteWithChildren,
-  NewsRoute: NewsRoute,
+  NewsRoute: NewsRouteWithChildren,
   ProgramsRoute: ProgramsRoute,
   ResourcesRoute: ResourcesRoute,
   SupportRoute: SupportRoute,
