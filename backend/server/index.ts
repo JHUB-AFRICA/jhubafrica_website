@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import compression from 'compression'
+import cookieParser from 'cookie-parser'
 
 import { NODE_ENV, API_VERSION, PORT, CORS_ORIGINS } from '../src/config/env.js'
 import { apiLimiter } from '../src/middleware/rateLimiter.middleware.js'
@@ -19,11 +20,12 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
 
+app.use(cookieParser())
 app.use(cors({
   origin: CORS_ORIGINS ? CORS_ORIGINS.split(',') : '*',
   credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
 }))
 
 app.use(compression())

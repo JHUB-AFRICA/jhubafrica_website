@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { adminLogin, adminLogout } from "../../axios/api/admin/auth";
+import { getAccessToken, setAccessToken, refreshSession } from "../../axios/axios";
 import { getNews } from "../../axios/api/news";
 import { getEvents } from "../../axios/api/events";
 import { getAdminInnovations } from "../../axios/api/admin/innovations";
@@ -36,8 +37,12 @@ export const Route = createFileRoute("/admin")({
     ],
   }),
   loader: async () => {
-    const hasToken = typeof window !== "undefined" && Boolean(localStorage.getItem("jhub_admin_token"));
-    if (!hasToken) {
+    let token = getAccessToken();
+    if (!token && typeof window !== "undefined") {
+      token = await refreshSession();
+    }
+
+    if (!token) {
       return { news: [], events: [], innovations: [], courses: [] };
     }
 
@@ -50,10 +55,9 @@ export const Route = createFileRoute("/admin")({
       ]);
       return { news, events, innovations, courses };
     } catch (error: any) {
-      console.warn("Loader failed to load admin content, likely expired session:", error);
+      console.warn("Loader failed to load admin content:", error);
       if (error?.response?.status === 401) {
-        localStorage.removeItem("jhub_admin_token");
-        localStorage.removeItem("jhub_admin_refresh_token");
+        setAccessToken(null);
       }
       return { news: [], events: [], innovations: [], courses: [] };
     }
@@ -71,7 +75,16 @@ function AdminPage() {
   const { news, events, innovations, courses } = Route.useLoaderData();
 
   useEffect(() => {
-    if (localStorage.getItem("jhub_admin_token")) setUnlocked(true);
+    if (getAccessToken()) {
+      setUnlocked(true);
+    } else {
+      refreshSession().then((token) => {
+        if (token) {
+          setUnlocked(true);
+          router.invalidate();
+        }
+      });
+    }
   }, []);
 
   async function tryUnlock(e: React.FormEvent) {
@@ -80,8 +93,7 @@ function AdminPage() {
     setErr("");
     try {
       const response = await adminLogin(email, password);
-      localStorage.setItem("jhub_admin_token", response.token);
-      localStorage.setItem("jhub_admin_refresh_token", response.refreshToken);
+      setAccessToken(response.token);
       setUnlocked(true);
       setErr("");
       await router.invalidate();
@@ -100,8 +112,7 @@ function AdminPage() {
     } catch (e) {
       console.warn("Sign out request failed:", e);
     }
-    localStorage.removeItem("jhub_admin_token");
-    localStorage.removeItem("jhub_admin_refresh_token");
+    setAccessToken(null);
     setUnlocked(false);
     setEmail("");
     setPassword("");
