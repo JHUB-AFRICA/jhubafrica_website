@@ -6,6 +6,7 @@ import { ContactModal } from "./ContactModal";
 import styles from "../../styles/Navbar.module.css";
 
 const NAV = [
+  { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/innovation", label: "Innovations" },
   { to: "/for-innovators", label: "For Innovators" },
@@ -78,20 +79,11 @@ export default function Navbar() {
 
         <div className={styles['sidebar-section-title']}>JHUB AFRICA</div>
         <div className={styles['sidebar-links-group']}>
-          <Link
-            to="/"
-            className={`${styles['nav-link']} ${styles['sidebar-home-link']}`}
-            activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
-            activeOptions={{ exact: true }}
-            onClick={() => setOpen(false)}
-          >
-            Home
-          </Link>
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className={styles['nav-link']}
+              className={item.to === "/" ? `${styles['nav-link']} ${styles['sidebar-home-link']}` : styles['nav-link']}
               activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
               activeOptions={{ exact: (item.to as string) === "/" }}
               onClick={() => {
