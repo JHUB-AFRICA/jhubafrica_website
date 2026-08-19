@@ -21,6 +21,8 @@ const cookieOptions: CookieOptions = {
   maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
 }
 
+const { maxAge, ...clearCookieOptions } = cookieOptions
+
 interface RotatedTokenGrace {
   token: string
   userId: string
@@ -273,7 +275,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       // Reuse Attack Detected!
       console.warn(`[SECURITY ALERT] Refresh token reuse detected for User ${userId}. Revoking all sessions!`)
       await supabaseAdmin.from('refresh_tokens').delete().eq('user_id', userId)
-      res.clearCookie('refreshToken', cookieOptions)
+      res.clearCookie('refreshToken', clearCookieOptions)
       return res.status(401).json({ error: 'SESSION_COMPROMISED' })
     }
 
@@ -328,7 +330,7 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
       await supabaseAdmin.from('refresh_tokens').delete().eq('token', refreshToken)
     }
 
-    res.clearCookie('refreshToken', cookieOptions)
+    res.clearCookie('refreshToken', clearCookieOptions)
 
     if (req.user?.sub) {
       await supabaseAdmin.auth.admin.signOut(req.user.sub)
