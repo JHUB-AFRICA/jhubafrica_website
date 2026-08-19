@@ -3,8 +3,8 @@ import { supabase, supabaseAdmin } from '../config/supabase.js'
 import { signToken, signRefreshToken, blacklistToken } from '../middleware/auth.middleware.js'
 import { CookieOptions } from 'express'
 import { redis } from '../config/redis.js'
-// CHANGED: import NODE_ENV so cookie flags can be environment-aware
 import { NODE_ENV } from '../config/env.js'
+import crypto from 'crypto'
 
 // CHANGED: derive isProd once, reuse below
 const isProd = NODE_ENV === 'production'
@@ -134,6 +134,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     // Save refresh token in DB
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     const { error: dbError } = await supabaseAdmin.from('refresh_tokens').insert({
+      id: crypto.randomUUID(),
       token: refreshToken,
       user_id: data.user.id,
       expires_at: expiresAt.toISOString()
@@ -188,6 +189,7 @@ export async function adminLogin(req: Request, res: Response, next: NextFunction
     // Save refresh token in DB
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     const { error: dbError } = await supabaseAdmin.from('refresh_tokens').insert({
+      id: crypto.randomUUID(),
       token: refreshToken,
       user_id: data.user.id,
       expires_at: expiresAt.toISOString()
@@ -298,6 +300,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
     // 4. Save new refresh token in DB
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     await supabaseAdmin.from('refresh_tokens').insert({
+      id: crypto.randomUUID(),
       token: newRefreshToken,
       user_id: userId,
       expires_at: expiresAt.toISOString()
