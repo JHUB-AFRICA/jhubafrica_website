@@ -39,7 +39,11 @@ export const Route = createFileRoute("/admin")({
   loader: async () => {
     let token = getAccessToken();
     if (!token && typeof window !== "undefined") {
-      token = await refreshSession();
+      try {
+        token = await refreshSession();
+      } catch (err) {
+        console.warn("Silent refresh failed on route load:", err);
+      }
     }
 
     if (!token) {

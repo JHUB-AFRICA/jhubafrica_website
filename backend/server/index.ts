@@ -28,7 +28,14 @@ app.use(cors({
   origin: CORS_ORIGINS ? CORS_ORIGINS.split(',') : '*',
   credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'x-requested-with',
+    'X-CSRF-Token',
+    'x-csrf-token'
+  ],
 }))
 
 app.use(compression())

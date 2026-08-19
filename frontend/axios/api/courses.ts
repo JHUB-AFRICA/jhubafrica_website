@@ -14,7 +14,7 @@ const getCategoryDetails = (category: string) => {
 
 export const mapCourse = (item: any): CourseItem => {
   const catDetails = getCategoryDetails(item.category || "Emerging Tech");
-  
+
   let mode = "Online";
   if (item.delivery_mode === "IN_PERSON" || item.deliveryMode === "IN_PERSON") {
     mode = "In-Person";
