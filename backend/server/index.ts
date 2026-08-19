@@ -15,6 +15,9 @@ import { supabaseAdmin } from '../src/config/supabase.js'
 // ── App ────────────────────────────────────────────────
 const app = express()
 
+// Trust Render's proxy so req.ip / X-Forwarded-For are read correctly
+app.set('trust proxy', 1)
+
 // ── Security & parsing ─────────────────────────────────
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },

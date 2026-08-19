@@ -1,69 +1,22 @@
 import { Request, Response, NextFunction } from 'express'
 import { supabase, supabaseAdmin } from '../config/supabase.js'
 import { signToken, signRefreshToken, blacklistToken } from '../middleware/auth.middleware.js'
-
-export async function register(req: Request, res: Response, next: NextFunction) {
-  try {
-    const { email, password, firstName, lastName, role } = req.body
-
-    // Create user in Supabase Auth
-    const { data: authUser, error } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { firstName, lastName, role },
-    })
-
-    if (error) {
-      if (error.message.includes('already registered')) {
-        return res.status(409).json({ error: 'Email already registered' })
-      }
-      throw error
-    }
-
-    // Sync user profile into public users table
-    const { error: dbError } = await supabaseAdmin.from('users').insert({
-      id: authUser.user.id,
-      email,
-      first_name: firstName,
-      last_name: lastName,
-      role: role.toUpperCase(),
-      is_verified: true,
-      is_active: true,
-    })
-    if (dbError) throw dbError
-
-    const token = signToken({
-      sub: authUser.user.id,
-      email,
-      role: role.toLowerCase() as any,
-    })
-    const refreshToken = signRefreshToken(authUser.user.id)
-
-    res.status(201).json({
-      message: 'Account created. Please verify your email.',
-      token,
-      refreshToken,
-      user: {
-        id: authUser.user.id,
-        email,
-        firstName,
-        lastName,
-        role,
-      },
-    })
-  } catch (err) {
-    next(err)
-  }
-}
-
 import { CookieOptions } from 'express'
 import { redis } from '../config/redis.js'
+// CHANGED: import NODE_ENV so cookie flags can be environment-aware
+import { NODE_ENV } from '../config/env.js'
 
+// CHANGED: derive isProd once, reuse below
+const isProd = NODE_ENV === 'production'
+
+// CHANGED: secure/sameSite now depend on environment.
+// Previously secure:true + sameSite:'none' silently dropped the cookie
+// on http://localhost, since browsers refuse Secure cookies on non-HTTPS
+// origins — meaning refresh could never work in local dev.
 const cookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: true,
-  sameSite: 'none',
+  secure: isProd,
+  sameSite: isProd ? 'none' : 'lax',
   path: '/api/v1/auth/refresh',
   maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
 }
@@ -96,6 +49,66 @@ async function isTokenInGracePeriod(token: string): Promise<string | null> {
   return found ? found.userId : null
 }
 
+export async function register(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email, password, firstName, lastName, role } = req.body
+
+    // Create user in Supabase Auth
+    const { data: authUser, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { firstName, lastName, role },
+    })
+
+    if (error) {
+      if (error.message.includes('already registered')) {
+        return res.status(409).json({ error: 'Email already registered' })
+      }
+      throw error
+    }
+
+    // Sync user profile into public users table
+    const { error: dbError } = await supabaseAdmin.from('users').insert({
+      id: authUser.user.id,
+      email,
+      first_name: firstName,
+      last_name: lastName,
+      role: role.toUpperCase(),
+      is_verified: true,
+      is_active: true,
+    })
+    // CHANGED: log before throwing so failures are visible in server logs
+    // instead of surfacing only as a generic 500 to the client.
+    if (dbError) {
+      console.error('[register] users insert failed:', dbError)
+      throw dbError
+    }
+
+    const token = signToken({
+      sub: authUser.user.id,
+      email,
+      role: role.toLowerCase() as any,
+    })
+    const refreshToken = signRefreshToken(authUser.user.id)
+
+    res.status(201).json({
+      message: 'Account created. Please verify your email.',
+      token,
+      refreshToken,
+      user: {
+        id: authUser.user.id,
+        email,
+        firstName,
+        lastName,
+        role,
+      },
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const { email, password } = req.body
@@ -125,7 +138,11 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       user_id: data.user.id,
       expires_at: expiresAt.toISOString()
     })
-    if (dbError) throw dbError
+    // CHANGED: log before throwing (see register() above for why)
+    if (dbError) {
+      console.error('[login] refresh_tokens insert failed:', dbError)
+      throw dbError
+    }
 
     res.cookie('refreshToken', refreshToken, cookieOptions)
 
@@ -175,7 +192,13 @@ export async function adminLogin(req: Request, res: Response, next: NextFunction
       user_id: data.user.id,
       expires_at: expiresAt.toISOString()
     })
-    if (dbError) throw dbError
+    // CHANGED: log before throwing — this is the insert most likely
+    // responsible for the 500 on /auth/admin/login. Check server logs
+    // for "[adminLogin] refresh_tokens insert failed" on next attempt.
+    if (dbError) {
+      console.error('[adminLogin] refresh_tokens insert failed:', dbError)
+      throw dbError
+    }
 
     res.cookie('refreshToken', refreshToken, cookieOptions)
 

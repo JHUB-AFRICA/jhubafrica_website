@@ -1,4 +1,6 @@
-import { api } from "../../axios.ts";
+// CHANGED: import adminApi instead of api — all endpoints here are under
+// /api/v1/admin/*, which require auth.
+import { adminApi } from "../../axios.ts";
 import { InnovationItem } from "../../../src/types/innovations.ts";
 
 export interface InnovationSubmission extends InnovationItem {
@@ -38,7 +40,8 @@ const mapInnovation = (item: any): InnovationSubmission => ({
 });
 
 export const getAdminInnovations = async (): Promise<InnovationSubmission[]> => {
-  const response = await api.get<{ data: any[] }>("/api/v1/admin/innovations");
+  // CHANGED: api -> adminApi
+  const response = await adminApi.get<{ data: any[] }>("/api/v1/admin/innovations");
   return response.data.data.map(mapInnovation);
 };
 
@@ -47,7 +50,8 @@ export const updateInnovationStatus = async (
   status: "PENDING" | "APPROVED" | "REJECTED" | "DRAFT" | "SUBMITTED" | "UNDER_REVIEW",
   reviewNotes?: string
 ): Promise<InnovationSubmission> => {
-  const response = await api.patch<{ data: InnovationSubmission }>(`/api/v1/admin/innovations/${id}/status`, {
+  // CHANGED: api -> adminApi
+  const response = await adminApi.patch<{ data: InnovationSubmission }>(`/api/v1/admin/innovations/${id}/status`, {
     status,
     reviewNotes,
   });
@@ -55,6 +59,7 @@ export const updateInnovationStatus = async (
 };
 
 export const toggleInnovationFeatured = async (id: string): Promise<{ success: boolean; isFeatured: boolean }> => {
-  const response = await api.patch<{ data: { success: boolean; isFeatured: boolean } }>(`/api/v1/admin/innovations/${id}/feature`);
+  // CHANGED: api -> adminApi
+  const response = await adminApi.patch<{ data: { success: boolean; isFeatured: boolean } }>(`/api/v1/admin/innovations/${id}/feature`);
   return response.data.data;
 };

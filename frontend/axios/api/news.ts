@@ -1,4 +1,6 @@
-import { api } from "../axios";
+// CHANGED: import both — getNews/getNewsBySlug are public, the rest are
+// admin-only writes.
+import { api, adminApi } from "../axios";
 import { NewsPost } from "../../src/types/news";
 
 const mapNews = (item: any): NewsPost => {
@@ -66,27 +68,32 @@ const mapToBackendNews = (post: Omit<NewsPost, "id">) => {
 };
 
 export const getNews = async (): Promise<NewsPost[]> => {
+  // UNCHANGED: public read, stays on api
   const response = await api.get<{ data: any[] }>("/api/v1/news");
   return response.data.data.map(mapNews);
 };
 
 export const addNews = async (post: Omit<NewsPost, "id">): Promise<NewsPost> => {
   const payload = mapToBackendNews(post);
-  const response = await api.post<{ data: any }>("/api/v1/admin/news", payload);
+  // CHANGED: api -> adminApi (writes to /api/v1/admin/news)
+  const response = await adminApi.post<{ data: any }>("/api/v1/admin/news", payload);
   return mapNews(response.data.data);
 };
 
 export const updateNews = async (post: NewsPost): Promise<NewsPost> => {
   const payload = mapToBackendNews(post);
-  const response = await api.patch<{ data: any }>(`/api/v1/admin/news/${post.id}`, payload);
+  // CHANGED: api -> adminApi
+  const response = await adminApi.patch<{ data: any }>(`/api/v1/admin/news/${post.id}`, payload);
   return mapNews(response.data.data);
 };
 
 export const deleteNews = async (id: string): Promise<void> => {
-  await api.delete(`/api/v1/admin/news/${id}`);
+  // CHANGED: api -> adminApi
+  await adminApi.delete(`/api/v1/admin/news/${id}`);
 };
 
 export const getNewsBySlug = async (slug: string): Promise<NewsPost> => {
+  // UNCHANGED: public read, stays on api
   const response = await api.get<{ data: any }>(`/api/v1/news/${slug}`);
   return mapNews(response.data.data);
 };

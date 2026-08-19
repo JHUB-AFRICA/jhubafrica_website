@@ -1,4 +1,6 @@
-import { api } from "../../axios.ts";
+// CHANGED: import adminApi instead of api — all endpoints here are under
+// /api/v1/admin/*, which require auth.
+import { adminApi } from "../../axios.ts";
 import { CourseItem } from "../../../src/types/courses";
 import { mapCourse } from "../courses";
 
@@ -22,7 +24,8 @@ export interface Lesson {
 }
 
 export const getAdminCourses = async (): Promise<CourseItem[]> => {
-  const response = await api.get<{ data: any[] }>("/api/v1/admin/courses");
+  // CHANGED: api -> adminApi
+  const response = await adminApi.get<{ data: any[] }>("/api/v1/admin/courses");
   return response.data.data.map(mapCourse);
 };
 
@@ -38,7 +41,8 @@ export const createCourse = async (course: Omit<CourseItem, "id">): Promise<Cour
     isFeatured: course.isFeatured || false,
     isPublished: course.isPublished || false,
   };
-  const response = await api.post<{ data: any }>("/api/v1/admin/courses", payload);
+  // CHANGED: api -> adminApi
+  const response = await adminApi.post<{ data: any }>("/api/v1/admin/courses", payload);
   return mapCourse(response.data.data);
 };
 
@@ -54,20 +58,24 @@ export const updateCourse = async (id: string, course: Partial<CourseItem>): Pro
     isFeatured: course.isFeatured,
     isPublished: course.isPublished,
   };
-  const response = await api.patch<{ data: any }>(`/api/v1/admin/courses/${id}`, payload);
+  // CHANGED: api -> adminApi
+  const response = await adminApi.patch<{ data: any }>(`/api/v1/admin/courses/${id}`, payload);
   return mapCourse(response.data.data);
 };
 
 export const deleteCourse = async (id: string): Promise<void> => {
-  await api.delete(`/api/v1/admin/courses/${id}`);
+  // CHANGED: api -> adminApi
+  await adminApi.delete(`/api/v1/admin/courses/${id}`);
 };
 
 export const createCohort = async (courseId: string, cohort: Omit<Cohort, "id" | "courseId">): Promise<Cohort> => {
-  const response = await api.post<{ data: Cohort }>(`/api/v1/admin/courses/${courseId}/cohorts`, cohort);
+  // CHANGED: api -> adminApi
+  const response = await adminApi.post<{ data: Cohort }>(`/api/v1/admin/courses/${courseId}/cohorts`, cohort);
   return response.data.data;
 };
 
 export const createLesson = async (courseId: string, lesson: Omit<Lesson, "id" | "courseId">): Promise<Lesson> => {
-  const response = await api.post<{ data: Lesson }>(`/api/v1/admin/courses/${courseId}/lessons`, lesson);
+  // CHANGED: api -> adminApi
+  const response = await adminApi.post<{ data: Lesson }>(`/api/v1/admin/courses/${courseId}/lessons`, lesson);
   return response.data.data;
 };

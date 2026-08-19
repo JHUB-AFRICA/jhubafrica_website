@@ -21,20 +21,39 @@ function addRefreshSubscriber(callback: (token: string) => void) {
   refreshSubscribers.push(callback);
 }
 
+const baseURL = import.meta.env.VITE_APP_API_URL || "http://localhost:4001";
+
+// CHANGED: `api` is now for PUBLIC reads only (news, events, public
+// innovations/courses listings). No withCredentials, no CSRF header,
+// no Authorization header — nothing that forces a CORS preflight.
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_URL || "http://localhost:4001",
-  withCredentials: true,
+  baseURL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-api.interceptors.request.use(
+// CHANGED (new): `adminApi` carries everything the old shared `api`
+// instance used to carry — auth token, cookies, CSRF header — but only
+// for admin login/refresh/logout and admin CRUD calls. Update imports in
+// axios/api/admin/*.ts to use this instead of `api`.
+export const adminApi = axios.create({
+  baseURL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+  },
+});
+
+// CHANGED: Authorization header attach logic moved from the old shared
+// `api` interceptor to `adminApi` only — public requests no longer carry
+// a bearer token or trigger a preflight.
+adminApi.interceptors.request.use(
   (config) => {
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    config.headers["X-Requested-With"] = "XMLHttpRequest";
     return config;
   },
   (error) => {
@@ -45,7 +64,7 @@ api.interceptors.request.use(
 export async function refreshSession(): Promise<string | null> {
   try {
     const response = await axios.post(
-      `${api.defaults.baseURL}/api/v1/auth/refresh`,
+      `${baseURL}/api/v1/auth/refresh`,
       {},
       {
         withCredentials: true,
@@ -61,11 +80,14 @@ export async function refreshSession(): Promise<string | null> {
   }
 }
 
-api.interceptors.response.use(
+// CHANGED: response interceptor (refresh-on-401 retry logic) moved from
+// `api` to `adminApi` — this flow only matters for authenticated admin
+// requests, never for public reads.
+adminApi.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (originalRequest.url?.includes("/auth/refresh")) {
         return Promise.reject(error);
@@ -75,7 +97,7 @@ api.interceptors.response.use(
         return new Promise((resolve) => {
           addRefreshSubscriber((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(api(originalRequest));
+            resolve(adminApi(originalRequest));
           });
         });
       }
@@ -89,7 +111,7 @@ api.interceptors.response.use(
         if (newToken) {
           onRefreshed(newToken);
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return api(originalRequest);
+          return adminApi(originalRequest);
         }
       } catch (err) {
         isRefreshing = false;

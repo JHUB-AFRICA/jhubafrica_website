@@ -1,4 +1,5 @@
-import { api } from "../axios";
+// CHANGED: import both — getEvents is public, the rest are admin-only writes.
+import { api, adminApi } from "../axios";
 import { EventItem } from "../../src/types/events";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -12,7 +13,7 @@ const mapEvent = (item: any): EventItem => {
   const date = new Date(item.start_date || item.startDate);
   const day = isNaN(date.getTime()) ? "01" : date.getDate().toString().padStart(2, "0");
   const month = isNaN(date.getTime()) ? "Jan" : MONTHS[date.getMonth()];
-  
+
   return {
     id: item.id,
     day,
@@ -32,7 +33,6 @@ const mapToBackendEvent = (event: Omit<EventItem, "id">) => {
   const dayNum = parseInt(event.day || "1", 10) || 1;
   const startDate = new Date(Date.UTC(year, monthIndex, dayNum, 9, 0, 0)).toISOString();
 
-  // Smartly determine event type based on title keywords
   let eventType: "HACKATHON" | "WORKSHOP" | "SEMINAR" | "CONFERENCE" | "WEBINAR" | "NETWORKING" | "OTHER" = "OTHER";
   const titleLower = (event.title || "").toLowerCase();
   if (titleLower.includes("hackathon")) {
@@ -55,29 +55,33 @@ const mapToBackendEvent = (event: Omit<EventItem, "id">) => {
     title: event.title,
     description: event.desc.length >= 10 ? event.desc : event.desc.padEnd(10, " "),
     type: eventType,
-    status: "PUBLISHED", // Sets it active so it renders on public feed
+    status: "PUBLISHED",
     startDate,
     coverImageUrl,
   };
 };
 
 export const getEvents = async (): Promise<EventItem[]> => {
+  // UNCHANGED: public read, stays on api
   const response = await api.get<{ data: any[] }>("/api/v1/events");
   return response.data.data.map(mapEvent);
 };
 
 export const addEvent = async (event: Omit<EventItem, "id">): Promise<EventItem> => {
   const payload = mapToBackendEvent(event);
-  const response = await api.post<{ data: any }>("/api/v1/admin/events", payload);
+  // CHANGED: api -> adminApi
+  const response = await adminApi.post<{ data: any }>("/api/v1/admin/events", payload);
   return mapEvent(response.data.data);
 };
 
 export const updateEvent = async (event: EventItem): Promise<EventItem> => {
   const payload = mapToBackendEvent(event);
-  const response = await api.patch<{ data: any }>(`/api/v1/admin/events/${event.id}`, payload);
+  // CHANGED: api -> adminApi
+  const response = await adminApi.patch<{ data: any }>(`/api/v1/admin/events/${event.id}`, payload);
   return mapEvent(response.data.data);
 };
 
 export const deleteEvent = async (id: string): Promise<void> => {
-  await api.delete(`/api/v1/admin/events/${id}`);
+  // CHANGED: api -> adminApi
+  await adminApi.delete(`/api/v1/admin/events/${id}`);
 };
