@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import ContactStrip from "../components/site/ContactStrip";
+import { Sprout, Compass, Leaf, Globe, Cpu, MapPin } from "lucide-react";
 import PartnersSection from "../components/site/PartnersSection";
 import { getEvents } from "../../axios/api/events";
 import { getNews } from "../../axios/api/news";
@@ -75,7 +75,7 @@ export const Route = createFileRoute("/")({
 
     return {
       meta: [
-        { title: "JHUB Africa — Innovation Hub at JKUAT" },
+        { title: "JHUB Africa — Africa's Innovation Hub" },
         {
           name: "description",
           content:
@@ -246,6 +246,38 @@ function Index() {
         </div>
       </div>
 
+      <section className="content-section" style={{ paddingBottom: "3rem", paddingTop: "3rem" }}>
+        <div style={{ display: "grid", gap: "2rem" }} className="diagonal-values-grid">
+          {/* Cell 1: Top-Left (Vision) */}
+          <div style={{ padding: "1.5rem 0", maxWidth: "480px" }} className="diagonal-vision-cell">
+            <h2 style={{ fontSize: "2.5rem", fontWeight: "900", color: "var(--jhub-blue)", lineHeight: "1.1", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              OUR<br />VISION
+            </h2>
+            <div style={{ width: "80px", height: "4px", backgroundColor: "var(--jhub-green)", margin: "1.5rem 0" }} />
+            <p style={{ fontSize: "1.35rem", lineHeight: "1.6", color: "var(--text-main)", fontWeight: "500", margin: 0 }}>
+              A one stop hub offering comprehensive array of digital solutions for societal needs.
+            </p>
+          </div>
+
+          {/* Cell 2: Top-Right (Spacer on Desktop) */}
+          <div className="diagonal-spacer-cell" />
+
+          {/* Cell 3: Bottom-Left (Spacer on Desktop) */}
+          <div className="diagonal-spacer-cell" />
+
+          {/* Cell 4: Bottom-Right (Mission) */}
+          <div style={{ padding: "1.5rem 0", maxWidth: "480px", marginLeft: "auto" }} className="diagonal-mission-cell">
+            <h2 style={{ fontSize: "2.5rem", fontWeight: "900", color: "var(--jhub-blue)", lineHeight: "1.1", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              OUR<br />MISSION
+            </h2>
+            <div style={{ width: "80px", height: "4px", backgroundColor: "var(--jhub-green)", margin: "1.5rem 0" }} />
+            <p style={{ fontSize: "1.35rem", lineHeight: "1.6", color: "var(--text-main)", fontWeight: "500", margin: 0 }}>
+              To drive sustainable digital transformation, providing accessible and impactful solutions for small and medium-scale farmers, traders and enterprises.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="content-section">
         <div className="section-eyebrow">Audience-based navigation</div>
         <h2 className="section-h2">Find what matters to you</h2>
@@ -295,32 +327,28 @@ function Index() {
           At JHUB Africa, we pride ourselves in fostering groundbreaking solutions that address pressing challenges. Our featured innovations span various sectors, showcasing the creativity and dedication of our innovators. Explore our transformative solutions that are making a real difference.
         </p>
         <h2 className="section-h2">Themes driving our innovation portfolio</h2>
-        <div className={styles['focus-grid']}>
-          <article className={styles['focus-card']}>
-            <div className={styles['focus-icon']}>🌾</div>
-            <h3>Climate Smart Agriculture</h3>
-            <p>Digital tools for resilient, sustainable food systems.</p>
-          </article>
-          <article className={styles['focus-card']}>
-            <div className={styles['focus-icon']}>🧭</div>
-            <h3>Digital Twin Models</h3>
-            <p>Real-time simulation and monitoring for systems and energy.</p>
-          </article>
-          <article className={styles['focus-card']}>
-            <div className={styles['focus-icon']}>🌿</div>
-            <h3>Green Digital Innovation</h3>
-            <p>Climate-friendly products that reduce waste and improve efficiency.</p>
-          </article>
-          <article className={styles['focus-card']}>
-            <div className={styles['focus-icon']}>🌐</div>
-            <h3>Digital Trade</h3>
-            <p>Platforms and tools that enable regional market access.</p>
-          </article>
-          <article className={styles['focus-card']}>
-            <div className={styles['focus-icon']}>🤖</div>
-            <h3>AI & Digital Transformation</h3>
-            <p>Inclusive AI and automation for African enterprises.</p>
-          </article>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem", marginTop: "3rem" }}>
+          {[
+            { icon: <Sprout size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "Climate Smart Agriculture", desc: "Digital tools for resilient, sustainable food systems." },
+            { icon: <Compass size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "Digital Twin Models", desc: "Real-time simulation and monitoring for systems and energy." },
+            { icon: <Leaf size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "Green Digital Innovation", desc: "Climate-friendly products that reduce waste and improve efficiency." },
+            { icon: <Globe size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "Digital Trade", desc: "Platforms and tools that enable regional market access." },
+            { icon: <Cpu size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "AI & Digital Transformation", desc: "Inclusive AI and automation for African enterprises." }
+          ].map((theme, index) => (
+            <div key={index} className="theme-row-item" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem", paddingBottom: "2rem", borderBottom: "1px solid var(--border-color)" }}>
+              {/* Column 1: Icon + Title (Enlarged) */}
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                {theme.icon}
+                <h3 style={{ fontSize: "1.45rem", fontWeight: "800", color: "var(--jhub-blue)", margin: 0, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  {theme.title}
+                </h3>
+              </div>
+              {/* Column 2: Description */}
+              <p className="prog-desc" style={{ fontSize: "1.15rem", color: "var(--text-main)", margin: 0, lineHeight: "1.5", alignSelf: "center", textAlign: "left" }}>
+                {theme.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -399,40 +427,38 @@ function Index() {
               <article className="prog-card" style={{ height: "100%", cursor: "pointer", display: "flex", flexDirection: "column", padding: 0, overflow: "hidden" }}>
                 {p.coverImageUrl ? (
                   <div style={{ height: "180px", overflow: "hidden", borderBottom: "1px solid var(--border-color)" }}>
-                    <img 
-                      src={p.coverImageUrl} 
-                      alt={p.title} 
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                    <img
+                      src={p.coverImageUrl}
+                      alt={p.title}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   </div>
                 ) : (
-                  <div style={{ height: "180px", background: "linear-gradient(135deg, rgba(8, 20, 45, 0.05), rgba(16, 185, 129, 0.05))", borderBottom: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ color: "var(--jhub-green)", fontSize: "2rem", fontWeight: "bold" }}>JHUB</span>
+                  <div style={{ height: "180px", position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #0f2d59 0%, #1e1b4b 100%)", borderBottom: "1px solid var(--border-color)" }}>
+                    <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }} xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <pattern id="grid-home" width="20" height="20" patternUnits="userSpaceOnUse">
+                          <circle cx="2" cy="2" r="1" fill="#ffffff" />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#grid-home)" />
+                    </svg>
+                    <div style={{ position: "absolute", top: "-20px", left: "-20px", width: "120px", height: "120px", borderRadius: "50%", background: "radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%)", filter: "blur(10px)" }} />
+                    <div style={{ position: "absolute", bottom: "-30px", right: "-10px", width: "140px", height: "140px", borderRadius: "50%", background: "radial-gradient(circle, rgba(15, 45, 89, 0.6) 0%, rgba(15, 45, 89, 0) 70%)", filter: "blur(10px)" }} />
+                    <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                      <span style={{ color: "#ffffff", fontSize: "1.25rem", fontWeight: "800", letterSpacing: "0.15em", textTransform: "uppercase", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", borderRadius: "8px", padding: "6px 16px", backdropFilter: "blur(4px)" }}>JHUB</span>
+                    </div>
                   </div>
                 )}
                 <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>
                   <div className="prog-title" style={{ marginTop: 0, fontSize: "1.25rem" }}>{p.title}</div>
-                  
+
                   {p.description && (
-                    <p className="prog-desc" style={{ marginTop: "0.5rem", color: "#475569", fontSize: "0.95rem" }}>
+                    <p className="prog-desc" style={{ marginTop: "0.5rem", color: "#475569", fontSize: "0.95rem", flexGrow: 1 }}>
                       {p.description}
                     </p>
                   )}
 
-                  <p className="prog-desc" style={{ marginTop: "0.75rem", flexGrow: 1 }}>
-                    <strong style={{ color: "var(--jhub-blue)" }}>Problem:</strong>{" "}
-                    {p.problem.length > 120 ? `${p.problem.substring(0, 120)}...` : p.problem}
-                  </p>
-
-                  <div className="quick-facts" style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-                    <span className="qf-pill">
-                      <strong>Stage</strong> {p.stage}
-                    </span>
-                    <span className="qf-pill">
-                      <strong>Sector</strong> {p.sector}
-                    </span>
-                  </div>
-                  
                   <div className="prog-meta" style={{ marginTop: "auto", paddingTop: "0.5rem" }}>
                     <span className="prog-arrow">
                       View project details →
@@ -504,17 +530,23 @@ function Index() {
                       <div className={styles['event-month']}>{event.month}</div>
                     </div>
                     <div>
-                      <div className={`prog-title ${event.titleColor}`}>{event.title}</div>
-                      <p className="prog-desc">{event.desc}</p>
+                      <div className={`prog-title ${event.titleColor}`} style={{ textAlign: "left" }}>{event.title}</div>
+                      <p className="prog-desc" style={{ textAlign: "left" }}>{event.desc}</p>
+                      {event.location && (
+                        <div style={{ display: "flex", gap: "0.35rem", alignItems: "center", fontSize: "0.82rem", color: "var(--text-muted)", marginTop: "0.5rem", textAlign: "left" }}>
+                          <MapPin size={14} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />
+                          <span>{event.location}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="prog-meta">
-                    <Link to="/events" className="prog-arrow">Read →</Link>
+                  <div className="prog-meta" style={{ justifyContent: "flex-start", marginTop: "1rem" }}>
+                    <Link to="/events" search={{ selectedId: event.id }} className="prog-arrow">Read →</Link>
                   </div>
                 </article>
               ))}
             </div>
-            <Link to="/events" className="btn-outline">View All Events</Link>
+            <Link to="/events" className="btn-outline" style={{ marginTop: "1.5rem" }}>View All Events</Link>
           </div>
 
           <div>
@@ -531,7 +563,7 @@ function Index() {
                 </article>
               ))}
             </div>
-            <Link to="/news" className="btn-outline">Read More News</Link>
+            <Link to="/news" className="btn-outline" style={{ marginTop: "1.5rem" }}>Read More News</Link>
           </div>
         </div>
       </section>
@@ -559,8 +591,6 @@ function Index() {
           <button type="submit" className="btn-primary">Subscribe</button>
         </form>
       </section>
-
-      <ContactStrip />
     </>
   );
 }

@@ -68,6 +68,7 @@ export function getEmptyEvent(): Omit<EventItem, "id"> {
         desc: "",
         titleColor: "",
         image: "",
+        location: "",
     };
 }
 

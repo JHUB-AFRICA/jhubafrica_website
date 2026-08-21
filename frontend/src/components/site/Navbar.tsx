@@ -1,21 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import ApplyDialog from "./ApplyDialog";
 import logoAsset from "../../assets/jhublogo.jpeg";
 import { ContactModal } from "./ContactModal";
 import styles from "../../styles/Navbar.module.css";
 
-const NAV = [
+interface NavMenuItem {
+  label: string;
+  to?: string;
+  children?: { to: string; label: string }[];
+}
+
+const MENU_ITEMS: NavMenuItem[] = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/innovation", label: "Innovations" },
-  { to: "/for-innovators", label: "For Innovators" },
-  { to: "/for-partners", label: "For Partners & Funders" },
-  { to: "/courses", label: "Courses & Programs" },
-  { to: "/news", label: "News" },
-  { to: "/events", label: "Events" },
+  {
+    label: "Programs",
+    children: [
+      { to: "/for-innovators", label: "For Innovators" },
+      { to: "/for-students", label: "For Students" },
+      { to: "/courses", label: "Courses & Programs" },
+    ],
+  },
+  { to: "/for-partners", label: "Partners" },
+  {
+    label: "Community",
+    children: [
+      { to: "/news", label: "News & Blog" },
+      { to: "/events", label: "Events" },
+    ],
+  },
   { to: "/contact", label: "Contact" },
-] as const;
+];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -42,20 +59,43 @@ export default function Navbar() {
 
         {/* Desktop Navigation (visible only on desktop) */}
         <nav className={`${styles['site-nav']} ${styles['desktop-nav']}`}>
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={styles['nav-link']}
-              activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
-              activeOptions={{ exact: (item.to as string) === "/" }}
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {MENU_ITEMS.map((item) => {
+            if (item.children) {
+              return (
+                <div key={item.label} className={styles['nav-dropdown']}>
+                  <button className={`${styles['nav-link']} ${styles['nav-link--dropdown']}`}>
+                    {item.label} <span style={{ marginLeft: "4px", fontSize: "0.55rem", verticalAlign: "middle" }}>▼</span>
+                  </button>
+                  <div className={styles['nav-submenu']}>
+                    {item.children.map((sub) => (
+                      <Link
+                        key={sub.to}
+                        to={sub.to}
+                        className={styles['nav-submenu-link']}
+                        activeProps={{ className: `${styles['nav-submenu-link']} ${styles.active}` }}
+                        onClick={() => setOpen(false)}
+                      >
+                        {sub.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={item.to}
+                to={item.to!}
+                className={styles['nav-link']}
+                activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
+                activeOptions={{ exact: item.to === "/" }}
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Global CTA inside sticky header (visible only on desktop) */}
@@ -79,20 +119,42 @@ export default function Navbar() {
 
         <div className={styles['sidebar-section-title']}>JHUB AFRICA</div>
         <div className={styles['sidebar-links-group']}>
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={item.to === "/" ? `${styles['nav-link']} ${styles['sidebar-home-link']}` : styles['nav-link']}
-              activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
-              activeOptions={{ exact: (item.to as string) === "/" }}
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {MENU_ITEMS.map((item) => {
+            if (item.children) {
+              return (
+                <div key={item.label} className={styles['nav-dropdown']}>
+                  <div className={styles['sidebar-section-title']} style={{ marginTop: "1rem", marginBottom: "0.25rem", paddingLeft: "1rem" }}>
+                    {item.label}
+                  </div>
+                  {item.children.map((sub) => (
+                    <Link
+                      key={sub.to}
+                      to={sub.to}
+                      className={styles['nav-link']}
+                      activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
+                      onClick={() => setOpen(false)}
+                      style={{ paddingLeft: "1.5rem" }}
+                    >
+                      {sub.label}
+                    </Link>
+                  ))}
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={item.to}
+                to={item.to!}
+                className={item.to === "/" ? `${styles['nav-link']} ${styles['sidebar-home-link']}` : styles['nav-link']}
+                activeProps={{ className: `${styles['nav-link']} ${styles.active}` }}
+                activeOptions={{ exact: item.to === "/" }}
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
 
         <div className={styles['sidebar-section-title']}>FOLLOW US</div>

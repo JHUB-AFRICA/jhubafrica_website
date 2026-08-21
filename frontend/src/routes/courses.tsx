@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
 import ApplyDialog from "../components/site/ApplyDialog";
 import { getPublicCourses } from "../../axios/api/courses";
 import { CourseItem } from "../types/courses";
+import SkeletonCards from "../components/site/SkeletonCards";
 
 export const Route = createFileRoute("/courses")({
   head: (ctx: { loaderData?: CourseItem[] }) => {
@@ -58,10 +60,42 @@ export const Route = createFileRoute("/courses")({
   },
   loader: () => getPublicCourses(),
   component: CoursesPage,
+  pendingComponent: () => (
+    <>
+      <header className="page-header">
+        <h1>
+          Our <span style={{ color: "var(--jhub-green)" }}>Courses</span>
+        </h1>
+        <p>
+          Practical, instructor-led programs designed with industry partners.
+          Cohort-based, with no upfront payment for accepted learners on
+          subsidised tracks.
+        </p>
+      </header>
+
+      <section className="content-section">
+        <SkeletonCards count={3} />
+      </section>
+    </>
+  ),
 });
+
+const CATEGORIES = ["All", "Software", "Data", "Emerging Tech"] as const;
 
 function CoursesPage() {
   const courses = Route.useLoaderData();
+  const [q, setQ] = useState("");
+  const [category, setCategory] = useState<string>("All");
+
+  const filtered = useMemo(() => {
+    return courses.filter((c: CourseItem) => {
+      const matchQ =
+        q.trim() === "" ||
+        `${c.title} ${c.desc}`.toLowerCase().includes(q.toLowerCase());
+      const matchCategory = category === "All" || c.tag === category;
+      return matchQ && matchCategory;
+    });
+  }, [courses, q, category]);
 
   return (
     <>
@@ -77,41 +111,93 @@ function CoursesPage() {
       </header>
 
       <section className="content-section">
-        <div className="cards-grid">
-          {courses.map((c: CourseItem) => (
-            <div key={c.id} className="prog-card">
-              <div className={`prog-title ${c.titleColor ?? ""}`}>
-                {c.title}
-              </div>
-              <p className="prog-desc">{c.desc}</p>
-              <div className="quick-facts">
-                <span className="qf-pill">
-                  <strong>Duration</strong> {c.duration}
-                </span>
-                <span className="qf-pill">
-                  <strong>Mode</strong> {c.mode}
-                </span>
-                <span className="qf-pill">
-                  <strong>Level</strong> {c.level}
-                </span>
-                <span
-                  className={`qf-pill ${c.cohort === "Open" ? "qf-open" : "qf-wait"}`}
-                >
-                  <strong>Cohort</strong> {c.cohort}
-                </span>
-              </div>
-              <div className="prog-meta">
-                <span className="prog-slots">{c.cert}</span>
-                <ApplyDialog
-                  triggerText="Join waitlist →"
-                  triggerVariant="ghost"
-                  triggerClassName="prog-arrow"
-                  source={c.title}
-                />
-              </div>
-            </div>
-          ))}
+        <div className="filter-bar">
+          <input
+            type="search"
+            placeholder="Search courses..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="filter-input"
+            aria-label="Search courses"
+          />
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="filter-select"
+            aria-label="Filter by category"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                Category: {cat}
+              </option>
+            ))}
+          </select>
         </div>
+
+        <div className="filter-meta">
+          Showing {filtered.length} of {courses.length} courses
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="empty-state-card" style={{ padding: "3rem 1.5rem", textAlign: "center", border: "1px dashed var(--border-color)", borderRadius: "12px", background: "var(--bg-soft)" }}>
+            <span style={{ fontSize: "2.2rem" }}>🎓</span>
+            <h3 style={{ fontSize: "1.2rem", fontWeight: "700", color: "var(--jhub-blue)", marginTop: "0.75rem", marginBottom: "0.5rem" }}>
+              No Courses Found
+            </h3>
+            <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", maxWidth: "420px", margin: "0 auto 1.25rem" }}>
+              We couldn't find any courses matching your search criteria. Try modifying your search keywords or choosing a different category.
+            </p>
+            <button
+              onClick={() => {
+                setQ("");
+                setCategory("All");
+              }}
+              className="btn-outline"
+              style={{ fontSize: "0.85rem", padding: "10px 24px" }}
+            >
+              Reset Filters
+            </button>
+          </div>
+        ) : (
+          <div className="cards-grid">
+            {filtered.map((c: CourseItem) => (
+              <div key={c.id} className="prog-card">
+                <span className={`prog-tag prog-tag-${c.color}`}>
+                  {c.tag}
+                </span>
+                <div className={`prog-title ${c.titleColor ?? ""}`} style={{ marginTop: "0.5rem" }}>
+                  {c.title}
+                </div>
+                <p className="prog-desc">{c.desc}</p>
+                <div className="quick-facts">
+                  <span className="qf-pill">
+                    <strong>Duration</strong> {c.duration}
+                  </span>
+                  <span className="qf-pill">
+                    <strong>Mode</strong> {c.mode}
+                  </span>
+                  <span className="qf-pill">
+                    <strong>Level</strong> {c.level}
+                  </span>
+                  <span
+                    className={`qf-pill ${c.cohort === "Open" ? "qf-open" : "qf-wait"}`}
+                  >
+                    <strong>Cohort</strong> {c.cohort}
+                  </span>
+                </div>
+                <div className="prog-meta">
+                  <span className="prog-slots">{c.cert}</span>
+                  <ApplyDialog
+                    triggerText="Join waitlist →"
+                    triggerVariant="ghost"
+                    triggerClassName="prog-arrow"
+                    source={c.title}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div style={{ marginTop: "3rem" }}>
           <div className="section-eyebrow">Course FAQ</div>

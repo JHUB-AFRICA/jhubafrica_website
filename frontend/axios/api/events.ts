@@ -23,6 +23,7 @@ const mapEvent = (item: any): EventItem => {
     desc: item.description || item.desc || "",
     titleColor: item.titleColor || "",
     image: item.cover_image_url || item.coverImageUrl || "",
+    location: item.location || "",
   };
 };
 
@@ -58,6 +59,7 @@ const mapToBackendEvent = (event: Omit<EventItem, "id">) => {
     status: "PUBLISHED",
     startDate,
     coverImageUrl,
+    location: event.location || "",
   };
 };
 

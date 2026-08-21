@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import ApplyDialog from "../components/site/ApplyDialog";
 
 export const Route = createFileRoute("/for-innovators")({
@@ -90,6 +91,7 @@ const FAQ = [
 ];
 
 function ForInnovatorsPage() {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   return (
     <>
@@ -143,16 +145,72 @@ function ForInnovatorsPage() {
           </ul>
         </div>
 
-        <div style={{ marginTop: "3rem" }}>
+        <div style={{ marginTop: "3.5rem", maxWidth: "800px", margin: "3.5rem auto 0 auto" }}>
           <div className="section-eyebrow">FAQ</div>
-          <h2 className="section-h2 red">Common questions</h2>
-          <div className="cards-grid" style={{ marginTop: "1.25rem" }}>
-            {FAQ.map((f) => (
-              <div key={f.q} className="prog-card">
-                <div className="prog-title">{f.q}</div>
-                <p className="prog-desc">{f.a}</p>
-              </div>
-            ))}
+          <h2 className="section-h2 red" style={{ marginBottom: "1.5rem" }}>Common questions</h2>
+          <div className="faq-accordion">
+            {FAQ.map((f, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div
+                  key={f.q}
+                  className="faq-item"
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "12px",
+                    marginBottom: "1rem",
+                    overflow: "hidden",
+                    transition: "box-shadow 0.2s, border-color 0.2s",
+                    boxShadow: isOpen ? "0 4px 20px rgba(15, 45, 89, 0.04)" : "none",
+                    borderColor: isOpen ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"
+                  }}
+                >
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                    style={{
+                      width: "100%",
+                      padding: "1.25rem 1.5rem",
+                      background: "none",
+                      border: "none",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      color: "var(--jhub-blue)",
+                      fontWeight: 700,
+                      fontSize: "1.05rem",
+                      fontFamily: "inherit"
+                    }}
+                  >
+                    <span>{f.q}</span>
+                    <span style={{
+                      transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.2s",
+                      fontSize: "1.2rem",
+                      color: "var(--jhub-green)",
+                      fontWeight: "bold"
+                    }}>
+                      ▼
+                    </span>
+                  </button>
+                  <div
+                    style={{
+                      maxHeight: isOpen ? "200px" : "0px",
+                      transition: "max-height 0.25s ease-in-out, padding 0.25s ease-in-out",
+                      overflow: "hidden",
+                      padding: isOpen ? "0 1.5rem 1.25rem 1.5rem" : "0 1.5rem",
+                      color: "var(--text-main)",
+                      fontSize: "0.95rem",
+                      lineHeight: "1.6"
+                    }}
+                  >
+                    <p style={{ margin: 0 }}>{f.a}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

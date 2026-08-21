@@ -1,7 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import ApplyDialog from "../components/site/ApplyDialog";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
-import ContactStrip from "../components/site/ContactStrip";
 import styles from "../styles/About.module.css";
 
 export const Route = createFileRoute("/about")({
@@ -59,7 +57,7 @@ function AboutPage() {
       </section>
 
       <section className="feature-split">
-        <div className="split-copy">
+        <div className="split-copy" style={{ maxWidth: "100%", flex: 1 }}>
           <h2>Our story</h2>
           <p>
             We work at the intersection of technology, business and community —
@@ -79,22 +77,62 @@ function AboutPage() {
             <li>Over 1,000 students engaged across 30+ active projects</li>
           </ul>
         </div>
-        <div className="split-panel">
-          <div className="info-card no-accent">
-            <h3>Mission</h3>
-            <p>
-              To nurture an innovation-driven ecosystem that creates jobs and
-              solves African challenges.
+      </section>
+
+      {/* RESTRUCTURED MISSION, VISION AND CORE VALUES */}
+      <section className="content-section" style={{ paddingTop: "2rem" }}>
+        <div style={{ display: "grid", gap: "2rem", marginBottom: "3.5rem" }} className="diagonal-values-grid">
+          {/* Cell 1: Top-Left (Vision) */}
+          <div style={{ padding: "1.5rem 0", maxWidth: "480px" }} className="diagonal-vision-cell">
+            <h3 style={{ fontSize: "2.5rem", fontWeight: "900", color: "var(--jhub-blue)", lineHeight: "1.1", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              OUR<br />VISION
+            </h3>
+            <div style={{ width: "80px", height: "4px", backgroundColor: "var(--jhub-green)", margin: "1.5rem 0" }} />
+            <p style={{ fontSize: "1.35rem", lineHeight: "1.6", color: "var(--text-main)", fontWeight: "500", margin: 0 }}>
+              A one stop hub offering comprehensive array of digital solutions for societal needs.
             </p>
           </div>
-          <div className="info-card no-accent">
-            <h3>Vision</h3>
-            <p>To be Africa's leading university-anchored innovation hub.</p>
+
+          {/* Cell 2: Top-Right (Spacer on Desktop) */}
+          <div className="diagonal-spacer-cell" />
+
+          {/* Cell 3: Bottom-Left (Spacer on Desktop) */}
+          <div className="diagonal-spacer-cell" />
+
+          {/* Cell 4: Bottom-Right (Mission) */}
+          <div style={{ padding: "1.5rem 0", maxWidth: "480px", marginLeft: "auto" }} className="diagonal-mission-cell">
+            <h3 style={{ fontSize: "2.5rem", fontWeight: "900", color: "var(--jhub-blue)", lineHeight: "1.1", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              OUR<br />MISSION
+            </h3>
+            <div style={{ width: "80px", height: "4px", backgroundColor: "var(--jhub-green)", margin: "1.5rem 0" }} />
+            <p style={{ fontSize: "1.35rem", lineHeight: "1.6", color: "var(--text-main)", fontWeight: "500", margin: 0 }}>
+              To drive sustainable digital transformation, providing accessible and impactful solutions for small and medium-scale farmers, traders and enterprises.
+            </p>
           </div>
-          <div className="info-card no-accent">
-            <h3>Values</h3>
-            <p>Integrity, collaboration, excellence and impact.</p>
-          </div>
+        </div>
+
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <div className="section-eyebrow">Guiding Principles</div>
+          <h2 className="section-h2" style={{ fontSize: "1.75rem" }}>Our Core Values</h2>
+        </div>
+
+        <div className="cards-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.25rem" }}>
+          {[
+            { title: "Adaptive Leadership", desc: "Leading with flexibility and foresight in a rapidly changing tech landscape." },
+            { title: "Global Perspective", desc: "Cultivating solutions with international standards and local relevance." },
+            { title: "Innovation & Entrepreneurship", desc: "Nurturing creative thinking and turning ideas into viable enterprises." },
+            { title: "Customer Centricity", desc: "Placing end-user needs and societal impact at the heart of our tech." },
+            { title: "Team Synergy", desc: "Harnessing the power of cross-disciplinary collaboration." },
+            { title: "Transparency", desc: "Operating with openness, trust, and accountability." },
+            { title: "Agility", desc: "Responding rapidly and efficiently to new challenges and learning cycles." },
+            { title: "Responsibility", desc: "Exercising ethical stewardship over our innovations and community." },
+            { title: "Sustainability", desc: "Designing long-term solutions that protect resources and build futures." }
+          ].map((val) => (
+            <div key={val.title} style={{ padding: "1.25rem 0", borderBottom: "1px solid var(--border-color)" }}>
+              <h4 style={{ fontSize: "1.15rem", fontWeight: "700", color: "var(--jhub-blue)", marginBottom: "0.5rem" }}>{val.title}</h4>
+              <p style={{ fontSize: "0.95rem", color: "var(--text-muted)", margin: 0, lineHeight: "1.5" }}>{val.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -135,11 +173,15 @@ function AboutPage() {
             Whether you want to sponsor a project, volunteer your technical expertise,
             or establish a strategic partnership, our doors are open. Let's talk.
           </p>
-          <ApplyDialog triggerText="Contact the team" source="About page" />
+          <Link
+            to="/contact"
+            className="btn-primary"
+            style={{ display: "inline-block", textDecoration: "none" }}
+          >
+            Contact the Team
+          </Link>
         </div>
       </section>
-
-      <ContactStrip />
     </>
   );
 }

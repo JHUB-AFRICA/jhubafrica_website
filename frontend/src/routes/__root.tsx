@@ -122,7 +122,7 @@ function RootComponent() {
       <HeadContent />
       <div className="app-shell">
         <Navbar />
-        <main>
+        <main className="route-transition-wrap">
           <Outlet />
         </main>
         <Footer />

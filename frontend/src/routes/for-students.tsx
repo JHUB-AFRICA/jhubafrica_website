@@ -74,16 +74,6 @@ function ForStudentsPage() {
           <button
             className="btn-outline"
             onClick={() => setIsContactModalOpen(true)}
-            style={{
-              background: "none",
-              border: "2px solid var(--jhub-orange)",
-              color: "var(--jhub-orange)",
-              padding: "0.75rem 1.5rem",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "1rem",
-              fontWeight: "600",
-            }}
           >
             Join the club
           </button>

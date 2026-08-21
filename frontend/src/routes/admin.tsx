@@ -458,6 +458,13 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
           className={styles['input-style']}
         />
         <InputField
+          label="Venue / Location"
+          placeholder="e.g. JKUAT Assembly Hall & Maker Space"
+          value={draft.location || ""}
+          onChange={(e) => setDraft({ ...draft, location: e.target.value })}
+          className={styles['input-style']}
+        />
+        <InputField
           required
           type="date"
           label="Event Date"

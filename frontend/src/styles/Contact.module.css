@@ -1,6 +1,6 @@
 .contact-page-header {
-  background: linear-gradient(135deg, #001f5c 0%, #003d99 100%);
-  padding: 4rem 2rem;
+  background: linear-gradient(135deg, var(--jhub-blue) 0%, #111827 100%);
+  padding: 5rem 2rem;
   text-align: center;
 }
 .contact-page-header h1 {
@@ -46,10 +46,11 @@
   outline: none;
   background: #ffffff;
   color: var(--text-main);
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 .contact-form-input:focus {
   border-color: var(--jhub-green);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 .contact-form-row {
   display: grid;

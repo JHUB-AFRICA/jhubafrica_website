@@ -7,4 +7,5 @@ export interface EventItem {
     desc: string;
     titleColor: "" | "green" | "red";
     image?: string;
+    location?: string;
 }

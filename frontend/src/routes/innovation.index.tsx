@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { getInnovations } from "../../axios/api/innovations";
 import { InnovationItem } from "../types/innovations";
 import styles from "../styles/Innovations.module.css";
+import SkeletonCards from "../components/site/SkeletonCards";
 
 export const Route = createFileRoute("/innovation/")({
   head: () => ({
@@ -24,6 +25,25 @@ export const Route = createFileRoute("/innovation/")({
     return getInnovations();
   },
   component: InnovationPage,
+  pendingComponent: () => (
+    <>
+      <header className="page-header">
+        <h1>
+          Innovations{" "}
+          <span style={{ color: "var(--jhub-green)" }}>Portfolio</span>
+        </h1>
+        <p>
+          A searchable portfolio of African innovations in our pipeline. Filter
+          by sector, stage or support need — and sponsor a project that fits
+          your priorities.
+        </p>
+      </header>
+
+      <section className="content-section">
+        <SkeletonCards count={4} hasImage={true} />
+      </section>
+    </>
+  ),
 });
 
 const STAGES = [
@@ -135,32 +155,30 @@ function InnovationPage() {
                     />
                   </div>
                 ) : (
-                  <div style={{ height: "180px", background: "linear-gradient(135deg, rgba(8, 20, 45, 0.05), rgba(16, 185, 129, 0.05))", borderBottom: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ color: "var(--jhub-green)", fontSize: "2rem", fontWeight: "bold" }}>JHUB</span>
+                  <div style={{ height: "180px", position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #0f2d59 0%, #1e1b4b 100%)", borderBottom: "1px solid var(--border-color)" }}>
+                    <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }} xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <pattern id="grid-portfolio" width="20" height="20" patternUnits="userSpaceOnUse">
+                          <circle cx="2" cy="2" r="1" fill="#ffffff" />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#grid-portfolio)" />
+                    </svg>
+                    <div style={{ position: "absolute", top: "-20px", left: "-20px", width: "120px", height: "120px", borderRadius: "50%", background: "radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%)", filter: "blur(10px)" }} />
+                    <div style={{ position: "absolute", bottom: "-30px", right: "-10px", width: "140px", height: "140px", borderRadius: "50%", background: "radial-gradient(circle, rgba(15, 45, 89, 0.6) 0%, rgba(15, 45, 89, 0) 70%)", filter: "blur(10px)" }} />
+                    <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                      <span style={{ color: "#ffffff", fontSize: "1.25rem", fontWeight: "800", letterSpacing: "0.15em", textTransform: "uppercase", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", borderRadius: "8px", padding: "6px 16px", backdropFilter: "blur(4px)" }}>JHUB</span>
+                    </div>
                   </div>
                 )}
                 <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>
                   <div className="prog-title" style={{ marginTop: 0, fontSize: "1.25rem" }}>{p.title}</div>
                   
                   {p.description && (
-                    <p className="prog-desc" style={{ marginTop: "0.5rem", color: "#475569", fontSize: "0.95rem" }}>
+                    <p className="prog-desc" style={{ marginTop: "0.5rem", color: "#475569", fontSize: "0.95rem", flexGrow: 1 }}>
                       {p.description}
                     </p>
                   )}
-
-                  <p className="prog-desc" style={{ marginTop: "0.75rem", flexGrow: 1 }}>
-                    <strong style={{ color: "var(--jhub-blue)" }}>Problem:</strong>{" "}
-                    {p.problem.length > 120 ? `${p.problem.substring(0, 120)}...` : p.problem}
-                  </p>
-
-                  <div className="quick-facts" style={{ marginTop: "1rem", marginBottom: "1rem" }}>
-                    <span className="qf-pill">
-                      <strong>Stage</strong> {p.stage}
-                    </span>
-                    <span className="qf-pill">
-                      <strong>Sector</strong> {p.sector}
-                    </span>
-                  </div>
                   
                   <div className="prog-meta" style={{ marginTop: "auto", paddingTop: "0.5rem" }}>
                     <span className="prog-arrow">
