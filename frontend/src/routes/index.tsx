@@ -105,7 +105,7 @@ export const Route = createFileRoute("/")({
       getNews(),
       getInnovations()
     ]);
-    return { events, news, innovations: innovations.slice(0, 4) };
+    return { events, news, innovations: innovations.slice(0, 3) };
   },
   component: Index,
 });

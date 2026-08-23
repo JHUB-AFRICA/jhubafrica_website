@@ -556,3 +556,25 @@ model Application {
 
   @@map("applications")
 }
+
+enum JHubTeamCategory {
+  ADVISORY_BOARD
+  DEV_TEAM
+  EXECUTIVE
+  MENTORS
+  SECRETARIAT
+}
+
+model JHubTeamMember {
+  id        String           @id @default(uuid())
+  name      String
+  title     String
+  bio       String?          @db.Text
+  avatarUrl String?          @map("avatar_url")
+  category  JHubTeamCategory
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("jhub_team_members")
+}

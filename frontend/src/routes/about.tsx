@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
+import { getTeamMembers } from "../../axios/api/team";
+import { JHubTeamMember } from "../types/team";
 import styles from "../styles/About.module.css";
 
 export const Route = createFileRoute("/about")({
@@ -18,10 +21,26 @@ export const Route = createFileRoute("/about")({
       },
     ],
   }),
+  loader: async () => {
+    try {
+      const team = await getTeamMembers();
+      return { team };
+    } catch (e) {
+      console.error("Failed to fetch team members:", e);
+      return { team: [] };
+    }
+  },
   component: AboutPage,
 });
 
 function AboutPage() {
+  const { team }: { team: JHubTeamMember[] } = Route.useLoaderData();
+  const [activeCategory, setActiveCategory] = useState<string>("ALL");
+
+  const filteredTeam = activeCategory === "ALL"
+    ? team
+    : team.filter((member) => member.category === activeCategory);
+
   return (
     <>
       <header className="page-header">
@@ -133,6 +152,89 @@ function AboutPage() {
               <p style={{ fontSize: "0.95rem", color: "var(--text-muted)", margin: 0, lineHeight: "1.5" }}>{val.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="content-section">
+        <div className="section-eyebrow">The Faces Behind JHUB Africa</div>
+        <h2 className="section-h2">Meet Our Team</h2>
+        <p className="section-p">
+          Our diverse team of experts, coordinators, developers, and advisors drive our mission to accelerate sustainable digital solutions across Africa.
+        </p>
+
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center", marginBottom: "2.5rem", marginTop: "1.5rem" }}>
+          {[
+            { key: "ALL", label: "All Team" },
+            { key: "EXECUTIVE", label: "Executive" },
+            { key: "ADVISORY_BOARD", label: "Advisory Board" },
+            { key: "SECRETARIAT", label: "Secretariat" },
+            { key: "DEV_TEAM", label: "Dev Team" },
+            { key: "MENTORS", label: "Mentors" }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveCategory(tab.key)}
+              className="btn-outline"
+              style={{
+                padding: "0.5rem 1.25rem",
+                fontSize: "0.9rem",
+                borderRadius: "30px",
+                border: activeCategory === tab.key ? "2px solid var(--jhub-green)" : "1px solid var(--border-color)",
+                backgroundColor: activeCategory === tab.key ? "var(--bg-soft)" : "transparent",
+                color: activeCategory === tab.key ? "var(--jhub-blue)" : "var(--text-muted)",
+                cursor: "pointer",
+                fontWeight: activeCategory === tab.key ? "700" : "500",
+                transition: "all 0.2s"
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="cards-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
+          {filteredTeam.map(member => (
+            <article
+              key={member.id}
+              className="prog-card"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: "16px",
+                overflow: "hidden",
+                border: "1px solid var(--border-color)",
+                background: "var(--bg-soft)",
+                padding: 0
+              }}
+            >
+              <div style={{ height: "240px", overflow: "hidden", position: "relative" }}>
+                <img
+                  src={member.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=256"}
+                  alt={member.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+              <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                <h3 style={{ fontSize: "1.25rem", fontWeight: "700", color: "var(--jhub-blue)", margin: "0 0 0.25rem 0" }}>
+                  {member.name}
+                </h3>
+                <div style={{ fontSize: "0.95rem", color: "var(--jhub-green)", fontWeight: "600", marginBottom: "0.75rem" }}>
+                  {member.title}
+                </div>
+                {member.bio && (
+                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0, lineHeight: "1.5" }}>
+                    {member.bio}
+                  </p>
+                )}
+              </div>
+            </article>
+          ))}
+
+          {filteredTeam.length === 0 && (
+            <div style={{ textAlign: "center", padding: "3rem", background: "var(--bg-soft)", borderRadius: "12px", border: "1px dashed var(--border-color)", gridColumn: "1 / -1" }}>
+              <p style={{ color: "var(--text-muted)", margin: 0 }}>No team members found in this category.</p>
+            </div>
+          )}
         </div>
       </section>
 
