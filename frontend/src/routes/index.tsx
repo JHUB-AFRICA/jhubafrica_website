@@ -552,16 +552,28 @@ function Index() {
           <div>
             <div className={styles['section-subtitle']}>Latest news</div>
             <div className={`cards-grid ${styles['news-grid']}`}>
-              {news.slice(0, 3).map((post) => (
-                <article key={post.id} className="prog-card news-card-compact">
-                  <div className={`prog-title ${post.titleColor}`}>{post.title}</div>
-                  <p className="prog-desc">{post.body}</p>
-                  <div className="prog-meta">
-                    <span className="prog-slots">{post.date}</span>
-                    <Link to="/news" className="prog-arrow">Read →</Link>
-                  </div>
-                </article>
-              ))}
+              {news.slice(0, 3).map((post) => {
+                const displayExcerpt = post.excerpt && post.excerpt.trim().length > 0
+                  ? post.excerpt
+                  : post.body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().substring(0, 110) + "...";
+                return (
+                  <Link
+                    key={post.id}
+                    to="/news/$slug"
+                    params={{ slug: post.slug }}
+                    style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                  >
+                    <article className="prog-card news-card-compact" style={{ display: "flex", flexDirection: "column", height: "100%", cursor: "pointer" }}>
+                      <div className={`prog-title ${post.titleColor}`}>{post.title}</div>
+                      <p className="prog-desc" style={{ flexGrow: 1, margin: "0.5rem 0 1rem 0" }}>{displayExcerpt}</p>
+                      <div className="prog-meta" style={{ marginTop: "auto" }}>
+                        <span className="prog-slots">{post.date}</span>
+                        <span className="prog-arrow">Read →</span>
+                      </div>
+                    </article>
+                  </Link>
+                );
+              })}
             </div>
             <Link to="/news" className="btn-outline" style={{ marginTop: "1.5rem" }}>Read More News</Link>
           </div>

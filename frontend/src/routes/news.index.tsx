@@ -24,6 +24,12 @@ export const Route = createFileRoute("/news/")({
   component: NewsIndexPage,
 });
 
+function cleanAndSliceExcerpt(htmlOrText: string, maxLength: number = 140) {
+  const plainText = htmlOrText.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (plainText.length <= maxLength) return plainText;
+  return plainText.substring(0, maxLength) + "...";
+}
+
 function NewsIndexPage() {
   const posts: NewsPost[] = Route.useLoaderData();
 
@@ -37,33 +43,49 @@ function NewsIndexPage() {
       <section className="content-section">
         <div className="cards-grid">
           {posts.map((p: NewsPost) => {
+            const cardImg = p.image || "https://images.unsplash.com/photo-1495020689067-958852a6565d?auto=format&fit=crop&q=80&w=600";
+            const displayExcerpt = p.excerpt && p.excerpt.trim().length > 0
+              ? p.excerpt
+              : cleanAndSliceExcerpt(p.body, 140);
+
             return (
-              <article
+              <Link
                 key={p.id || p.title}
-                className="prog-card news-card-compact"
+                to="/news/$slug"
+                params={{ slug: p.slug }}
+                style={{ textDecoration: "none", color: "inherit", display: "block" }}
               >
-                {p.image && (
+                <article
+                  className="prog-card news-card-compact"
+                  style={{ display: "flex", flexDirection: "column", height: "100%", cursor: "pointer" }}
+                >
                   <div style={{ marginBottom: "1rem", borderRadius: "0.5rem", overflow: "hidden", height: "200px" }}>
                     <img
-                      src={p.image}
+                      src={cardImg}
                       alt={p.title}
                       style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   </div>
-                )}
-                <div className={`prog-title ${p.titleColor}`}>{p.title}</div>
-                <p className="prog-desc">{p.excerpt}</p>
-                <div className="prog-meta">
-                  <span className="prog-slots">{p.date}</span>
-                  <Link
-                    to="/news/$slug"
-                    params={{ slug: p.slug }}
-                    className="prog-link-button"
-                  >
-                    Read →
-                  </Link>
-                </div>
-              </article>
+                  <div style={{ textTransform: "uppercase", fontSize: "0.75rem", fontWeight: "700", color: "var(--jhub-green)", marginBottom: "0.5rem" }}>
+                    {p.tag}
+                  </div>
+                  <div className={`prog-title ${p.titleColor}`} style={{ marginTop: 0, fontSize: "1.2rem", fontWeight: "700", lineHeight: "1.3" }}>
+                    {p.title}
+                  </div>
+                  <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.75rem", marginTop: "0.25rem" }}>
+                    {p.date}
+                  </div>
+                  <p className="prog-desc" style={{ flexGrow: 1, margin: "0 0 1.25rem 0", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: "1.5" }}>
+                    {displayExcerpt}
+                  </p>
+                  <div className="prog-meta" style={{ marginTop: "auto", paddingTop: "0.5rem" }}>
+                    <span className="prog-slots" style={{ visibility: "hidden" }}>Slots</span>
+                    <span className="prog-link-button">
+                      Read →
+                    </span>
+                  </div>
+                </article>
+              </Link>
             );
           })}
         </div>

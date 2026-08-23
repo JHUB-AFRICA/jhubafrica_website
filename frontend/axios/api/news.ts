@@ -8,7 +8,7 @@ const mapNews = (item: any): NewsPost => {
   const dateObj = new Date(publishedAt);
   const formattedDate = isNaN(dateObj.getTime())
     ? "Recent"
-    : dateObj.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    : dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
   const categoryToTag: Record<string, string> = {
     news: "News",

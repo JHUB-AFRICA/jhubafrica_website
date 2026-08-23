@@ -62,25 +62,27 @@ function NewsDetailPage() {
       </header>
 
       <section className="content-section" style={{ maxWidth: "800px", margin: "0 auto", paddingBottom: "4rem" }}>
-        {post.image && (
-          <div
-            style={{
-              marginBottom: "2rem",
-              borderRadius: "0.75rem",
-              overflow: "hidden",
-              height: "400px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
-            }}
-          >
-            <img
-              src={post.image}
-              alt={post.title}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          </div>
-        )}
+        <div
+          style={{
+            marginBottom: "2rem",
+            borderRadius: "0.75rem",
+            overflow: "hidden",
+            height: "400px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+          }}
+        >
+          <img
+            src={post.image || "https://images.unsplash.com/photo-1495020689067-958852a6565d?auto=format&fit=crop&q=80&w=600"}
+            alt={post.title}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
 
         <div style={{ fontSize: "1.1rem", lineHeight: "1.8", color: "#334155" }}>
+          <div style={{ fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ width: "24px", height: "2px", backgroundColor: "var(--jhub-green)" }}></span>
+            By JHUB Editorial Team
+          </div>
           {post.body ? (
             post.body.split("\n\n").map((paragraph: string, index: number) => (
               <p key={index} style={{ marginBottom: "1.5rem" }}>
