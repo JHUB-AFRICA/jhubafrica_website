@@ -12,6 +12,12 @@ datasource db {
 // ENUMS
 // ─────────────────────────────────────────────────────────
 
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 enum UserRole {
   ADMIN
   INNOVATOR
@@ -174,6 +180,8 @@ model Innovation {
   // Media
   coverImageUrl String?  @map("cover_image_url")
   mediaUrls     String[] @map("media_urls")
+  images        InnovationImage[]
+  contentJson   Json?    @map("content_json")
 
   // Team
   ownerId     String       @map("owner_id")
@@ -265,6 +273,7 @@ model Course {
   coverImageUrl String?            @map("cover_image_url")
   isFeatured    Boolean            @default(false) @map("is_featured")
   isPublished   Boolean            @default(false) @map("is_published")
+  status        ContentStatus      @default(DRAFT) @map("status")
 
   cohorts     Cohort[]
   lessons     Lesson[]
@@ -413,10 +422,13 @@ model Post {
   excerpt       String?
   content       String    @db.Text
   category      String // 'news' | 'impact-story' | 'partner-story' | 'project-update' | 'announcement'
-  isPublished   Boolean   @default(false) @map("is_published")
-  isFeatured    Boolean   @default(false) @map("is_featured")
-  publishedAt   DateTime? @map("published_at")
-  coverImageUrl String?   @map("cover_image_url")
+  isPublished   Boolean       @default(false) @map("is_published")
+  status        ContentStatus @default(DRAFT) @map("status")
+  isFeatured    Boolean       @default(false) @map("is_featured")
+  publishedAt   DateTime?     @map("published_at")
+  coverImageUrl String?       @map("cover_image_url")
+  images        PostImage[]
+  contentJson   Json?         @map("content_json")
   tags          String[]
 
   authorId String?
@@ -426,6 +438,28 @@ model Post {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("posts")
+}
+
+model PostImage {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("post_images")
+}
+
+model InnovationImage {
+  id           String      @id @default(uuid())
+  innovationId String      @map("innovation_id")
+  innovation   Innovation  @relation(fields: [innovationId], references: [id], onDelete: Cascade)
+  url          String
+  order        Int         @default(0)
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  @@map("innovation_images")
 }
 
 // ─────────────────────────────────────────────────────────

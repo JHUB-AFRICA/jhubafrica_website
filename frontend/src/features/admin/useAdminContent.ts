@@ -47,11 +47,14 @@ export function getEmptyNews(): Omit<NewsPost, "id"> {
         title: "",
         date: today,
         body: "",
+        contentJson: null,
         excerpt: "",
         slug: "",
         color: "g",
         titleColor: "green",
+        status: "PUBLISHED",
         image: "",
+        images: [],
     };
 }
 

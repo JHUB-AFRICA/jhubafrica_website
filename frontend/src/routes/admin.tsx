@@ -2,7 +2,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { adminLogin, adminLogout } from "../../axios/api/admin/auth";
 import { getAccessToken, setAccessToken, refreshSession } from "../../axios/axios";
-import { getNews } from "../../axios/api/news";
+import { getAdminNews } from "../../axios/api/news";
 import { getEvents } from "../../axios/api/events";
 import { getAdminInnovations } from "../../axios/api/admin/innovations";
 import { getAdminCourses } from "../../axios/api/admin/courses";
@@ -20,6 +20,8 @@ import {
 } from "@/features/admin/useAdminContent";
 import { AdminFormActions } from "@/features/admin/components/AdminFormActions";
 import { AdminImageUpload } from "@/features/admin/components/AdminImageUpload";
+import { MultiImageManager } from "@/features/admin/components/MultiImageManager";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { InputField } from "@/features/admin/components/InputField";
 import { TextareaField } from "@/features/admin/components/TextareaField";
 import { SelectField } from "@/features/admin/components/SelectField";
@@ -52,7 +54,7 @@ export const Route = createFileRoute("/admin")({
 
     try {
       const [news, events, innovations, courses] = await Promise.all([
-        getNews(),
+        getAdminNews(),
         getEvents(),
         getAdminInnovations(),
         getAdminCourses(),
@@ -279,7 +281,6 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
     submit,
     edit,
     remove,
-    handleImageUpload,
     resetDraft,
   } = useNewsAdmin();
 
@@ -327,6 +328,21 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
           className={styles['input-style']}
         />
         <SelectField
+          label="Publication Status"
+          value={draft.status || "PUBLISHED"}
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              status: e.target.value as "DRAFT" | "PUBLISHED" | "ARCHIVED",
+            })
+          }
+          className={styles['input-style']}
+        >
+          <option value="PUBLISHED">Status: Published (Visible to public)</option>
+          <option value="DRAFT">Status: Draft (Hidden from public)</option>
+          <option value="ARCHIVED">Status: Archived</option>
+        </SelectField>
+        <SelectField
           label="Tag Color"
           value={draft.color}
           onChange={(e) =>
@@ -351,7 +367,7 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
         >
           <option value="">Title: Default</option>
           <option value="green">Title: Green</option>
-          <option value="red">Title: Red</option>
+          <option value="red">Title: Red (Featured)</option>
         </SelectField>
         <TextareaField
           required
@@ -362,21 +378,41 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
           onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })}
           className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
         />
-        <TextareaField
-          required
-          rows={6}
-          label="Full Story (Content)"
-          placeholder="Write the full story here"
-          value={draft.body}
-          onChange={(e) => setDraft({ ...draft, body: e.target.value })}
-          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
-        />
-        <AdminImageUpload
-          onFileSelected={(file) => {
-            void handleImageUpload(file);
+
+        {/* TipTap Rich Text Editor for Content Story */}
+        <div style={{ gridColumn: "1 / -1" }}>
+          <label style={{ display: "block", fontWeight: 600, marginBottom: "0.5rem", color: "#1e293b", fontSize: "0.95rem" }}>
+            Full Story (Rich Content)
+          </label>
+          <RichTextEditor
+            content={draft.body}
+            jsonContent={draft.contentJson}
+            onChange={(html, json) => {
+              setDraft({
+                ...draft,
+                body: html,
+                contentJson: json,
+              });
+            }}
+            placeholder="Write the full story, add subheadings, quotes, lists..."
+          />
+        </div>
+
+        {/* Multi-Image Gallery & Upload Manager */}
+        <MultiImageManager
+          images={draft.images && draft.images.length > 0 ? draft.images : (draft.image ? [draft.image] : [])}
+          bucket="post-images"
+          label="Post Images & Gallery"
+          helperText="Upload 1 or more images. Drag to reorder. The first photo (#1) is the main hero cover."
+          onChange={(newImages) => {
+            setDraft({
+              ...draft,
+              images: newImages,
+              image: newImages[0]?.url || "",
+            });
           }}
-          previewUrl={draft.image}
         />
+
         <AdminFormActions
           submitting={submitting}
           submitLabel={"id" in draft && draft.id ? "Update post" : "Add post"}
@@ -395,14 +431,41 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
         {items.map((p) => (
           <li key={p.id} className={styles['row-style']}>
             <div>
-              <strong>{p.title}</strong>{" "}
-              <span style={{ opacity: 0.6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                <strong>{p.title}</strong>
+                <span
+                  style={{
+                    fontSize: "0.72rem",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    backgroundColor: p.status === "DRAFT" ? "#fef3c7" : p.status === "ARCHIVED" ? "#f1f5f9" : "#dcfce7",
+                    color: p.status === "DRAFT" ? "#92400e" : p.status === "ARCHIVED" ? "#475569" : "#166534",
+                  }}
+                >
+                  {p.status || "PUBLISHED"}
+                </span>
+                {p.images && p.images.length > 1 && (
+                  <span
+                    style={{
+                      fontSize: "0.72rem",
+                      padding: "2px 6px",
+                      borderRadius: "4px",
+                      fontWeight: 600,
+                      backgroundColor: "#e0f2fe",
+                      color: "#0369a1",
+                    }}
+                  >
+                    📷 {p.images.length} images
+                  </span>
+                )}
+              </div>
+              <span style={{ opacity: 0.6, fontSize: "0.85rem" }}>
                 · {p.date} · {p.tag}
               </span>
               <div style={{ fontSize: "0.9rem", opacity: 0.8, marginTop: 4 }}>
                 <strong>Summary:</strong> {p.excerpt}
-                <br />
-                <strong>Full Story:</strong> {p.body}
               </div>
             </div>
             <div style={{ display: "flex", gap: "0.5rem" }}>

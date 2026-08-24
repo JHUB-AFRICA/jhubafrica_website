@@ -8,4 +8,9 @@ export interface EventItem {
     titleColor: "" | "green" | "red";
     image?: string;
     location?: string;
+    slug?: string;
+    type?: string;
+    meetingUrl?: string;
+    isOnline?: boolean;
+    registrationUrl?: string;
 }

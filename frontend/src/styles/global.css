@@ -798,6 +798,67 @@ main {
   }
 }
 
+/* HORIZONTAL EVENT CARD LAYOUT */
+.horizontal-event-card {
+  display: flex;
+  flex-direction: row;
+  padding: 0 0 2rem 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-color);
+  background: transparent;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  margin-bottom: 2rem;
+  height: 180px;
+}
+
+.horizontal-event-media {
+  flex-shrink: 0;
+  width: 280px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.horizontal-event-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.horizontal-event-details {
+  padding: 0 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .horizontal-event-card {
+    flex-direction: column;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    height: auto !important;
+  }
+  .horizontal-event-media {
+    width: 100%;
+    height: 200px;
+  }
+  .horizontal-event-media img {
+    position: static;
+  }
+  .horizontal-event-details {
+    padding: 1rem 0 0 0;
+    height: auto !important;
+    text-align: left;
+  }
+}
+
 
 
 

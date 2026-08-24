@@ -24,6 +24,11 @@ const mapEvent = (item: any): EventItem => {
     titleColor: item.titleColor || "",
     image: item.cover_image_url || item.coverImageUrl || "",
     location: item.location || "",
+    slug: item.slug || "",
+    type: item.type || "OTHER",
+    meetingUrl: item.meeting_url || item.meetingUrl || "",
+    isOnline: item.is_online || item.isOnline || false,
+    registrationUrl: item.registration_url || item.registrationUrl || "",
   };
 };
 
@@ -60,6 +65,9 @@ const mapToBackendEvent = (event: Omit<EventItem, "id">) => {
     startDate,
     coverImageUrl,
     location: event.location || "",
+    meeting_url: event.meetingUrl || "",
+    is_online: event.isOnline || false,
+    registration_url: event.registrationUrl || "",
   };
 };
 
@@ -67,6 +75,11 @@ export const getEvents = async (): Promise<EventItem[]> => {
   // UNCHANGED: public read, stays on api
   const response = await api.get<{ data: any[] }>("/api/v1/events");
   return response.data.data.map(mapEvent);
+};
+
+export const getEventBySlug = async (slug: string): Promise<EventItem> => {
+  const response = await api.get<{ data: any }>(`/api/v1/events/${slug}`);
+  return mapEvent(response.data.data);
 };
 
 export const addEvent = async (event: Omit<EventItem, "id">): Promise<EventItem> => {

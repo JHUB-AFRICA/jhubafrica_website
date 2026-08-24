@@ -11,7 +11,7 @@ export async function getEvents(req: Request, res: Response, next: NextFunction)
 
     let query = supabase
       .from('events')
-      .select('id, slug, title, description, type, status, start_date, end_date, location, is_online, is_featured, cover_image_url', { count: 'exact' })
+      .select('id, slug, title, description, type, status, start_date, end_date, location, is_online, meeting_url, registration_url, is_featured, cover_image_url', { count: 'exact' })
       .eq('status', 'PUBLISHED')
       .order('start_date', { ascending: upcoming !== false })
       .range(offset, offset + limit - 1)

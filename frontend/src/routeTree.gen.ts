@@ -25,8 +25,10 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as InnovationIndexRouteImport } from './routes/innovation.index'
+import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as InnovationSlugRouteImport } from './routes/innovation.$slug'
+import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -108,6 +110,11 @@ const InnovationIndexRoute = InnovationIndexRouteImport.update({
   path: '/',
   getParentRoute: () => InnovationRoute,
 } as any)
+const EventsIndexRoute = EventsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsRoute,
+} as any)
 const NewsSlugRoute = NewsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -118,6 +125,11 @@ const InnovationSlugRoute = InnovationSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => InnovationRoute,
 } as any)
+const EventsSlugRoute = EventsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EventsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -125,7 +137,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
-  '/events': typeof EventsRoute
+  '/events': typeof EventsRouteWithChildren
   '/for-innovators': typeof ForInnovatorsRoute
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
@@ -134,8 +146,10 @@ export interface FileRoutesByFullPath {
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
+  '/events/$slug': typeof EventsSlugRoute
   '/innovation/$slug': typeof InnovationSlugRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/events/': typeof EventsIndexRoute
   '/innovation/': typeof InnovationIndexRoute
   '/news/': typeof NewsIndexRoute
 }
@@ -145,15 +159,16 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
-  '/events': typeof EventsRoute
   '/for-innovators': typeof ForInnovatorsRoute
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
+  '/events/$slug': typeof EventsSlugRoute
   '/innovation/$slug': typeof InnovationSlugRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/events': typeof EventsIndexRoute
   '/innovation': typeof InnovationIndexRoute
   '/news': typeof NewsIndexRoute
 }
@@ -164,7 +179,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
-  '/events': typeof EventsRoute
+  '/events': typeof EventsRouteWithChildren
   '/for-innovators': typeof ForInnovatorsRoute
   '/for-partners': typeof ForPartnersRoute
   '/for-students': typeof ForStudentsRoute
@@ -173,8 +188,10 @@ export interface FileRoutesById {
   '/programs': typeof ProgramsRoute
   '/resources': typeof ResourcesRoute
   '/support': typeof SupportRoute
+  '/events/$slug': typeof EventsSlugRoute
   '/innovation/$slug': typeof InnovationSlugRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/events/': typeof EventsIndexRoute
   '/innovation/': typeof InnovationIndexRoute
   '/news/': typeof NewsIndexRoute
 }
@@ -195,8 +212,10 @@ export interface FileRouteTypes {
     | '/programs'
     | '/resources'
     | '/support'
+    | '/events/$slug'
     | '/innovation/$slug'
     | '/news/$slug'
+    | '/events/'
     | '/innovation/'
     | '/news/'
   fileRoutesByTo: FileRoutesByTo
@@ -206,15 +225,16 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/courses'
-    | '/events'
     | '/for-innovators'
     | '/for-partners'
     | '/for-students'
     | '/programs'
     | '/resources'
     | '/support'
+    | '/events/$slug'
     | '/innovation/$slug'
     | '/news/$slug'
+    | '/events'
     | '/innovation'
     | '/news'
   id:
@@ -233,8 +253,10 @@ export interface FileRouteTypes {
     | '/programs'
     | '/resources'
     | '/support'
+    | '/events/$slug'
     | '/innovation/$slug'
     | '/news/$slug'
+    | '/events/'
     | '/innovation/'
     | '/news/'
   fileRoutesById: FileRoutesById
@@ -245,7 +267,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
   CoursesRoute: typeof CoursesRoute
-  EventsRoute: typeof EventsRoute
+  EventsRoute: typeof EventsRouteWithChildren
   ForInnovatorsRoute: typeof ForInnovatorsRoute
   ForPartnersRoute: typeof ForPartnersRoute
   ForStudentsRoute: typeof ForStudentsRoute
@@ -370,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InnovationIndexRouteImport
       parentRoute: typeof InnovationRoute
     }
+    '/events/': {
+      id: '/events/'
+      path: '/'
+      fullPath: '/events/'
+      preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/news/$slug': {
       id: '/news/$slug'
       path: '/$slug'
@@ -384,8 +413,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InnovationSlugRouteImport
       parentRoute: typeof InnovationRoute
     }
+    '/events/$slug': {
+      id: '/events/$slug'
+      path: '/$slug'
+      fullPath: '/events/$slug'
+      preLoaderRoute: typeof EventsSlugRouteImport
+      parentRoute: typeof EventsRoute
+    }
   }
 }
+
+interface EventsRouteChildren {
+  EventsSlugRoute: typeof EventsSlugRoute
+  EventsIndexRoute: typeof EventsIndexRoute
+}
+
+const EventsRouteChildren: EventsRouteChildren = {
+  EventsSlugRoute: EventsSlugRoute,
+  EventsIndexRoute: EventsIndexRoute,
+}
+
+const EventsRouteWithChildren =
+  EventsRoute._addFileChildren(EventsRouteChildren)
 
 interface InnovationRouteChildren {
   InnovationSlugRoute: typeof InnovationSlugRoute
@@ -419,7 +468,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
   CoursesRoute: CoursesRoute,
-  EventsRoute: EventsRoute,
+  EventsRoute: EventsRouteWithChildren,
   ForInnovatorsRoute: ForInnovatorsRoute,
   ForPartnersRoute: ForPartnersRoute,
   ForStudentsRoute: ForStudentsRoute,
