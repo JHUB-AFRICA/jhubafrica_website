@@ -251,9 +251,11 @@ function Index() {
           {/* Cell 1: Top-Left (Vision) */}
           <div style={{ padding: "1.5rem 0", maxWidth: "480px" }} className="diagonal-vision-cell">
             <h2 style={{ fontSize: "2.5rem", fontWeight: "900", color: "var(--jhub-blue)", lineHeight: "1.1", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              OUR<br />VISION
+              <span className="hover-underline-center" style={{ display: "inline-block", cursor: "pointer" }}>
+                OUR<br />VISION
+              </span>
             </h2>
-            <div style={{ width: "80px", height: "4px", backgroundColor: "var(--jhub-green)", margin: "1.5rem 0" }} />
+            <div className="vision-mission-line" style={{ width: "80px", height: "4px", backgroundColor: "var(--jhub-green)", margin: "1.5rem 0", transition: "width 0.35s ease" }} />
             <p style={{ fontSize: "1.35rem", lineHeight: "1.6", color: "var(--text-main)", fontWeight: "500", margin: 0 }}>
               A one stop hub offering comprehensive array of digital solutions for societal needs.
             </p>
@@ -268,9 +270,11 @@ function Index() {
           {/* Cell 4: Bottom-Right (Mission) */}
           <div style={{ padding: "1.5rem 0", maxWidth: "480px", marginLeft: "auto" }} className="diagonal-mission-cell">
             <h2 style={{ fontSize: "2.5rem", fontWeight: "900", color: "var(--jhub-blue)", lineHeight: "1.1", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              OUR<br />MISSION
+              <span className="hover-underline-center" style={{ display: "inline-block", cursor: "pointer" }}>
+                OUR<br />MISSION
+              </span>
             </h2>
-            <div style={{ width: "80px", height: "4px", backgroundColor: "var(--jhub-green)", margin: "1.5rem 0" }} />
+            <div className="vision-mission-line" style={{ width: "80px", height: "4px", backgroundColor: "var(--jhub-green)", margin: "1.5rem 0", transition: "width 0.35s ease" }} />
             <p style={{ fontSize: "1.35rem", lineHeight: "1.6", color: "var(--text-main)", fontWeight: "500", margin: 0 }}>
               To drive sustainable digital transformation, providing accessible and impactful solutions for small and medium-scale farmers, traders and enterprises.
             </p>
