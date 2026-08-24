@@ -227,7 +227,7 @@ function EventsPage() {
                       </span>
                     </div>
 
-                    <h3 style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--jhub-blue)", margin: "0 0 0.5rem 0", lineHeight: "1.3" }}>
+                    <h3 className="hover-underline-center" style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--jhub-blue)", margin: "0 0 0.5rem 0", lineHeight: "1.3" }}>
                       {e.title}
                     </h3>
                     

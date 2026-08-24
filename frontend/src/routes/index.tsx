@@ -519,63 +519,124 @@ function Index() {
         <div className="section-eyebrow">Visibility</div>
         <h2 className="section-h2">Upcoming events and latest news</h2>
         <div className={styles['event-news-grid']}>
+          {/* Upcoming Events Column */}
           <div>
             <div className={styles['section-subtitle']}>Upcoming events</div>
-            <div className={`cards-grid ${styles['news-grid']}`}>
-              {events.slice(0, 3).map((event) => (
-                <article key={event.id} className="prog-card news-card-compact">
-                  <div className={styles['event-card-inner']}>
-                    <div className={styles['event-date']}>
-                      <div className={styles['event-day']}>{event.day}</div>
-                      <div className={styles['event-month']}>{event.month}</div>
-                    </div>
-                    <div>
-                      <div className={`prog-title ${event.titleColor}`} style={{ textAlign: "left" }}>{event.title}</div>
-                      <p className="prog-desc" style={{ textAlign: "left" }}>{event.desc}</p>
-                      {event.location && (
-                        <div style={{ display: "flex", gap: "0.35rem", alignItems: "center", fontSize: "0.82rem", color: "var(--text-muted)", marginTop: "0.5rem", textAlign: "left" }}>
-                          <MapPin size={14} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />
-                          <span>{event.location}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="prog-meta" style={{ justifyContent: "flex-start", marginTop: "1rem" }}>
-                    <Link to="/events" search={{ selectedId: event.id }} className="prog-arrow">Read →</Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-            <Link to="/events" className="btn-outline" style={{ marginTop: "1.5rem" }}>View All Events</Link>
-          </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              {events.slice(0, 3).map((event) => {
+                const eventDateObj = new Date(event.startDateISO);
+                const formattedTime = isNaN(eventDateObj.getTime())
+                  ? "9:00 AM"
+                  : eventDateObj.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+                const displayDateTime = `${event.month} ${event.day}, ${isNaN(eventDateObj.getFullYear()) ? new Date().getFullYear() : eventDateObj.getFullYear()} at ${formattedTime}`;
+                const displayDesc = event.desc.replace(/<[^>]*>/g, " ").substring(0, 95) + (event.desc.length > 95 ? "..." : "");
 
-          <div>
-            <div className={styles['section-subtitle']}>Latest news</div>
-            <div className={`cards-grid ${styles['news-grid']}`}>
-              {news.slice(0, 3).map((post) => {
-                const displayExcerpt = post.excerpt && post.excerpt.trim().length > 0
-                  ? post.excerpt
-                  : post.body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().substring(0, 110) + "...";
                 return (
                   <Link
-                    key={post.id}
-                    to="/news/$slug"
-                    params={{ slug: post.slug }}
+                    key={event.id || event.title}
+                    to="/events/$slug"
+                    params={{ slug: event.slug || "" }}
                     style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                    className="home-event-item"
                   >
-                    <article className="prog-card news-card-compact" style={{ display: "flex", flexDirection: "column", height: "100%", cursor: "pointer" }}>
-                      <div className={`prog-title ${post.titleColor}`}>{post.title}</div>
-                      <p className="prog-desc" style={{ flexGrow: 1, margin: "0.5rem 0 1rem 0" }}>{displayExcerpt}</p>
-                      <div className="prog-meta" style={{ marginTop: "auto" }}>
-                        <span className="prog-slots">{post.date}</span>
-                        <span className="prog-arrow">Read →</span>
+                    <article style={{ display: "flex", gap: "1.1rem", alignItems: "flex-start", paddingBottom: "1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+                      {/* Left Column Media */}
+                      <div style={{ width: "130px", height: "100px", borderRadius: "10px", overflow: "hidden", flexShrink: 0, backgroundColor: "#f1f5f9" }}>
+                        <img
+                          src={event.image || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=600"}
+                          alt={event.title}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.35s ease" }}
+                        />
+                      </div>
+
+                      {/* Right Column Details */}
+                      <div style={{ flexGrow: 1, minWidth: 0 }}>
+                        <div style={{ marginBottom: "0.25rem" }}>
+                          <span style={{ textTransform: "uppercase", fontSize: "0.68rem", background: "rgba(16, 185, 129, 0.1)", color: "var(--jhub-green)", padding: "2px 8px", borderRadius: "4px", fontWeight: "700" }}>
+                            {event.type || "Event"}
+                          </span>
+                        </div>
+                        <h3 className="hover-underline-center" style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--jhub-blue)", margin: "0.2rem 0 0.35rem 0", lineHeight: "1.3" }}>
+                          {event.title}
+                        </h3>
+                        <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: "600", marginBottom: "0.25rem" }}>
+                          {displayDateTime}
+                        </div>
+                        {event.location && (
+                          <div style={{ display: "flex", gap: "0.3rem", alignItems: "center", fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
+                            <MapPin size={13} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />
+                            <span>{event.location}</span>
+                          </div>
+                        )}
+                        <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: "0 0 0.5rem 0", lineHeight: "1.45" }}>
+                          {displayDesc}
+                        </p>
+                        <span className="prog-arrow" style={{ fontSize: "0.82rem", fontWeight: "700" }}>
+                          Read More →
+                        </span>
                       </div>
                     </article>
                   </Link>
                 );
               })}
             </div>
-            <Link to="/news" className="btn-outline" style={{ marginTop: "1.5rem" }}>Read More News</Link>
+            <Link to="/events" className="btn-outline" style={{ marginTop: "1.5rem", display: "inline-block" }}>View All Events</Link>
+          </div>
+
+          {/* Latest News Column */}
+          <div>
+            <div className={styles['section-subtitle']}>Latest news</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              {news.slice(0, 3).map((post) => {
+                const cardImg = post.image || "https://images.unsplash.com/photo-1495020689067-958852a6565d?auto=format&fit=crop&q=80&w=600";
+                const displayExcerpt = post.excerpt && post.excerpt.trim().length > 0
+                  ? post.excerpt
+                  : post.body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().substring(0, 95) + "...";
+
+                return (
+                  <Link
+                    key={post.id || post.title}
+                    to="/news/$slug"
+                    params={{ slug: post.slug }}
+                    style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                    className="home-news-item"
+                  >
+                    <article style={{ display: "flex", gap: "1.1rem", alignItems: "flex-start", paddingBottom: "1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+                      {/* Left Column Media */}
+                      <div style={{ width: "130px", height: "100px", borderRadius: "10px", overflow: "hidden", flexShrink: 0, backgroundColor: "#f1f5f9" }}>
+                        <img
+                          src={cardImg}
+                          alt={post.title}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.35s ease" }}
+                        />
+                      </div>
+
+                      {/* Right Column Details */}
+                      <div style={{ flexGrow: 1, minWidth: 0 }}>
+                        <div style={{ marginBottom: "0.25rem" }}>
+                          <span style={{ textTransform: "uppercase", fontSize: "0.68rem", background: "rgba(16, 185, 129, 0.1)", color: "var(--jhub-green)", padding: "2px 8px", borderRadius: "4px", fontWeight: "700" }}>
+                            {post.tag || "News"}
+                          </span>
+                        </div>
+                        <h3 className="hover-underline-center" style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--jhub-blue)", margin: "0.2rem 0 0.35rem 0", lineHeight: "1.3" }}>
+                          {post.title}
+                        </h3>
+                        <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
+                          {post.date}
+                        </div>
+                        <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: "0 0 0.5rem 0", lineHeight: "1.45" }}>
+                          {displayExcerpt}
+                        </p>
+                        <span className="prog-arrow" style={{ fontSize: "0.82rem", fontWeight: "700" }}>
+                          Read →
+                        </span>
+                      </div>
+                    </article>
+                  </Link>
+                );
+              })}
+            </div>
+            <Link to="/news" className="btn-outline" style={{ marginTop: "1.5rem", display: "inline-block" }}>Read More News</Link>
           </div>
         </div>
       </section>
