@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { getEvents } from "../../axios/api/events";
 import { EventItem } from "../types/events";
 import SkeletonCards from "../components/site/SkeletonCards";
+import ResourceFallback from "../components/site/ResourceFallback";
 import { MapPin, Search } from "lucide-react";
 
 export const Route = createFileRoute("/events/")({
@@ -66,6 +67,17 @@ export const Route = createFileRoute("/events/")({
     return getEvents();
   },
   component: EventsPage,
+  errorComponent: ({ error, reset }) => (
+    <>
+      <header className="page-header">
+        <h1>Upcoming <span style={{ color: "var(--jhub-green)" }}>Events</span></h1>
+        <p>Hands-on opportunities to learn, build and connect with Africa's tech ecosystem.</p>
+      </header>
+      <section className="content-section">
+        <ResourceFallback error={error} onRetry={reset} resourceName="Events Calendar" />
+      </section>
+    </>
+  ),
   pendingComponent: () => (
     <>
       <header className="page-header">

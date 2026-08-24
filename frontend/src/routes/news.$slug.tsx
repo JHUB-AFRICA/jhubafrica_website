@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getNewsBySlug } from "../../axios/api/news";
 import { NewsPost } from "../types/news";
 import { RichContentRenderer } from "../components/ui/RichContentRenderer";
+import ResourceFallback from "../components/site/ResourceFallback";
 
 export const Route = createFileRoute("/news/$slug")({
   head: (ctx: { loaderData?: NewsPost }) => {
@@ -26,6 +27,14 @@ export const Route = createFileRoute("/news/$slug")({
     return getNewsBySlug(params.slug);
   },
   component: NewsDetailPage,
+  errorComponent: ({ error, reset }) => (
+    <ResourceFallback
+      error={error}
+      onRetry={reset}
+      resourceName="News Article"
+      isFullPage={true}
+    />
+  ),
 });
 
 function NewsDetailPage() {

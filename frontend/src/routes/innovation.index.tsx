@@ -4,6 +4,7 @@ import { getInnovations } from "../../axios/api/innovations";
 import { InnovationItem } from "../types/innovations";
 import styles from "../styles/Innovations.module.css";
 import SkeletonCards from "../components/site/SkeletonCards";
+import ResourceFallback from "../components/site/ResourceFallback";
 
 export const Route = createFileRoute("/innovation/")({
   head: () => ({
@@ -25,6 +26,25 @@ export const Route = createFileRoute("/innovation/")({
     return getInnovations();
   },
   component: InnovationPage,
+  errorComponent: ({ error, reset }) => (
+    <>
+      <header className="page-header">
+        <h1>
+          Innovations{" "}
+          <span style={{ color: "var(--jhub-green)" }}>Portfolio</span>
+        </h1>
+        <p>
+          A searchable portfolio of African innovations in our pipeline. Filter
+          by sector, stage or support need — and sponsor a project that fits
+          your priorities.
+        </p>
+      </header>
+
+      <section className="content-section">
+        <ResourceFallback error={error} onRetry={reset} resourceName="Innovations Portfolio" />
+      </section>
+    </>
+  ),
   pendingComponent: () => (
     <>
       <header className="page-header">

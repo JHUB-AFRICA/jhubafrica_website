@@ -4,6 +4,7 @@ import ApplyDialog from "../components/site/ApplyDialog";
 import { getPublicCourses } from "../../axios/api/courses";
 import { CourseItem } from "../types/courses";
 import SkeletonCards from "../components/site/SkeletonCards";
+import ResourceFallback from "../components/site/ResourceFallback";
 
 export const Route = createFileRoute("/courses")({
   head: (ctx: { loaderData?: CourseItem[] }) => {
@@ -60,6 +61,23 @@ export const Route = createFileRoute("/courses")({
   },
   loader: () => getPublicCourses(),
   component: CoursesPage,
+  errorComponent: ({ error, reset }) => (
+    <>
+      <header className="page-header">
+        <h1>
+          Our <span style={{ color: "var(--jhub-green)" }}>Courses</span>
+        </h1>
+        <p>
+          Practical, instructor-led programs designed with industry partners.
+          Cohort-based, with no upfront payment for accepted learners on
+          subsidised tracks.
+        </p>
+      </header>
+      <section className="content-section">
+        <ResourceFallback error={error} onRetry={reset} resourceName="Courses" />
+      </section>
+    </>
+  ),
   pendingComponent: () => (
     <>
       <header className="page-header">
