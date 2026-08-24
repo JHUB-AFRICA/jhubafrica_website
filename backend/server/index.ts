@@ -24,19 +24,46 @@ app.use(helmet({
 }))
 
 app.use(cookieParser())
-app.use(cors({
-  origin: CORS_ORIGINS ? CORS_ORIGINS.split(',') : '*',
-  credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'x-requested-with',
-    'X-CSRF-Token',
-    'x-csrf-token'
-  ],
-}))
+
+const defaultOrigins = [
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
+  'https://jhubafrica.com',
+  'https://www.jhubafrica.com',
+]
+
+const allowedOrigins = CORS_ORIGINS
+  ? [...new Set([...CORS_ORIGINS.split(',').map((s) => s.trim()), ...defaultOrigins])]
+  : defaultOrigins
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true)
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+        return callback(null, true)
+      }
+      // Allow localhost or 127.0.0.1 on any port in dev/preview
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        return callback(null, true)
+      }
+      return callback(null, true)
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'x-requested-with',
+      'X-CSRF-Token',
+      'x-csrf-token',
+    ],
+  })
+)
 
 app.use(compression())
 app.use(express.json({ limit: '10mb' }))

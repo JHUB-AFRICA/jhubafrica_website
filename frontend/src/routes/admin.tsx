@@ -61,8 +61,7 @@ export const Route = createFileRoute("/admin")({
       ]);
       return { news, events, innovations, courses };
     } catch (error: any) {
-      console.warn("Loader failed to load admin content:", error);
-      if (error?.response?.status === 401) {
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
         setAccessToken(null);
       }
       return { news: [], events: [], innovations: [], courses: [] };

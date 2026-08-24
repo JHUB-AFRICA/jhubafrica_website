@@ -176,8 +176,19 @@ export async function adminLogin(req: Request, res: Response, next: NextFunction
       return res.status(401).json({ error: 'Invalid email or password' })
     }
 
-    const role = data.user.user_metadata?.role ?? 'guest'
-    if (role.toLowerCase() !== 'admin') {
+    let role = data.user.user_metadata?.role
+    if (!role || role.toLowerCase() !== 'admin') {
+      const { data: dbUser } = await supabaseAdmin
+        .from('users')
+        .select('role')
+        .eq('id', data.user.id)
+        .maybeSingle()
+      if (dbUser?.role) {
+        role = dbUser.role
+      }
+    }
+
+    if ((role || '').toLowerCase() !== 'admin') {
       return res.status(403).json({ error: 'Access denied: Administrator privileges required' })
     }
 
@@ -196,9 +207,7 @@ export async function adminLogin(req: Request, res: Response, next: NextFunction
       user_id: data.user.id,
       expires_at: expiresAt.toISOString()
     })
-    // CHANGED: log before throwing — this is the insert most likely
-    // responsible for the 500 on /auth/admin/login. Check server logs
-    // for "[adminLogin] refresh_tokens insert failed" on next attempt.
+
     if (dbError) {
       console.error('[adminLogin] refresh_tokens insert failed:', dbError)
       throw dbError
@@ -264,10 +273,13 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
         if (!user.user) {
           return res.status(401).json({ error: 'User not found' })
         }
+        const { data: dbUser } = await supabaseAdmin.from('users').select('role').eq('id', userId).maybeSingle()
+        const userRole = (dbUser?.role || user.user.user_metadata?.role || 'guest').toLowerCase()
+
         const newToken = signToken({
           sub: userId,
           email: user.user.email!,
-          role: user.user.user_metadata?.role ?? 'guest',
+          role: userRole as any,
         })
         return res.json({ token: newToken })
       }
@@ -292,10 +304,13 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       return res.status(401).json({ error: 'User not found' })
     }
 
+    const { data: dbUser } = await supabaseAdmin.from('users').select('role').eq('id', userId).maybeSingle()
+    const userRole = (dbUser?.role || user.user.user_metadata?.role || 'guest').toLowerCase()
+
     const newAccessToken = signToken({
       sub: userId,
       email: user.user.email!,
-      role: user.user.user_metadata?.role ?? 'guest',
+      role: userRole as any,
     })
     const newRefreshToken = signRefreshToken(userId)
 

@@ -6,17 +6,19 @@ import { NotFoundError } from '../../middleware/error.middleware.js'
 export async function getAdminPosts(req: Request, res: Response, next: NextFunction) {
   try {
     const { page, limit, category, featured, search, tag, status } = req.query as any
-    const offset = (page - 1) * limit
+    const pageNum = Math.max(1, parseInt(page as string) || 1)
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string) || 50))
+    const offset = (pageNum - 1) * limitNum
 
     let query = supabaseAdmin
       .from('posts')
       .select(`
-        id, slug, title, excerpt, content, content_json, category, is_published, status,
+        id, slug, title, excerpt, content, category, is_published,
         is_featured, published_at, cover_image_url, tags, authorId, created_at, updated_at,
         post_images ( id, url, order )
       `, { count: 'exact' })
       .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
+      .range(offset, offset + limitNum - 1)
 
     if (category) query = query.eq('category', category)
     if (status)   query = query.eq('status', status)
@@ -24,17 +26,41 @@ export async function getAdminPosts(req: Request, res: Response, next: NextFunct
     if (search)   query = query.ilike('title', `%${search}%`)
     if (tag)      query = query.contains('tags', [tag])
 
-    const { data, error, count } = await query
-    if (error) throw error
+    let result = await query
+
+    if (result.error) {
+      console.warn('[getAdminPosts fallback]:', result.error.message)
+      let fallbackQuery = supabaseAdmin
+        .from('posts')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limitNum - 1)
+
+      if (category) fallbackQuery = fallbackQuery.eq('category', category)
+      if (featured) fallbackQuery = fallbackQuery.eq('is_featured', true)
+      if (search)   fallbackQuery = fallbackQuery.ilike('title', `%${search}%`)
+
+      result = await fallbackQuery
+      if (result.error) throw result.error
+    }
+
+    const { data, count } = result
 
     const mapped = (data || []).map((p: any) => ({
       ...p,
-      images: (p.post_images || []).sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)),
+      images: Array.isArray(p.post_images)
+        ? p.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+        : (p.cover_image_url ? [{ url: p.cover_image_url, order: 0 }] : []),
     }))
 
     res.json({
       data: mapped,
-      meta: { page, limit, total: count, totalPages: Math.ceil((count ?? 0) / limit) },
+      meta: {
+        page: pageNum,
+        limit: limitNum,
+        total: count ?? mapped.length,
+        totalPages: Math.ceil((count ?? mapped.length) / limitNum),
+      },
     })
   } catch (err) {
     next(err)
@@ -44,20 +70,31 @@ export async function getAdminPosts(req: Request, res: Response, next: NextFunct
 export async function getAdminPostById(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params
-    const { data, error } = await supabaseAdmin
+    let resData = await supabaseAdmin
       .from('posts')
       .select(`
         *,
         post_images ( id, url, order )
       `)
       .eq('id', id)
-      .single()
+      .maybeSingle()
 
-    if (error || !data) throw new NotFoundError('Article')
+    if (resData.error) {
+      resData = await supabaseAdmin
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle()
+      if (resData.error) throw resData.error
+    }
+
+    if (!resData.data) throw new NotFoundError('Article')
 
     const mapped = {
-      ...data,
-      images: (data.post_images || []).sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)),
+      ...resData.data,
+      images: Array.isArray(resData.data.post_images)
+        ? resData.data.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+        : (resData.data.cover_image_url ? [{ url: resData.data.cover_image_url, order: 0 }] : []),
     }
 
     res.json({ data: mapped })

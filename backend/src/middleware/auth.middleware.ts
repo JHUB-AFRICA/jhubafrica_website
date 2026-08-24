@@ -95,16 +95,37 @@ export async function optionalAuth(req: Request, res: Response, next: NextFuncti
 
 // ── Role-based access control ──────────────────────────
 export function requireRole(...roles: UserRole[]) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' })
     }
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        error: `Access denied. Required role: ${roles.join(' or ')}`,
-      })
+
+    const userRole = (req.user.role || '').toLowerCase()
+    const allowedRoles = roles.map(r => r.toLowerCase())
+
+    if (allowedRoles.includes(userRole)) {
+      return next()
     }
-    next()
+
+    // Fallback: check database public.users table in case metadata is out of sync
+    try {
+      const { data: dbUser } = await supabaseAdmin
+        .from('users')
+        .select('role')
+        .eq('id', req.user.sub)
+        .maybeSingle()
+
+      if (dbUser?.role && allowedRoles.includes(dbUser.role.toLowerCase())) {
+        req.user.role = dbUser.role.toLowerCase() as any
+        return next()
+      }
+    } catch (err) {
+      console.warn('[requireRole DB fallback error]:', err)
+    }
+
+    return res.status(403).json({
+      error: `Access denied. Required role: ${roles.join(' or ')}`,
+    })
   }
 }
 

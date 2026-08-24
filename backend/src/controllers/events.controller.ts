@@ -6,7 +6,9 @@ import { NotFoundError } from '../middleware/error.middleware.js'
 export async function getEvents(req: Request, res: Response, next: NextFunction) {
   try {
     const { page, limit, type, upcoming, past, featured } = req.query as any
-    const offset = (page - 1) * limit
+    const pageNum = Math.max(1, parseInt(page as string) || 1)
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string) || 50))
+    const offset = (pageNum - 1) * limitNum
     const now = new Date().toISOString()
 
     let query = supabase
@@ -14,7 +16,7 @@ export async function getEvents(req: Request, res: Response, next: NextFunction)
       .select('id, slug, title, description, type, status, start_date, end_date, location, is_online, meeting_url, registration_url, is_featured, cover_image_url', { count: 'exact' })
       .eq('status', 'PUBLISHED')
       .order('start_date', { ascending: upcoming !== false })
-      .range(offset, offset + limit - 1)
+      .range(offset, offset + limitNum - 1)
 
     if (type)     query = query.eq('type', type)
     if (featured) query = query.eq('is_featured', true)
@@ -26,7 +28,7 @@ export async function getEvents(req: Request, res: Response, next: NextFunction)
 
     res.json({
       data,
-      meta: { page, limit, total: count, totalPages: Math.ceil((count ?? 0) / limit) },
+      meta: { page: pageNum, limit: limitNum, total: count, totalPages: Math.ceil((count ?? 0) / limitNum) },
     })
   } catch (err) {
     next(err)

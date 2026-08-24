@@ -6,7 +6,9 @@ import { NotFoundError, ConflictError } from '../middleware/error.middleware.js'
 export async function getCourses(req: Request, res: Response, next: NextFunction) {
   try {
     const { page, limit, category, mode, featured, search } = req.query as any
-    const offset = (page - 1) * limit
+    const pageNum = Math.max(1, parseInt(page as string) || 1)
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string) || 50))
+    const offset = (pageNum - 1) * limitNum
 
     let query = supabase
       .from('courses')
@@ -17,7 +19,7 @@ export async function getCourses(req: Request, res: Response, next: NextFunction
       `, { count: 'exact' })
       .eq('is_published', true)
       .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
+      .range(offset, offset + limitNum - 1)
 
     if (category) query = query.eq('category', category)
     if (mode)     query = query.eq('delivery_mode', mode)
@@ -29,7 +31,7 @@ export async function getCourses(req: Request, res: Response, next: NextFunction
 
     res.json({
       data,
-      meta: { page, limit, total: count, totalPages: Math.ceil((count ?? 0) / limit) },
+      meta: { page: pageNum, limit: limitNum, total: count, totalPages: Math.ceil((count ?? 0) / limitNum) },
     })
   } catch (err) {
     next(err)
