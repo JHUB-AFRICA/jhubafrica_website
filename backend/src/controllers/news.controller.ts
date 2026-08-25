@@ -13,9 +13,8 @@ export async function getNews(req: Request, res: Response, next: NextFunction) {
     let query = supabase
       .from('posts')
       .select(`
-        id, slug, title, author, content, excerpt, category, published_at,
-        is_featured, is_published, cover_image_url, tags,
-        post_images ( id, url, order )
+        id, slug, title, excerpt, content, category, is_published,
+        is_featured, published_at, cover_image_url, tags, authorId, created_at, updated_at
       `, { count: 'exact' })
       .eq('is_published', true)
       .order('published_at', { ascending: false })
@@ -28,7 +27,6 @@ export async function getNews(req: Request, res: Response, next: NextFunction) {
 
     let result = await query
 
-    // Fallback if post_images relation or author column does not exist in Supabase DB yet
     if (result.error) {
       console.warn('[getNews fallback query triggered]:', result.error.message)
       let fallbackQuery = supabase
@@ -48,13 +46,10 @@ export async function getNews(req: Request, res: Response, next: NextFunction) {
 
     const { data, count } = result
 
-    // Normalize post_images & author
     const mapped = (data || []).map((p: any) => ({
       ...p,
-      author: p.author || 'JHUB Editorial Team',
-      images: Array.isArray(p.post_images)
-        ? p.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-        : (p.cover_image_url ? [{ url: p.cover_image_url, order: 0 }] : []),
+      author: p.authorId || p.author || 'JHUB Editorial Team',
+      images: p.cover_image_url ? [{ url: p.cover_image_url, order: 0 }] : [],
     }))
 
     res.json({
@@ -77,8 +72,7 @@ export async function getFeaturedNews(req: Request, res: Response, next: NextFun
       let query = supabase
         .from('posts')
         .select(`
-          id, slug, title, excerpt, category, published_at, cover_image_url,
-          post_images ( id, url, order )
+          id, slug, title, excerpt, category, published_at, cover_image_url, authorId
         `)
         .eq('is_published', true)
         .eq('is_featured', true)
@@ -98,9 +92,8 @@ export async function getFeaturedNews(req: Request, res: Response, next: NextFun
 
       return (res.data || []).map((p: any) => ({
         ...p,
-        images: Array.isArray(p.post_images)
-          ? p.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-          : (p.cover_image_url ? [{ url: p.cover_image_url, order: 0 }] : []),
+        author: p.authorId || p.author || 'JHUB Editorial Team',
+        images: p.cover_image_url ? [{ url: p.cover_image_url, order: 0 }] : [],
       }))
     })
     res.json({ data })
@@ -115,33 +108,18 @@ export async function getArticleBySlug(req: Request, res: Response, next: NextFu
     const data = await withCache(CacheKey.news(slug), CacheTTL.medium, async () => {
       let res = await supabase
         .from('posts')
-        .select(`
-          *,
-          post_images ( id, url, order )
-        `)
+        .select('*')
         .eq('slug', slug)
         .eq('is_published', true)
         .maybeSingle()
 
-      if (res.error) {
-        let fallback = await supabase
-          .from('posts')
-          .select('*')
-          .eq('slug', slug)
-          .eq('is_published', true)
-          .maybeSingle()
-        if (fallback.error) throw fallback.error
-        res = fallback
-      }
-
+      if (res.error) throw res.error
       if (!res.data) return null
 
       return {
         ...res.data,
-        author: res.data.author || 'JHUB Editorial Team',
-        images: Array.isArray(res.data.post_images)
-          ? res.data.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-          : (res.data.cover_image_url ? [{ url: res.data.cover_image_url, order: 0 }] : []),
+        author: res.data.authorId || res.data.author || 'JHUB Editorial Team',
+        images: res.data.cover_image_url ? [{ url: res.data.cover_image_url, order: 0 }] : [],
       }
     })
     if (!data) throw new NotFoundError('Article')

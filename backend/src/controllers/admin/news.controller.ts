@@ -13,15 +13,15 @@ export async function getAdminPosts(req: Request, res: Response, next: NextFunct
     let query = supabaseAdmin
       .from('posts')
       .select(`
-        id, slug, title, author, excerpt, content, content_json, category, status, is_published,
-        is_featured, published_at, cover_image_url, tags, authorId, created_at, updated_at,
-        post_images ( id, url, order )
+        id, slug, title, excerpt, content, category, is_published,
+        is_featured, published_at, cover_image_url, tags, authorId, created_at, updated_at
       `, { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(offset, offset + limitNum - 1)
 
     if (category) query = query.eq('category', category)
-    if (status)   query = query.eq('status', status)
+    if (status === 'PUBLISHED') query = query.eq('is_published', true)
+    if (status === 'DRAFT') query = query.eq('is_published', false)
     if (featured) query = query.eq('is_featured', true)
     if (search)   query = query.ilike('title', `%${search}%`)
     if (tag)      query = query.contains('tags', [tag])
@@ -48,9 +48,9 @@ export async function getAdminPosts(req: Request, res: Response, next: NextFunct
 
     const mapped = (data || []).map((p: any) => ({
       ...p,
-      images: Array.isArray(p.post_images)
-        ? p.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-        : (p.cover_image_url ? [{ url: p.cover_image_url, order: 0 }] : []),
+      author: p.authorId || p.author || 'JHUB Editorial Team',
+      status: p.is_published ? 'PUBLISHED' : 'DRAFT',
+      images: p.cover_image_url ? [{ url: p.cover_image_url, order: 0 }] : [],
     }))
 
     res.json({
@@ -72,29 +72,18 @@ export async function getAdminPostById(req: Request, res: Response, next: NextFu
     const { id } = req.params
     let resData = await supabaseAdmin
       .from('posts')
-      .select(`
-        *,
-        post_images ( id, url, order )
-      `)
+      .select('*')
       .eq('id', id)
       .maybeSingle()
 
-    if (resData.error) {
-      resData = await supabaseAdmin
-        .from('posts')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle()
-      if (resData.error) throw resData.error
-    }
-
+    if (resData.error) throw resData.error
     if (!resData.data) throw new NotFoundError('Article')
 
     const mapped = {
       ...resData.data,
-      images: Array.isArray(resData.data.post_images)
-        ? resData.data.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-        : (resData.data.cover_image_url ? [{ url: resData.data.cover_image_url, order: 0 }] : []),
+      author: resData.data.authorId || resData.data.author || 'JHUB Editorial Team',
+      status: resData.data.is_published ? 'PUBLISHED' : 'DRAFT',
+      images: resData.data.cover_image_url ? [{ url: resData.data.cover_image_url, order: 0 }] : [],
     }
 
     res.json({ data: mapped })
@@ -159,80 +148,31 @@ export async function createAdminPost(req: Request, res: Response, next: NextFun
     const effectiveIsPublished = effectiveStatus === 'PUBLISHED' || Boolean(isPublished)
     const effectiveCoverImage = coverImageUrl || (Array.isArray(images) && images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0]?.url) : null)
     const effectiveExcerpt = (excerpt && excerpt.trim()) || generateExcerpt(content, contentJson, 140)
+    const effectiveAuthor = (author && author.trim()) || (authorId && authorId.trim()) || 'JHUB Editorial Team'
     const newPostId = crypto.randomUUID()
 
-    const fullPayload: any = {
+    const payload: any = {
       id: newPostId,
       slug,
       title,
-      author: author || 'JHUB Editorial Team',
+      authorId: effectiveAuthor,
       excerpt: effectiveExcerpt || null,
       content: content || '',
-      content_json: contentJson || null,
       category: category || 'news',
       is_published: effectiveIsPublished,
-      status: effectiveStatus,
       is_featured: Boolean(isFeatured),
       published_at: publishedAt || (effectiveIsPublished ? new Date().toISOString() : null),
       cover_image_url: effectiveCoverImage,
       tags: tags || [],
-      authorId: authorId || null,
     }
 
     let { data, error } = await supabaseAdmin
       .from('posts')
-      .insert(fullPayload)
+      .insert(payload)
       .select()
       .single()
 
-    // Schema fallback if content_json or status column is not present in remote database
-    if (error && (error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('column'))) {
-      console.warn('[createAdminPost fallback]: content_json/status column missing in DB, retrying with core columns:', error.message)
-      const corePayload: any = {
-        id: newPostId,
-        slug,
-        title,
-        excerpt: effectiveExcerpt || null,
-        content: content || '',
-        category: category || 'news',
-        is_published: effectiveIsPublished,
-        is_featured: Boolean(isFeatured),
-        published_at: publishedAt || (effectiveIsPublished ? new Date().toISOString() : null),
-        cover_image_url: effectiveCoverImage,
-        tags: tags || [],
-      }
-      const retry = await supabaseAdmin
-        .from('posts')
-        .insert(corePayload)
-        .select()
-        .single()
-
-      if (retry.error) throw retry.error
-      data = retry.data
-    } else if (error) {
-      throw error
-    }
-
-    // Insert associated images if table exists
-    if (Array.isArray(images) && images.length > 0) {
-      const imageRows = images.map((img: any, idx: number) => ({
-        id: crypto.randomUUID(),
-        post_id: newPostId,
-        url: typeof img === 'string' ? img : img.url,
-        order: typeof img === 'object' && typeof img.order === 'number' ? img.order : idx,
-      })).filter((row) => Boolean(row.url))
-
-      if (imageRows.length > 0) {
-        try {
-          const imgRes = await supabaseAdmin.from('post_images').insert(imageRows)
-          if (imgRes.error) {
-            console.warn('[createAdminPost] post_images insert warning:', imgRes.error.message)
-          }
-        } catch (imgErr: any) {
-          console.warn('[createAdminPost] post_images insert skipped:', imgErr?.message)
-        }
-      }
-    }
+    if (error) throw error
 
     // Evict Redis Cache
     if (redis) {
@@ -242,30 +182,12 @@ export async function createAdminPost(req: Request, res: Response, next: NextFun
       ]).catch(() => {})
     }
 
-    // Retrieve created post with images
-    let fullPostRes = await supabaseAdmin
-      .from('posts')
-      .select(`*, post_images ( id, url, order )`)
-      .eq('id', newPostId)
-      .maybeSingle()
-
-    if (fullPostRes.error) {
-      fullPostRes = await supabaseAdmin
-        .from('posts')
-        .select('*')
-        .eq('id', newPostId)
-        .maybeSingle()
-    }
-
-    const fullPost = fullPostRes.data || data
-    const mappedImages = Array.isArray(fullPost?.post_images)
-      ? fullPost.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-      : (effectiveCoverImage ? [{ url: effectiveCoverImage, order: 0 }] : [])
-
     res.status(201).json({
       data: {
-        ...fullPost,
-        images: mappedImages,
+        ...data,
+        author: data.authorId || 'JHUB Editorial Team',
+        status: data.is_published ? 'PUBLISHED' : 'DRAFT',
+        images: effectiveCoverImage ? [{ url: effectiveCoverImage, order: 0 }] : [],
       },
     })
   } catch (err) {
@@ -296,7 +218,7 @@ export async function updateAdminPost(req: Request, res: Response, next: NextFun
     // Retrieve existing post to clear specific slug cache
     const { data: existing } = await supabaseAdmin
       .from('posts')
-      .select('slug, published_at, status')
+      .select('slug, published_at, is_published')
       .eq('id', id)
       .maybeSingle()
 
@@ -306,25 +228,22 @@ export async function updateAdminPost(req: Request, res: Response, next: NextFun
       const slugify = (await import('slugify')).default
       updates.slug = slugify(title, { lower: true, strict: true })
     }
-    if (author !== undefined) {
-      updates.author = author || 'JHUB Editorial Team'
+    if (author !== undefined || authorId !== undefined) {
+      updates.authorId = (author && author.trim()) || (authorId && authorId.trim()) || 'JHUB Editorial Team'
     }
     if (excerpt !== undefined) {
       updates.excerpt = excerpt && excerpt.trim() ? excerpt.trim() : generateExcerpt(content, contentJson, 140)
     }
     if (content !== undefined) updates.content = content
-    if (contentJson !== undefined) updates.content_json = contentJson
     if (category !== undefined) updates.category = category
 
     if (status !== undefined) {
-      updates.status = status
       updates.is_published = status === 'PUBLISHED'
       if (status === 'PUBLISHED' && !existing?.published_at && !publishedAt) {
         updates.published_at = new Date().toISOString()
       }
     } else if (isPublished !== undefined) {
       updates.is_published = isPublished
-      updates.status = isPublished ? 'PUBLISHED' : 'DRAFT'
       if (isPublished && !existing?.published_at && !publishedAt) {
         updates.published_at = new Date().toISOString()
       }
@@ -332,9 +251,10 @@ export async function updateAdminPost(req: Request, res: Response, next: NextFun
 
     if (isFeatured !== undefined) updates.is_featured = isFeatured
     if (publishedAt !== undefined) updates.published_at = publishedAt || null
-    if (coverImageUrl !== undefined) updates.cover_image_url = coverImageUrl || null
+    if (coverImageUrl !== undefined) {
+      updates.cover_image_url = coverImageUrl || (Array.isArray(images) && images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0]?.url) : null)
+    }
     if (tags !== undefined) updates.tags = tags
-    if (authorId !== undefined) updates.authorId = authorId || null
 
     let { data, error } = await supabaseAdmin
       .from('posts')
@@ -343,40 +263,8 @@ export async function updateAdminPost(req: Request, res: Response, next: NextFun
       .select()
       .single()
 
-    if (error && (error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('column'))) {
-      console.warn('[updateAdminPost fallback]: Retrying update without content_json/status:', error.message)
-      delete updates.content_json
-      delete updates.status
-      delete updates.authorId
-      const retry = await supabaseAdmin
-        .from('posts')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single()
-      if (retry.error) throw retry.error
-      data = retry.data
-    } else if (error || !data) {
+    if (error || !data) {
       throw error || new NotFoundError('Article')
-    }
-
-    // Sync multi-images if provided
-    if (Array.isArray(images)) {
-      try {
-        await supabaseAdmin.from('post_images').delete().eq('post_id', id)
-        const imageRows = images.map((img: any, idx: number) => ({
-          id: crypto.randomUUID(),
-          post_id: id,
-          url: typeof img === 'string' ? img : img.url,
-          order: typeof img === 'object' && typeof img.order === 'number' ? img.order : idx,
-        })).filter((row) => Boolean(row.url))
-
-        if (imageRows.length > 0) {
-          await supabaseAdmin.from('post_images').insert(imageRows)
-        }
-      } catch (imgErr: any) {
-        console.warn('[updateAdminPost] post_images sync skipped:', imgErr?.message)
-      }
     }
 
     // Evict Redis Cache
@@ -389,29 +277,12 @@ export async function updateAdminPost(req: Request, res: Response, next: NextFun
       ]).catch(() => {})
     }
 
-    let fullPostRes = await supabaseAdmin
-      .from('posts')
-      .select(`*, post_images ( id, url, order )`)
-      .eq('id', id)
-      .maybeSingle()
-
-    if (fullPostRes.error) {
-      fullPostRes = await supabaseAdmin
-        .from('posts')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle()
-    }
-
-    const fullPost = fullPostRes.data || data
-    const mappedImages = Array.isArray(fullPost?.post_images)
-      ? fullPost.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-      : (fullPost?.cover_image_url ? [{ url: fullPost.cover_image_url, order: 0 }] : [])
-
     res.json({
       data: {
-        ...fullPost,
-        images: mappedImages,
+        ...data,
+        author: data.authorId || 'JHUB Editorial Team',
+        status: data.is_published ? 'PUBLISHED' : 'DRAFT',
+        images: data.cover_image_url ? [{ url: data.cover_image_url, order: 0 }] : [],
       },
     })
   } catch (err) {
