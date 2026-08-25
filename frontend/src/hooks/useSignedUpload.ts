@@ -14,7 +14,7 @@ export function useSignedUpload() {
   const [error, setError] = useState<string | null>(null)
 
   const uploadFile = useCallback(
-    async (file: File, bucket: StorageBucket = 'post-images'): Promise<UploadResult> => {
+    async (file: File, bucket: StorageBucket = 'post-images', folder?: string): Promise<UploadResult> => {
       setUploading(true)
       setError(null)
       setProgress(10)
@@ -30,6 +30,7 @@ export function useSignedUpload() {
           }>('/api/v1/admin/uploads/sign', {
             bucket,
             filename: file.name,
+            folder,
             contentType: file.type,
           })
 
@@ -60,6 +61,7 @@ export function useSignedUpload() {
         const formData = new FormData()
         formData.append('file', file)
         formData.append('bucket', bucket)
+        if (folder) formData.append('folder', folder)
 
         const directRes = await adminApi.post<{ url: string; path: string }>(
           '/api/v1/admin/uploads/direct',
@@ -91,11 +93,11 @@ export function useSignedUpload() {
   )
 
   const uploadMultipleFiles = useCallback(
-    async (files: File[], bucket: StorageBucket = 'post-images'): Promise<UploadResult[]> => {
+    async (files: File[], bucket: StorageBucket = 'post-images', folder?: string): Promise<UploadResult[]> => {
       setUploading(true)
       setError(null)
       try {
-        const uploadPromises = files.map((file) => uploadFile(file, bucket))
+        const uploadPromises = files.map((file) => uploadFile(file, bucket, folder))
         const results = await Promise.all(uploadPromises)
         return results
       } catch (err: any) {

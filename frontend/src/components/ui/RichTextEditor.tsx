@@ -11,6 +11,7 @@ interface RichTextEditorProps {
   placeholder?: string
   minHeight?: string
   bucket?: StorageBucket
+  folder?: string
 }
 
 export function RichTextEditor({
@@ -20,6 +21,7 @@ export function RichTextEditor({
   placeholder = 'Write your content here...',
   minHeight = '240px',
   bucket = 'post-images',
+  folder = 'news',
 }: RichTextEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { uploadFile, uploading, error: uploadError } = useSignedUpload()
@@ -53,7 +55,7 @@ export function RichTextEditor({
     const caption = window.prompt('Enter Image Caption (optional, displayed below the image):') || ''
 
     try {
-      const result = await uploadFile(file, bucket)
+      const result = await uploadFile(file, bucket, folder)
       editor.chain().focus().setImage({
         src: result.url,
         alt: caption || file.name,

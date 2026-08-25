@@ -40,7 +40,7 @@ async function ensureBucket(bucketName: string) {
  */
 adminUploadsRouter.post('/sign', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { bucket, filename } = req.body
+    const { bucket, filename, folder } = req.body
     const targetBucket = (bucket || 'post-images') as AllowedBucket
 
     if (!ALLOWED_BUCKETS.includes(targetBucket)) {
@@ -56,10 +56,14 @@ adminUploadsRouter.post('/sign', async (req: Request, res: Response, next: NextF
     // Auto-ensure bucket exists
     await ensureBucket(targetBucket)
 
-    // Sanitize filename and create unique path
+    // Sanitize folder & filename
+    const cleanFolder = typeof folder === 'string' && folder.trim()
+      ? folder.trim().replace(/[^a-zA-Z0-9_\-\/]/g, '_').replace(/^\/+|\/+$/g, '')
+      : ''
     const sanitizedName = filename.replace(/[^a-zA-Z0-9._-]/g, '_')
     const uniqueId = crypto.randomUUID()
-    const filePath = `${Date.now()}-${uniqueId}-${sanitizedName}`
+    const fileNameWithPrefix = `${Date.now()}-${uniqueId}-${sanitizedName}`
+    const filePath = cleanFolder ? `${cleanFolder}/${fileNameWithPrefix}` : fileNameWithPrefix
 
     // Create signed upload URL from Supabase Storage
     let { data, error } = await supabaseAdmin.storage
@@ -86,6 +90,7 @@ adminUploadsRouter.post('/sign', async (req: Request, res: Response, next: NextF
       token: data?.token,
       path: data?.path || filePath,
       publicUrl: publicData.publicUrl,
+      folder: cleanFolder || null,
     })
   } catch (err) {
     next(err)
@@ -103,6 +108,7 @@ adminUploadsRouter.post(
     try {
       const file = req.file
       const bucket = (req.body.bucket || 'post-images') as AllowedBucket
+      const folder = req.body.folder
 
       if (!file) {
         return res.status(400).json({ error: 'File is required' })
@@ -114,9 +120,13 @@ adminUploadsRouter.post(
 
       await ensureBucket(bucket)
 
+      const cleanFolder = typeof folder === 'string' && folder.trim()
+        ? folder.trim().replace(/[^a-zA-Z0-9_\-\/]/g, '_').replace(/^\/+|\/+$/g, '')
+        : ''
       const sanitizedName = (file.originalname || 'image.jpg').replace(/[^a-zA-Z0-9._-]/g, '_')
       const uniqueId = crypto.randomUUID()
-      const filePath = `${Date.now()}-${uniqueId}-${sanitizedName}`
+      const fileNameWithPrefix = `${Date.now()}-${uniqueId}-${sanitizedName}`
+      const filePath = cleanFolder ? `${cleanFolder}/${fileNameWithPrefix}` : fileNameWithPrefix
 
       const { error: uploadError } = await supabaseAdmin.storage
         .from(bucket)
@@ -137,12 +147,50 @@ adminUploadsRouter.post(
       res.json({
         url: publicData.publicUrl,
         path: filePath,
+        folder: cleanFolder || null,
       })
     } catch (err) {
       next(err)
     }
   }
 )
+
+/**
+ * GET /api/v1/admin/uploads/folders
+ * Lists all existing folders within a storage bucket
+ */
+adminUploadsRouter.get('/folders', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const bucket = (req.query.bucket || 'post-images') as AllowedBucket
+    if (!ALLOWED_BUCKETS.includes(bucket)) {
+      return res.status(400).json({ error: 'Invalid bucket' })
+    }
+
+    await ensureBucket(bucket)
+
+    const { data, error } = await supabaseAdmin.storage.from(bucket).list('', {
+      limit: 100,
+      sortBy: { column: 'name', order: 'asc' },
+    })
+
+    if (error) {
+      console.warn('[Uploads] Error listing folders:', error.message)
+      return res.json({ folders: ['news', 'events', 'innovations', 'gallery', 'general'] })
+    }
+
+    // Folders in Supabase Storage have id === null or are objects with no metadata
+    const discoveredFolders = (data || [])
+      .filter((item: any) => !item.id || item.metadata === null || !item.name.includes('.'))
+      .map((item: any) => item.name)
+
+    const defaultFolders = ['news', 'events', 'innovations', 'gallery', 'general']
+    const combined = Array.from(new Set([...defaultFolders, ...discoveredFolders]))
+
+    res.json({ folders: combined })
+  } catch (err) {
+    next(err)
+  }
+})
 
 export default adminUploadsRouter
 

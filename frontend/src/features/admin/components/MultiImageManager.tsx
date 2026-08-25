@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useSignedUpload, StorageBucket } from '../../../hooks/useSignedUpload'
+import { adminApi } from '../../../../axios/axios'
 
 export interface ManagedImage {
   id?: string
@@ -152,6 +153,22 @@ export function MultiImageManager({
   const { uploadMultipleFiles, uploading, progress, error } = useSignedUpload()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [selectedFolder, setSelectedFolder] = useState<string>(bucket === 'innovation-images' ? 'innovations' : 'news')
+  const [customFolder, setCustomFolder] = useState<string>('')
+  const [isCustom, setIsCustom] = useState(false)
+  const [availableFolders, setAvailableFolders] = useState<string[]>(['news', 'events', 'innovations', 'gallery', 'general'])
+
+  // Fetch available folders in Supabase on mount
+  React.useEffect(() => {
+    adminApi
+      .get<{ folders: string[] }>(`/api/v1/admin/uploads/folders?bucket=${bucket}`)
+      .then((res) => {
+        if (res.data?.folders && res.data.folders.length > 0) {
+          setAvailableFolders(res.data.folders)
+        }
+      })
+      .catch(() => {})
+  }, [bucket])
 
   // Normalize image items
   const normalizedImages: ManagedImage[] = images.map((img, idx) => {
@@ -195,15 +212,20 @@ export function MultiImageManager({
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return
     const fileArray = Array.from(files)
+    const effectiveFolder = isCustom && customFolder.trim() ? customFolder.trim() : selectedFolder
 
     try {
-      const uploadResults = await uploadMultipleFiles(fileArray, bucket)
+      const uploadResults = await uploadMultipleFiles(fileArray, bucket, effectiveFolder)
       const newItems: ManagedImage[] = uploadResults.map((res, i) => ({
         id: `uploaded-${Date.now()}-${i}`,
         url: res.url,
         order: normalizedImages.length + i,
       }))
       onChange([...normalizedImages, ...newItems])
+      
+      if (isCustom && customFolder.trim() && !availableFolders.includes(customFolder.trim())) {
+        setAvailableFolders((prev) => [...prev, customFolder.trim()])
+      }
     } catch (err) {
       console.error('Failed to upload selected files:', err)
     } finally {
@@ -239,6 +261,91 @@ export function MultiImageManager({
             {normalizedImages.length} image{normalizedImages.length === 1 ? '' : 's'} added
           </span>
         )}
+      </div>
+
+      {/* Supabase Storage Folder Selector & Creator */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: '0.6rem',
+          backgroundColor: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          padding: '0.5rem 0.75rem',
+          marginBottom: '0.75rem',
+          fontSize: '0.85rem',
+        }}
+      >
+        <span style={{ fontWeight: 600, color: '#334155', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          📁 Storage Folder:
+        </span>
+
+        {!isCustom ? (
+          <select
+            value={selectedFolder}
+            onChange={(e) => {
+              if (e.target.value === '__new__') {
+                setIsCustom(true)
+              } else {
+                setSelectedFolder(e.target.value)
+              }
+            }}
+            style={{
+              padding: '3px 8px',
+              fontSize: '0.83rem',
+              borderRadius: '5px',
+              border: '1px solid #cbd5e1',
+              backgroundColor: '#ffffff',
+              color: '#0f172a',
+              fontWeight: 500,
+            }}
+          >
+            {availableFolders.map((f) => (
+              <option key={f} value={f}>
+                📂 {f}
+              </option>
+            ))}
+            <option value="__new__">➕ + Create New Folder in Supabase...</option>
+          </select>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <input
+              type="text"
+              placeholder="e.g. hackathon-2026 or events/summit"
+              value={customFolder}
+              onChange={(e) => setCustomFolder(e.target.value)}
+              style={{
+                padding: '3px 8px',
+                fontSize: '0.83rem',
+                borderRadius: '5px',
+                border: '1px solid var(--jhub-green, #10b981)',
+                backgroundColor: '#ffffff',
+                color: '#0f172a',
+                width: '200px',
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setIsCustom(false)}
+              style={{
+                padding: '2px 6px',
+                fontSize: '0.75rem',
+                borderRadius: '4px',
+                border: '1px solid #cbd5e1',
+                backgroundColor: '#ffffff',
+                cursor: 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        <span style={{ fontSize: '0.78rem', color: '#64748b', marginLeft: 'auto' }}>
+          Uploaded files will be saved in <code>{bucket}/{isCustom && customFolder ? customFolder : selectedFolder}/</code>
+        </span>
       </div>
 
       <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.85rem', color: '#64748b' }}>{helperText}</p>
