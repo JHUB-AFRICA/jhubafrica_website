@@ -50,16 +50,26 @@ export function RichTextEditor({
     const file = e.target.files?.[0]
     if (!file) return
 
+    const caption = window.prompt('Enter Image Caption (optional, displayed below the image):') || ''
+
     try {
       const result = await uploadFile(file, bucket)
-      editor.chain().focus().setImage({ src: result.url, alt: file.name }).run()
+      editor.chain().focus().setImage({
+        src: result.url,
+        alt: caption || file.name,
+        title: caption,
+      }).run()
     } catch (err) {
       console.error('Failed to upload image into editor:', err)
       // Fallback: FileReader Base64 if storage is unreachable
       const reader = new FileReader()
       reader.onload = () => {
         if (typeof reader.result === 'string') {
-          editor.chain().focus().setImage({ src: reader.result, alt: file.name }).run()
+          editor.chain().focus().setImage({
+            src: reader.result,
+            alt: caption || file.name,
+            title: caption,
+          }).run()
         }
       }
       reader.readAsDataURL(file)
@@ -71,7 +81,12 @@ export function RichTextEditor({
   const addImageByUrl = () => {
     const url = window.prompt('Enter Image URL:')
     if (url && url.trim()) {
-      editor.chain().focus().setImage({ src: url.trim() }).run()
+      const caption = window.prompt('Enter Image Caption (optional, displayed below the image):') || ''
+      editor.chain().focus().setImage({
+        src: url.trim(),
+        alt: caption,
+        title: caption,
+      }).run()
     }
   }
 

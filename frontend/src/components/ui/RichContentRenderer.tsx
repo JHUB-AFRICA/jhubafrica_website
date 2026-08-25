@@ -86,17 +86,49 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
         </blockquote>
       )
 
-    case 'image':
+    case 'image': {
+      const caption = node.attrs?.title || node.attrs?.alt || ''
       return (
-        <div key={index} style={{ margin: '1.5rem 0', borderRadius: '8px', overflow: 'hidden' }}>
+        <figure
+          key={index}
+          style={{
+            margin: '2rem auto',
+            maxWidth: '80%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+        >
           <img
             src={node.attrs?.src}
-            alt={node.attrs?.alt || ''}
-            title={node.attrs?.title || ''}
-            style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+            alt={caption}
+            title={caption}
+            style={{
+              maxWidth: '100%',
+              maxHeight: '440px',
+              objectFit: 'contain',
+              borderRadius: '10px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.07)',
+            }}
           />
-        </div>
+          {caption && caption.trim().length > 0 && (
+            <figcaption
+              style={{
+                marginTop: '0.65rem',
+                fontSize: '0.88rem',
+                color: '#64748b',
+                fontStyle: 'italic',
+                lineHeight: '1.45',
+                padding: '0 0.5rem',
+              }}
+            >
+              {caption}
+            </figcaption>
+          )}
+        </figure>
       )
+    }
 
     case 'horizontalRule':
       return <hr key={index} style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '2rem 0' }} />

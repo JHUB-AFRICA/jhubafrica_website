@@ -277,7 +277,7 @@ function NewsDetailPage() {
           }}
         >
           <span style={{ width: "24px", height: "2px", backgroundColor: "var(--jhub-green)" }}></span>
-          By JHUB Editorial Team
+          By {post.author || "JHUB Editorial Team"}
         </div>
 
         {/* Article Body Content (Supports TipTap Rich JSON & Plaintext) */}

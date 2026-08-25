@@ -326,6 +326,27 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
           onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
           className={styles['input-style']}
         />
+        <InputField
+          label="Author (Written By)"
+          placeholder="e.g. Dr. Jane Mwangi or JHUB Editorial Team"
+          value={draft.author || ""}
+          onChange={(e) => setDraft({ ...draft, author: e.target.value })}
+          className={styles['input-style']}
+        />
+        <InputField
+          type="date"
+          label="Publication Date"
+          value={draft.publishedAt || ""}
+          onChange={(e) => {
+            const ymd = e.target.value;
+            const d = new Date(ymd);
+            const formatted = isNaN(d.getTime())
+              ? ymd
+              : d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+            setDraft({ ...draft, publishedAt: ymd, date: formatted });
+          }}
+          className={styles['input-style']}
+        />
         <SelectField
           label="Publication Status"
           value={draft.status || "PUBLISHED"}

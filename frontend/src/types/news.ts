@@ -9,7 +9,9 @@ export interface NewsPost {
   slug: string;
   tag: string;
   title: string;
+  author?: string;
   date: string;
+  publishedAt?: string;
   body: string;
   contentJson?: any;
   excerpt: string;

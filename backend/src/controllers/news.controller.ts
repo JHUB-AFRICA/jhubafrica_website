@@ -13,7 +13,7 @@ export async function getNews(req: Request, res: Response, next: NextFunction) {
     let query = supabase
       .from('posts')
       .select(`
-        id, slug, title, content, excerpt, category, published_at,
+        id, slug, title, author, content, excerpt, category, published_at,
         is_featured, is_published, cover_image_url, tags,
         post_images ( id, url, order )
       `, { count: 'exact' })
@@ -28,7 +28,7 @@ export async function getNews(req: Request, res: Response, next: NextFunction) {
 
     let result = await query
 
-    // Fallback if post_images relation does not exist in Supabase DB yet
+    // Fallback if post_images relation or author column does not exist in Supabase DB yet
     if (result.error) {
       console.warn('[getNews fallback query triggered]:', result.error.message)
       let fallbackQuery = supabase
@@ -48,9 +48,10 @@ export async function getNews(req: Request, res: Response, next: NextFunction) {
 
     const { data, count } = result
 
-    // Normalize post_images
+    // Normalize post_images & author
     const mapped = (data || []).map((p: any) => ({
       ...p,
+      author: p.author || 'JHUB Editorial Team',
       images: Array.isArray(p.post_images)
         ? p.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
         : (p.cover_image_url ? [{ url: p.cover_image_url, order: 0 }] : []),
@@ -137,6 +138,7 @@ export async function getArticleBySlug(req: Request, res: Response, next: NextFu
 
       return {
         ...res.data,
+        author: res.data.author || 'JHUB Editorial Team',
         images: Array.isArray(res.data.post_images)
           ? res.data.post_images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
           : (res.data.cover_image_url ? [{ url: res.data.cover_image_url, order: 0 }] : []),

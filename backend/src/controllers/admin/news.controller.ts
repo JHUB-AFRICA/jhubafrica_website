@@ -140,6 +140,7 @@ export async function createAdminPost(req: Request, res: Response, next: NextFun
 
     const {
       title,
+      author,
       excerpt,
       content,
       contentJson,
@@ -164,6 +165,7 @@ export async function createAdminPost(req: Request, res: Response, next: NextFun
       id: newPostId,
       slug,
       title,
+      author: author || 'JHUB Editorial Team',
       excerpt: effectiveExcerpt || null,
       content: content || '',
       content_json: contentJson || null,
@@ -276,6 +278,7 @@ export async function updateAdminPost(req: Request, res: Response, next: NextFun
     const { id } = req.params
     const {
       title,
+      author,
       excerpt,
       content,
       contentJson,
@@ -302,6 +305,9 @@ export async function updateAdminPost(req: Request, res: Response, next: NextFun
       updates.title = title
       const slugify = (await import('slugify')).default
       updates.slug = slugify(title, { lower: true, strict: true })
+    }
+    if (author !== undefined) {
+      updates.author = author || 'JHUB Editorial Team'
     }
     if (excerpt !== undefined) {
       updates.excerpt = excerpt && excerpt.trim() ? excerpt.trim() : generateExcerpt(content, contentJson, 140)

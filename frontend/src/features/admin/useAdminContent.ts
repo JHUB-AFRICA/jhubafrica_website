@@ -45,7 +45,9 @@ export function getEmptyNews(): Omit<NewsPost, "id"> {
     return {
         tag: "Announcement",
         title: "",
+        author: "JHUB Editorial Team",
         date: today,
+        publishedAt: new Date().toISOString().split("T")[0],
         body: "",
         contentJson: null,
         excerpt: "",
@@ -135,6 +137,7 @@ export function useNewsAdmin() {
             try {
                 const payload = {
                     ...draft,
+                    author: draft.author && draft.author.trim() ? draft.author.trim() : "JHUB Editorial Team",
                     excerpt: effectiveExcerpt,
                 };
 
@@ -159,7 +162,25 @@ export function useNewsAdmin() {
     );
 
     const edit = useCallback((post: NewsPost) => {
-        setDraft(post);
+        const rawImages: any[] = post.images && post.images.length > 0
+            ? post.images
+            : (post.image ? [{ id: "img-0", url: post.image, order: 0 }] : []);
+
+        let formattedYmd = "";
+        if (post.publishedAt) {
+            formattedYmd = post.publishedAt.split("T")[0];
+        } else if (post.date) {
+            const d = new Date(post.date);
+            if (!isNaN(d.getTime())) formattedYmd = d.toISOString().split("T")[0];
+        }
+
+        setDraft({
+            ...post,
+            author: post.author || "JHUB Editorial Team",
+            publishedAt: formattedYmd || new Date().toISOString().split("T")[0],
+            images: rawImages,
+            image: rawImages[0]?.url || post.image || "",
+        });
         window.scrollTo({ top: 300, behavior: "smooth" });
     }, []);
 

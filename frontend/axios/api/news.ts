@@ -2,11 +2,17 @@ import { api, adminApi } from "../axios";
 import { NewsPost, PostImageItem } from "../../src/types/news";
 
 const mapNews = (item: any): NewsPost => {
-  const publishedAt = item.published_at || item.publishedAt;
-  const dateObj = new Date(publishedAt);
-  const formattedDate = isNaN(dateObj.getTime())
-    ? "Recent"
-    : dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const rawPublishedAt = item.published_at || item.publishedAt;
+  let formattedDate = "";
+  
+  if (rawPublishedAt) {
+    const dateObj = new Date(rawPublishedAt);
+    formattedDate = isNaN(dateObj.getTime())
+      ? rawPublishedAt
+      : dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  } else {
+    formattedDate = item.date || "Recent";
+  }
 
   const categoryToTag: Record<string, string> = {
     news: "News",
@@ -48,7 +54,9 @@ const mapNews = (item: any): NewsPost => {
     slug: item.slug || "",
     tag,
     title: item.title,
+    author: item.author || item.author_name || "JHUB Editorial Team",
     date: formattedDate,
+    publishedAt: rawPublishedAt || undefined,
     body: item.content || "",
     contentJson: item.content_json || item.contentJson || null,
     excerpt: item.excerpt || "",
@@ -73,8 +81,19 @@ const mapToBackendNews = (post: Omit<NewsPost, "id">) => {
   const coverImageUrl = post.image || post.images?.[0]?.url || "";
   const status = post.status || "PUBLISHED";
 
+  // Parse ISO date from post.publishedAt or post.date
+  let publishedAtISO: string | null = null;
+  if (post.publishedAt) {
+    const d = new Date(post.publishedAt);
+    if (!isNaN(d.getTime())) publishedAtISO = d.toISOString();
+  } else if (post.date) {
+    const d = new Date(post.date);
+    if (!isNaN(d.getTime())) publishedAtISO = d.toISOString();
+  }
+
   return {
     title: post.title,
+    author: post.author || "JHUB Editorial Team",
     content: post.body && post.body.length >= 10 ? post.body : (post.body || "").padEnd(10, " "),
     contentJson: post.contentJson || null,
     excerpt: post.excerpt || "",
@@ -82,6 +101,7 @@ const mapToBackendNews = (post: Omit<NewsPost, "id">) => {
     status,
     isPublished: status === "PUBLISHED",
     isFeatured: post.titleColor === "red",
+    publishedAt: publishedAtISO,
     coverImageUrl,
     images: (post.images || []).map((img, idx) => ({
       url: typeof img === "string" ? img : img.url,
