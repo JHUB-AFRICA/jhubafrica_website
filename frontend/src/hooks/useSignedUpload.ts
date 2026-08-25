@@ -20,39 +20,63 @@ export function useSignedUpload() {
       setProgress(10)
 
       try {
-        // 1. Request signed URL from backend admin endpoint
-        const signResponse = await adminApi.post<{
-          signedUrl: string
-          publicUrl: string
-          path: string
-          token: string
-        }>('/api/v1/admin/uploads/sign', {
-          bucket,
-          filename: file.name,
-          contentType: file.type,
-        })
+        // Strategy A: Request signed URL for direct binary client-to-Supabase upload
+        try {
+          const signResponse = await adminApi.post<{
+            signedUrl: string
+            publicUrl: string
+            path: string
+            token: string
+          }>('/api/v1/admin/uploads/sign', {
+            bucket,
+            filename: file.name,
+            contentType: file.type,
+          })
 
-        const { signedUrl, publicUrl, path } = signResponse.data
-        setProgress(40)
+          const { signedUrl, publicUrl, path } = signResponse.data
+          setProgress(40)
 
-        // 2. Binary PUT directly to Supabase Storage (bypasses server body parser limit)
-        const uploadRes = await fetch(signedUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': file.type || 'application/octet-stream',
-          },
-          body: file,
-        })
+          const uploadRes = await fetch(signedUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': file.type || 'application/octet-stream',
+            },
+            body: file,
+          })
 
-        if (!uploadRes.ok) {
-          throw new Error(`Upload to storage failed with status ${uploadRes.status}: ${uploadRes.statusText}`)
+          if (uploadRes.ok) {
+            setProgress(100)
+            return {
+              url: publicUrl,
+              path,
+            }
+          }
+        } catch (signedErr) {
+          console.warn('[useSignedUpload] Signed URL upload failed, attempting direct backend fallback...', signedErr)
         }
+
+        // Strategy B: Direct fallback upload via backend service role
+        setProgress(50)
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('bucket', bucket)
+
+        const directRes = await adminApi.post<{ url: string; path: string }>(
+          '/api/v1/admin/uploads/direct',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: (progressEvent) => {
+              const percent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || file.size))
+              setProgress(percent)
+            },
+          }
+        )
 
         setProgress(100)
-        return {
-          url: publicUrl,
-          path,
-        }
+        return directRes.data
       } catch (err: any) {
         console.error('[useSignedUpload Error]:', err)
         const msg = err?.response?.data?.error || err?.message || 'Failed to upload image'

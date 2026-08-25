@@ -368,16 +368,6 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
           <option value="green">Title: Green</option>
           <option value="red">Title: Red (Featured)</option>
         </SelectField>
-        <TextareaField
-          required
-          rows={2}
-          label="Summary (Excerpt)"
-          placeholder="Brief summary displayed on the card (max 150 chars)"
-          value={draft.excerpt}
-          onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })}
-          className={styles['input-style']} style={{ gridColumn: "1 / -1", resize: "vertical" }}
-        />
-
         {/* TipTap Rich Text Editor for Content Story */}
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={{ display: "block", fontWeight: 600, marginBottom: "0.5rem", color: "#1e293b", fontSize: "0.95rem" }}>
@@ -387,13 +377,56 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
             content={draft.body}
             jsonContent={draft.contentJson}
             onChange={(html, json) => {
-              setDraft({
-                ...draft,
+              // Auto-generate excerpt if excerpt is empty or unmodified
+              const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+              const autoExcerpt = plain.length > 140 ? plain.substring(0, 140).trim() + "..." : plain;
+
+              setDraft((prev: any) => ({
+                ...prev,
                 body: html,
                 contentJson: json,
-              });
+                excerpt: (!prev.excerpt || prev.isExcerptAuto) ? autoExcerpt : prev.excerpt,
+                isExcerptAuto: !prev.excerpt || prev.isExcerptAuto,
+              }));
             }}
             placeholder="Write the full story, add subheadings, quotes, lists..."
+          />
+        </div>
+
+        {/* Auto-extracted Summary Excerpt Field */}
+        <div style={{ gridColumn: "1 / -1" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
+            <label style={{ fontWeight: 600, color: "#1e293b", fontSize: "0.95rem" }}>
+              Summary / Excerpt <span style={{ fontWeight: 400, color: "#64748b", fontSize: "0.85rem" }}>(Auto-extracted from story for card display)</span>
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                const plain = (draft.body || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+                const autoExcerpt = plain.length > 140 ? plain.substring(0, 140).trim() + "..." : plain;
+                setDraft((prev: any) => ({ ...prev, excerpt: autoExcerpt, isExcerptAuto: true }));
+              }}
+              style={{
+                fontSize: "0.8rem",
+                color: "var(--jhub-blue, #0f2d59)",
+                background: "#f1f5f9",
+                border: "1px solid #cbd5e1",
+                borderRadius: "4px",
+                padding: "3px 10px",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              🔄 Auto-extract from story
+            </button>
+          </div>
+          <textarea
+            rows={2}
+            placeholder="Auto-extracted snippet from full story (max 150 chars)..."
+            value={draft.excerpt}
+            onChange={(e) => setDraft((prev: any) => ({ ...prev, excerpt: e.target.value, isExcerptAuto: false }))}
+            className={styles['input-style']}
+            style={{ width: "100%", resize: "vertical" }}
           />
         </div>
 

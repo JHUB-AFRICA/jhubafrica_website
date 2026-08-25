@@ -593,9 +593,10 @@ function Index() {
             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               {news.slice(0, 3).map((post) => {
                 const cardImg = post.image || "https://images.unsplash.com/photo-1495020689067-958852a6565d?auto=format&fit=crop&q=80&w=600";
-                const displayExcerpt = post.excerpt && post.excerpt.trim().length > 0
-                  ? post.excerpt
-                  : post.body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().substring(0, 95) + "...";
+                const rawText = (post.excerpt && post.excerpt.trim().length > 0)
+                  ? post.excerpt.trim()
+                  : post.body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+                const displayExcerpt = rawText.length > 105 ? rawText.substring(0, 105).trim() + "..." : rawText;
 
                 return (
                   <Link

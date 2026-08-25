@@ -49,9 +49,12 @@ export const Route = createFileRoute("/news/")({
 });
 
 function cleanAndSliceExcerpt(htmlOrText: string, maxLength: number = 140) {
+  if (!htmlOrText) return "";
   const plainText = htmlOrText.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   if (plainText.length <= maxLength) return plainText;
-  return plainText.substring(0, maxLength) + "...";
+  const sub = plainText.substring(0, maxLength);
+  const lastSpace = sub.lastIndexOf(" ");
+  return (lastSpace > 60 ? sub.substring(0, lastSpace) : sub).trim() + "...";
 }
 
 function NewsIndexPage() {

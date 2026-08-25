@@ -120,16 +120,28 @@ export function useNewsAdmin() {
     const submit = useCallback(
         async (e: FormEvent) => {
             e.preventDefault();
-            if (!draft.title.trim() || !draft.body.trim() || !draft.excerpt.trim()) return;
+            if (!draft.title.trim() || !draft.body.trim()) return;
+
+            // Auto-generate clean excerpt if left empty
+            let effectiveExcerpt = draft.excerpt.trim();
+            if (!effectiveExcerpt) {
+                const plain = draft.body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+                effectiveExcerpt = plain.length > 140 ? plain.substring(0, 140).trim() + "..." : plain;
+            }
 
             setSubmitting(true);
             setMsg("Saving...");
 
             try {
+                const payload = {
+                    ...draft,
+                    excerpt: effectiveExcerpt,
+                };
+
                 if ("id" in draft && draft.id) {
-                    await updateNews(draft as NewsPost);
+                    await updateNews(payload as NewsPost);
                 } else {
-                    await addNews(draft as Omit<NewsPost, "id">);
+                    await addNews(payload as Omit<NewsPost, "id">);
                 }
 
                 await router.invalidate();

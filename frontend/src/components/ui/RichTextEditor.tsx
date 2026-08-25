@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import ImageExtension from '@tiptap/extension-image'
+import { useSignedUpload, StorageBucket } from '../../hooks/useSignedUpload'
 
 interface RichTextEditorProps {
   content?: string
@@ -9,6 +10,7 @@ interface RichTextEditorProps {
   onChange: (html: string, json: any) => void
   placeholder?: string
   minHeight?: string
+  bucket?: StorageBucket
 }
 
 export function RichTextEditor({
@@ -16,8 +18,12 @@ export function RichTextEditor({
   jsonContent,
   onChange,
   placeholder = 'Write your content here...',
-  minHeight = '220px',
+  minHeight = '240px',
+  bucket = 'post-images',
 }: RichTextEditorProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { uploadFile, uploading, error: uploadError } = useSignedUpload()
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -40,10 +46,32 @@ export function RichTextEditor({
     return <div style={{ padding: '1rem', color: '#94a3b8' }}>Loading editor...</div>
   }
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      const result = await uploadFile(file, bucket)
+      editor.chain().focus().setImage({ src: result.url, alt: file.name }).run()
+    } catch (err) {
+      console.error('Failed to upload image into editor:', err)
+      // Fallback: FileReader Base64 if storage is unreachable
+      const reader = new FileReader()
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          editor.chain().focus().setImage({ src: reader.result, alt: file.name }).run()
+        }
+      }
+      reader.readAsDataURL(file)
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
   const addImageByUrl = () => {
     const url = window.prompt('Enter Image URL:')
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run()
+    if (url && url.trim()) {
+      editor.chain().focus().setImage({ src: url.trim() }).run()
     }
   }
 
@@ -58,6 +86,15 @@ export function RichTextEditor({
         flexDirection: 'column',
       }}
     >
+      {/* Hidden File Input for Direct Computer Uploads */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+        onChange={handleFileUpload}
+        style={{ display: 'none' }}
+      />
+
       {/* Toolbar */}
       <div
         style={{
@@ -209,21 +246,52 @@ export function RichTextEditor({
 
         <div style={{ width: '1px', height: '18px', backgroundColor: '#cbd5e1', margin: '0 4px' }} />
 
+        {/* Upload Image From Computer Button */}
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => fileInputRef.current?.click()}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '4px 9px',
+            fontSize: '0.83rem',
+            fontWeight: 600,
+            backgroundColor: '#f1f5f9',
+            border: '1px solid #cbd5e1',
+            borderRadius: '4px',
+            cursor: uploading ? 'wait' : 'pointer',
+            color: 'var(--jhub-blue, #0f2d59)',
+          }}
+          title="Upload image from computer and insert at cursor"
+        >
+          {uploading ? '⏳ Uploading...' : '📷 Upload Image'}
+        </button>
+
+        {/* Insert Image URL Button */}
         <button
           type="button"
           onClick={addImageByUrl}
           style={{
             padding: '4px 8px',
-            fontSize: '0.85rem',
+            fontSize: '0.83rem',
             backgroundColor: 'transparent',
             border: '1px solid transparent',
             borderRadius: '4px',
             cursor: 'pointer',
+            color: 'var(--text-muted, #64748b)',
           }}
-          title="Insert Image"
+          title="Insert image by URL"
         >
-          🖼 Insert Image
+          🔗 Image URL
         </button>
+
+        {uploadError && (
+          <span style={{ fontSize: '0.75rem', color: '#ef4444', marginLeft: '4px' }}>
+            {uploadError}
+          </span>
+        )}
 
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
           <button
@@ -263,7 +331,13 @@ export function RichTextEditor({
 
       {/* Editor Content Area */}
       <div style={{ padding: '1rem', minHeight }}>
-        <EditorContent editor={editor} style={{ outline: 'none', minHeight: '180px' }} />
+        <EditorContent
+          editor={editor}
+          style={{
+            outline: 'none',
+            minHeight: '180px',
+          }}
+        />
       </div>
     </div>
   )
