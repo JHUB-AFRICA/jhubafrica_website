@@ -21,11 +21,11 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
     case 'paragraph': {
       const hasContent = node.content && node.content.length > 0
       return (
-        <p key={index} style={{ marginBottom: '1.25rem', lineHeight: '1.8' }}>
+        <p key={index} style={{ marginBottom: '1.5rem', lineHeight: '1.85', minHeight: '1.25rem' }}>
           {hasContent ? (
             node.content.map((child: any, i: number) => renderTipTapNode(child, i))
           ) : (
-            <br />
+            <>&nbsp;</>
           )}
         </p>
       )
@@ -44,21 +44,23 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
         lineHeight: 1.3,
       }
 
-      if (level === 2) return <h2 key={index} style={{ ...headingStyle, fontSize: '1.75rem' }}>{headingContent}</h2>
-      if (level === 3) return <h3 key={index} style={{ ...headingStyle, fontSize: '1.4rem' }}>{headingContent}</h3>
-      return <h4 key={index} style={{ ...headingStyle, fontSize: '1.2rem' }}>{headingContent}</h4>
+      if (level === 1) return <h1 key={index} style={{ ...headingStyle, fontSize: '2rem' }}>{headingContent}</h1>
+      if (level === 2) return <h2 key={index} style={{ ...headingStyle, fontSize: '1.65rem' }}>{headingContent}</h2>
+      if (level === 3) return <h3 key={index} style={{ ...headingStyle, fontSize: '1.35rem' }}>{headingContent}</h3>
+      if (level === 4) return <h4 key={index} style={{ ...headingStyle, fontSize: '1.15rem' }}>{headingContent}</h4>
+      return <h5 key={index} style={{ ...headingStyle, fontSize: '1.05rem' }}>{headingContent}</h5>
     }
 
     case 'bulletList':
       return (
-        <ul key={index} style={{ paddingLeft: '1.5rem', marginBottom: '1.25rem', lineHeight: '1.8' }}>
+        <ul key={index} style={{ paddingLeft: '1.75rem', marginBottom: '1.25rem', lineHeight: '1.8', listStyleType: 'disc' }}>
           {(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}
         </ul>
       )
 
     case 'orderedList':
       return (
-        <ol key={index} style={{ paddingLeft: '1.5rem', marginBottom: '1.25rem', lineHeight: '1.8' }}>
+        <ol key={index} style={{ paddingLeft: '1.75rem', marginBottom: '1.25rem', lineHeight: '1.8', listStyleType: 'decimal' }}>
           {(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}
         </ol>
       )
@@ -76,14 +78,37 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
           key={index}
           style={{
             borderLeft: '4px solid var(--jhub-green, #10b981)',
-            paddingLeft: '1rem',
+            paddingLeft: '1.25rem',
             margin: '1.5rem 0',
             fontStyle: 'italic',
             color: '#475569',
+            backgroundColor: '#f8fafc',
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem',
+            borderRadius: '0 6px 6px 0',
           }}
         >
           {(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}
         </blockquote>
+      )
+
+    case 'codeBlock':
+      return (
+        <pre
+          key={index}
+          style={{
+            backgroundColor: '#0f172a',
+            color: '#f8fafc',
+            padding: '1rem',
+            borderRadius: '8px',
+            overflowX: 'auto',
+            margin: '1.5rem 0',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: '0.9rem',
+          }}
+        >
+          <code>{(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}</code>
+        </pre>
       )
 
     case 'image': {
@@ -106,7 +131,7 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
             title={caption}
             style={{
               maxWidth: '100%',
-              maxHeight: '440px',
+              maxHeight: '420px',
               objectFit: 'contain',
               borderRadius: '10px',
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.07)',
@@ -147,6 +172,26 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
           if (mark.type === 'strike') {
             textElement = <s key="s">{textElement}</s>
           }
+          if (mark.type === 'underline') {
+            textElement = <u key="u">{textElement}</u>
+          }
+          if (mark.type === 'code') {
+            textElement = (
+              <code
+                key="code"
+                style={{
+                  backgroundColor: '#f1f5f9',
+                  color: '#0f172a',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  fontFamily: 'ui-monospace, monospace',
+                  fontSize: '0.9em',
+                }}
+              >
+                {textElement}
+              </code>
+            )
+          }
           if (mark.type === 'link') {
             textElement = (
               <a
@@ -180,13 +225,15 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
 export function RichContentRenderer({
   content,
   contentJson,
-  className,
+  className = '',
   style,
 }: RichContentRendererProps) {
+  const combinedClass = `rich-story-content ${className}`.trim()
+
   // If TipTap JSON is present, render structured AST
   if (contentJson && typeof contentJson === 'object' && contentJson.type === 'doc') {
     return (
-      <div className={className} style={{ fontSize: '1.1rem', color: '#334155', ...style }}>
+      <div className={combinedClass} style={{ fontSize: '1.1rem', color: '#334155', ...style }}>
         {renderTipTapNode(contentJson, 0)}
       </div>
     )
@@ -196,7 +243,7 @@ export function RichContentRenderer({
   if (content && (content.includes('<p>') || content.includes('<h2>') || content.includes('<div>'))) {
     return (
       <div
-        className={className}
+        className={combinedClass}
         style={{ fontSize: '1.1rem', color: '#334155', ...style }}
         dangerouslySetInnerHTML={{ __html: content }}
       />
@@ -208,13 +255,20 @@ export function RichContentRenderer({
     return <p style={{ fontStyle: 'italic', color: '#94a3b8' }}>No content available.</p>
   }
 
+  const paragraphs = content.split(/\n\s*\n/)
   return (
-    <div className={className} style={{ fontSize: '1.1rem', color: '#334155', ...style }}>
-      {content.split('\n\n').map((paragraph: string, index: number) => (
-        <p key={index} style={{ marginBottom: '1.5rem', lineHeight: '1.8' }}>
-          {paragraph}
-        </p>
-      ))}
+    <div className={combinedClass} style={{ fontSize: '1.1rem', color: '#334155', ...style }}>
+      {paragraphs.map((paragraph: string, index: number) => {
+        const trimmed = paragraph.trim()
+        if (!trimmed) {
+          return <p key={index} style={{ marginBottom: '1.5rem', minHeight: '1.25rem' }}>&nbsp;</p>
+        }
+        return (
+          <p key={index} style={{ marginBottom: '1.5rem', lineHeight: '1.85' }}>
+            {trimmed}
+          </p>
+        )
+      })}
     </div>
   )
 }

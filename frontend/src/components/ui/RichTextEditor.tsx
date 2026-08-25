@@ -2,6 +2,8 @@ import React, { useRef } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import ImageExtension from '@tiptap/extension-image'
+import LinkExtension from '@tiptap/extension-link'
+import UnderlineExtension from '@tiptap/extension-underline'
 import { useSignedUpload, StorageBucket } from '../../hooks/useSignedUpload'
 
 interface RichTextEditorProps {
@@ -30,7 +32,17 @@ export function RichTextEditor({
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [2, 3, 4],
+          levels: [1, 2, 3, 4, 5, 6],
+        },
+      }),
+      UnderlineExtension,
+      LinkExtension.configure({
+        openOnClick: false,
+        autolink: true,
+        defaultProtocol: 'https',
+        HTMLAttributes: {
+          target: '_blank',
+          rel: 'noopener noreferrer',
         },
       }),
       ImageExtension.configure({
@@ -38,11 +50,71 @@ export function RichTextEditor({
         allowBase64: true,
       }),
     ],
+    editorProps: {
+      attributes: {
+        class: 'ProseMirror',
+      },
+      transformPastedHTML(html) {
+        return html
+      },
+      transformPastedText(text) {
+        return text
+      },
+      handlePaste(view, event) {
+        const items = event.clipboardData?.items
+        if (items) {
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+              const file = items[i].getAsFile()
+              if (file) {
+                const reader = new FileReader()
+                reader.onload = () => {
+                  if (typeof reader.result === 'string') {
+                    view.dispatch(
+                      view.state.tr.replaceSelectionWith(
+                        view.state.schema.nodes.image.create({ src: reader.result })
+                      )
+                    )
+                  }
+                }
+                reader.readAsDataURL(file)
+                return true
+              }
+            }
+          }
+        }
+        return false
+      },
+    },
+    parseOptions: {
+      preserveWhitespace: 'full',
+    },
     content: jsonContent || content || '',
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML(), editor.getJSON())
     },
   })
+
+  // Synchronize editor content when incoming props change (e.g., clicking Edit on a post or Reset)
+  React.useEffect(() => {
+    if (!editor || editor.isDestroyed) return
+
+    const incoming = jsonContent || content || ''
+
+    if (incoming && typeof incoming === 'object' && incoming.type === 'doc') {
+      const currentJSON = JSON.stringify(editor.getJSON())
+      const incomingJSON = JSON.stringify(incoming)
+      if (currentJSON !== incomingJSON) {
+        editor.commands.setContent(incoming, { emitUpdate: false })
+      }
+    } else {
+      const incomingStr = typeof incoming === 'string' ? incoming : ''
+      const currentHTML = editor.getHTML()
+      if (incomingStr !== currentHTML) {
+        editor.commands.setContent(incomingStr, { emitUpdate: false })
+      }
+    }
+  }, [content, jsonContent, editor])
 
   if (!editor) {
     return <div style={{ padding: '1rem', color: '#94a3b8' }}>Loading editor...</div>
@@ -92,6 +164,18 @@ export function RichTextEditor({
     }
   }
 
+  const setLink = () => {
+    const previousUrl = editor.getAttributes('link').href || ''
+    const url = window.prompt('Enter or edit link URL:', previousUrl)
+    if (url === null) return
+    if (url.trim() === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run()
+      return
+    }
+    const formattedUrl = url.trim().match(/^https?:\/\//i) ? url.trim() : `https://${url.trim()}`
+    editor.chain().focus().extendMarkRange('link').setLink({ href: formattedUrl }).run()
+  }
+
   return (
     <div
       style={{
@@ -136,7 +220,7 @@ export function RichTextEditor({
             borderRadius: '4px',
             cursor: 'pointer',
           }}
-          title="Bold"
+          title="Bold (Ctrl+B)"
         >
           <strong>B</strong>
         </button>
@@ -153,9 +237,26 @@ export function RichTextEditor({
             borderRadius: '4px',
             cursor: 'pointer',
           }}
-          title="Italic"
+          title="Italic (Ctrl+I)"
         >
           <em>I</em>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          style={{
+            padding: '4px 8px',
+            fontSize: '0.85rem',
+            textDecoration: 'underline',
+            backgroundColor: editor.isActive('underline') ? '#e2e8f0' : 'transparent',
+            border: '1px solid transparent',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+          title="Underline (Ctrl+U)"
+        >
+          <u>U</u>
         </button>
 
         <button
@@ -172,10 +273,27 @@ export function RichTextEditor({
           }}
           title="Strikethrough"
         >
-          S
+          <s>S</s>
         </button>
 
         <div style={{ width: '1px', height: '18px', backgroundColor: '#cbd5e1', margin: '0 4px' }} />
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          style={{
+            padding: '4px 8px',
+            fontSize: '0.85rem',
+            fontWeight: 700,
+            backgroundColor: editor.isActive('heading', { level: 1 }) ? '#e2e8f0' : 'transparent',
+            border: '1px solid transparent',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+          title="Heading 1"
+        >
+          H1
+        </button>
 
         <button
           type="button"
@@ -209,6 +327,23 @@ export function RichTextEditor({
           title="Heading 3"
         >
           H3
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
+          style={{
+            padding: '4px 8px',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            backgroundColor: editor.isActive('heading', { level: 4 }) ? '#e2e8f0' : 'transparent',
+            border: '1px solid transparent',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+          title="Heading 4"
+        >
+          H4
         </button>
 
         <div style={{ width: '1px', height: '18px', backgroundColor: '#cbd5e1', margin: '0 4px' }} />
@@ -261,6 +396,24 @@ export function RichTextEditor({
           “ Quote
         </button>
 
+        <button
+          type="button"
+          onClick={setLink}
+          style={{
+            padding: '4px 8px',
+            fontSize: '0.85rem',
+            backgroundColor: editor.isActive('link') ? '#e2e8f0' : 'transparent',
+            border: '1px solid transparent',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            color: editor.isActive('link') ? 'var(--jhub-green, #10b981)' : 'inherit',
+            fontWeight: editor.isActive('link') ? 700 : 500,
+          }}
+          title="Add / Edit Link"
+        >
+          🔗 Link
+        </button>
+
         <div style={{ width: '1px', height: '18px', backgroundColor: '#cbd5e1', margin: '0 4px' }} />
 
         {/* Upload Image From Computer Button */}
@@ -301,7 +454,7 @@ export function RichTextEditor({
           }}
           title="Insert image by URL"
         >
-          🔗 Image URL
+          🖼️ Image URL
         </button>
 
         {uploadError && (

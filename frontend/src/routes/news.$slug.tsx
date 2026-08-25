@@ -128,10 +128,15 @@ function NewsDetailPage() {
               position: "relative",
               borderRadius: "0.75rem",
               overflow: "hidden",
-              height: "440px",
+              maxHeight: "420px",
+              maxWidth: "85%",
+              margin: "0 auto",
               boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
               backgroundColor: "#0f172a",
               cursor: "zoom-in",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
             onClick={() => setIsLightboxOpen(true)}
           >
@@ -139,9 +144,9 @@ function NewsDetailPage() {
               src={allImages[activeIndex]}
               alt={`${post.title} - image ${activeIndex + 1}`}
               style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
+                maxWidth: "100%",
+                maxHeight: "420px",
+                objectFit: "contain",
                 transition: "transform 0.3s ease",
               }}
             />

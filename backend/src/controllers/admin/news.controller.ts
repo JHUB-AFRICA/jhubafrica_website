@@ -13,7 +13,7 @@ export async function getAdminPosts(req: Request, res: Response, next: NextFunct
     let query = supabaseAdmin
       .from('posts')
       .select(`
-        id, slug, title, excerpt, content, category, is_published,
+        id, slug, title, author, excerpt, content, content_json, category, status, is_published,
         is_featured, published_at, cover_image_url, tags, authorId, created_at, updated_at,
         post_images ( id, url, order )
       `, { count: 'exact' })
