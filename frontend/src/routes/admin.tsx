@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { adminLogin, adminLogout } from "../../axios/api/admin/auth";
 import { getAccessToken, setAccessToken, refreshSession } from "../../axios/axios";
 import { getAdminNews } from "../../axios/api/news";
@@ -133,6 +134,7 @@ function AdminPage() {
     title: "",
     onConfirm: async () => {},
   });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const requestDelete = (title: string, onConfirm: () => Promise<void>) => {
     setConfirmDelete({
@@ -187,9 +189,17 @@ function AdminPage() {
               type="submit"
               disabled={loading}
               className="btn-primary"
-              style={{ justifySelf: "start" }}
+              style={{
+                justifySelf: "start",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                opacity: loading ? 0.65 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading && <Loader2 className="animate-spin" size={16} />}
+              <span>{loading ? "Signing in..." : "Sign In"}</span>
             </button>
           </form>
         </section>
@@ -232,16 +242,30 @@ function AdminPage() {
               <button
                 className="btn-outline"
                 type="button"
-                onClick={() => setConfirmDelete({ ...confirmDelete, isOpen: false })}
-                style={{ padding: "0.5rem 1.25rem", borderRadius: "6px", cursor: "pointer", fontSize: "0.9rem" }}
+                disabled={isDeleting}
+                onClick={() => !isDeleting && setConfirmDelete({ ...confirmDelete, isOpen: false })}
+                style={{
+                  padding: "0.5rem 1.25rem",
+                  borderRadius: "6px",
+                  cursor: isDeleting ? "not-allowed" : "pointer",
+                  opacity: isDeleting ? 0.65 : 1,
+                  fontSize: "0.9rem",
+                  transition: "opacity 0.2s ease",
+                }}
               >
                 Cancel
               </button>
               <button
                 type="button"
+                disabled={isDeleting}
                 onClick={async () => {
-                  await confirmDelete.onConfirm();
-                  setConfirmDelete({ ...confirmDelete, isOpen: false });
+                  try {
+                    setIsDeleting(true);
+                    await confirmDelete.onConfirm();
+                    setConfirmDelete({ ...confirmDelete, isOpen: false });
+                  } finally {
+                    setIsDeleting(false);
+                  }
                 }}
                 style={{
                   backgroundColor: "#dc2626",
@@ -249,12 +273,18 @@ function AdminPage() {
                   border: "none",
                   borderRadius: "6px",
                   padding: "0.5rem 1.25rem",
-                  cursor: "pointer",
+                  cursor: isDeleting ? "not-allowed" : "pointer",
+                  opacity: isDeleting ? 0.65 : 1,
                   fontWeight: 600,
                   fontSize: "0.9rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  transition: "opacity 0.2s ease",
                 }}
               >
-                Yes, Delete
+                {isDeleting && <Loader2 className="animate-spin" size={16} />}
+                <span>{isDeleting ? "Deleting..." : "Yes, Delete"}</span>
               </button>
             </div>
           </div>
@@ -277,6 +307,7 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
     setDraft,
     msg,
     submitting,
+    deletingId,
     submit,
     edit,
     remove,
@@ -521,16 +552,26 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
                 <strong>Summary:</strong> {p.excerpt}
               </div>
             </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <button className="btn-outline" onClick={() => edit(p)}>
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button className="btn-outline" onClick={() => edit(p)} disabled={deletingId === p.id}>
                 Edit
               </button>
               <button
                 className="btn-outline"
+                disabled={deletingId === p.id}
                 onClick={() => onDeleteRequest(p.title, () => remove(p.id, true))}
-                style={{ color: "#b91c1c" }}
+                style={{
+                  color: "#b91c1c",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  opacity: deletingId === p.id ? 0.65 : 1,
+                  cursor: deletingId === p.id ? "not-allowed" : "pointer",
+                  transition: "opacity 0.2s ease",
+                }}
               >
-                Delete
+                {deletingId === p.id && <Loader2 className="animate-spin" size={14} />}
+                <span>{deletingId === p.id ? "Deleting..." : "Delete"}</span>
               </button>
             </div>
           </li>
@@ -553,6 +594,7 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
     setDraft,
     msg,
     submitting,
+    deletingId,
     submit,
     edit,
     remove,
@@ -655,16 +697,26 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
                 {p.desc}
               </div>
             </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <button className="btn-outline" onClick={() => edit(p)}>
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button className="btn-outline" onClick={() => edit(p)} disabled={deletingId === p.id}>
                 Edit
               </button>
               <button
                 className="btn-outline"
+                disabled={deletingId === p.id}
                 onClick={() => onDeleteRequest(p.title, () => remove(p.id, true))}
-                style={{ color: "#b91c1c" }}
+                style={{
+                  color: "#b91c1c",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  opacity: deletingId === p.id ? 0.65 : 1,
+                  cursor: deletingId === p.id ? "not-allowed" : "pointer",
+                  transition: "opacity 0.2s ease",
+                }}
               >
-                Delete
+                {deletingId === p.id && <Loader2 className="animate-spin" size={14} />}
+                <span>{deletingId === p.id ? "Deleting..." : "Delete"}</span>
               </button>
             </div>
           </li>
@@ -682,7 +734,7 @@ interface InnovationsAdminProps {
 }
 
 function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
-  const { draft, setDraft, msg, submitting, submit, edit, remove, handleImageUpload, resetDraft } =
+  const { draft, setDraft, msg, submitting, deletingId, submit, edit, remove, handleImageUpload, resetDraft } =
     useInnovationAdmin();
 
   return (
@@ -947,16 +999,26 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <button className="btn-outline" onClick={() => edit(item)}>
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button className="btn-outline" onClick={() => edit(item)} disabled={deletingId === item.id}>
                 Edit
               </button>
               <button
                 className="btn-outline"
+                disabled={deletingId === item.id}
                 onClick={() => onDeleteRequest(item.title, () => remove(item.id, true))}
-                style={{ color: "#b91c1c" }}
+                style={{
+                  color: "#b91c1c",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  opacity: deletingId === item.id ? 0.65 : 1,
+                  cursor: deletingId === item.id ? "not-allowed" : "pointer",
+                  transition: "opacity 0.2s ease",
+                }}
               >
-                Delete
+                {deletingId === item.id && <Loader2 className="animate-spin" size={14} />}
+                <span>{deletingId === item.id ? "Deleting..." : "Delete"}</span>
               </button>
             </div>
           </li>
@@ -974,7 +1036,7 @@ interface CoursesAdminProps {
 }
 
 function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
-  const { draft, setDraft, msg, submitting, submit, edit, remove, resetDraft } =
+  const { draft, setDraft, msg, submitting, deletingId, submit, edit, remove, resetDraft } =
     useCourseAdmin();
 
   return (
@@ -1123,16 +1185,26 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
                 {item.desc}
               </div>
             </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <button className="btn-outline" onClick={() => edit(item)}>
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button className="btn-outline" onClick={() => edit(item)} disabled={deletingId === item.id}>
                 Edit
               </button>
               <button
                 className="btn-outline"
+                disabled={deletingId === item.id}
                 onClick={() => onDeleteRequest(item.title, () => remove(item.id, true))}
-                style={{ color: "#b91c1c" }}
+                style={{
+                  color: "#b91c1c",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  opacity: deletingId === item.id ? 0.65 : 1,
+                  cursor: deletingId === item.id ? "not-allowed" : "pointer",
+                  transition: "opacity 0.2s ease",
+                }}
               >
-                Delete
+                {deletingId === item.id && <Loader2 className="animate-spin" size={14} />}
+                <span>{deletingId === item.id ? "Deleting..." : "Delete"}</span>
               </button>
             </div>
           </li>

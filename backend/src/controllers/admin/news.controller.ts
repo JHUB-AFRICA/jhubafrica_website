@@ -423,27 +423,60 @@ export async function deleteAdminPost(req: Request, res: Response, next: NextFun
   try {
     const { id } = req.params
 
-    // Retrieve existing post to clear specific slug cache & get image urls for cleanup
-    const { data: existing } = await supabaseAdmin
-      .from('posts')
-      .select('slug, post_images ( url )')
-      .eq('id', id)
-      .single()
+    // 1. Retrieve existing post info safely
+    let existing: any = null
+    try {
+      const { data } = await supabaseAdmin
+        .from('posts')
+        .select('slug, cover_image_url')
+        .eq('id', id)
+        .maybeSingle()
+      existing = data
+    } catch (fetchErr) {
+      console.warn('[deleteAdminPost] fetch post warning:', fetchErr)
+    }
 
-    // Delete post (cascade will delete post_images in DB)
+    // 2. Fetch associated post_images if table exists
+    let postImages: any[] = []
+    try {
+      const { data: imgData } = await supabaseAdmin
+        .from('post_images')
+        .select('url')
+        .eq('post_id', id)
+      if (Array.isArray(imgData)) postImages = imgData
+    } catch {
+      // Ignored if post_images relation does not exist
+    }
+
+    // 3. Delete from post_images first if table exists
+    try {
+      await supabaseAdmin.from('post_images').delete().eq('post_id', id)
+    } catch (imgDelErr) {
+      console.warn('[deleteAdminPost] post_images delete skipped:', imgDelErr)
+    }
+
+    // 4. Delete from posts table
     const { error } = await supabaseAdmin
       .from('posts')
       .delete()
       .eq('id', id)
 
-    if (error) throw error
+    if (error) {
+      console.error('[deleteAdminPost error]:', error)
+      throw error
+    }
 
-    // Storage cleanup for deleted images
-    if (existing?.post_images && existing.post_images.length > 0) {
+    // 5. Cleanup storage files if applicable
+    const allImageUrls = [
+      existing?.cover_image_url,
+      ...postImages.map((img: any) => img.url),
+    ].filter(Boolean)
+
+    if (allImageUrls.length > 0) {
       try {
-        const filePaths = existing.post_images
-          .map((img: any) => {
-            const parts = (img.url || '').split('/post-images/')
+        const filePaths = allImageUrls
+          .map((url: string) => {
+            const parts = url.split('/post-images/')
             return parts.length > 1 ? decodeURIComponent(parts[1].split('?')[0]) : null
           })
           .filter(Boolean) as string[]
@@ -456,7 +489,7 @@ export async function deleteAdminPost(req: Request, res: Response, next: NextFun
       }
     }
 
-    // Evict Redis Cache
+    // 6. Evict Redis Cache
     if (redis) {
       const cacheKeys = [
         CacheKey.news(),
@@ -465,7 +498,7 @@ export async function deleteAdminPost(req: Request, res: Response, next: NextFun
       if (existing?.slug) cacheKeys.push(CacheKey.news(existing.slug))
 
       const client = redis
-      await Promise.all(cacheKeys.map(k => client.del(k)))
+      await Promise.all(cacheKeys.map((k) => client.del(k))).catch(() => {})
     }
 
     res.status(204).end()

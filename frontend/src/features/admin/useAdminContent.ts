@@ -118,6 +118,7 @@ export function useNewsAdmin() {
     const [draft, setDraft] = useState<NewsDraft>(getEmptyNews());
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const submit = useCallback(
         async (e: FormEvent) => {
@@ -187,6 +188,7 @@ export function useNewsAdmin() {
     const remove = useCallback(async (id: string, bypassConfirm = false) => {
         if (!bypassConfirm && !confirm("Delete this news post?")) return;
 
+        setDeletingId(id);
         setMsg("Deleting...");
 
         try {
@@ -197,6 +199,8 @@ export function useNewsAdmin() {
         } catch (err) {
             console.error(err);
             setMsg("Error deleting post.");
+        } finally {
+            setDeletingId(null);
         }
     }, [router]);
 
@@ -213,6 +217,7 @@ export function useNewsAdmin() {
         setDraft,
         msg,
         submitting,
+        deletingId,
         submit,
         edit,
         remove,
@@ -226,6 +231,7 @@ export function useEventAdmin() {
     const [draft, setDraft] = useState<EventDraft>(getEmptyEvent());
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const submit = useCallback(
         async (e: FormEvent) => {
@@ -264,6 +270,7 @@ export function useEventAdmin() {
     const remove = useCallback(async (id: string, bypassConfirm = false) => {
         if (!bypassConfirm && !confirm("Delete this event?")) return;
 
+        setDeletingId(id);
         setMsg("Deleting...");
 
         try {
@@ -274,6 +281,8 @@ export function useEventAdmin() {
         } catch (err) {
             console.error(err);
             setMsg("Error deleting event.");
+        } finally {
+            setDeletingId(null);
         }
     }, [router]);
 
@@ -290,6 +299,7 @@ export function useEventAdmin() {
         setDraft,
         msg,
         submitting,
+        deletingId,
         submit,
         edit,
         remove,
@@ -303,6 +313,7 @@ export function useInnovationAdmin() {
     const [draft, setDraft] = useState<InnovationDraft>(getEmptyInnovation());
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const submit = useCallback(
         async (e: FormEvent) => {
@@ -341,6 +352,7 @@ export function useInnovationAdmin() {
     const remove = useCallback(async (id: string, bypassConfirm = false) => {
         if (!bypassConfirm && !confirm("Delete this innovation?")) return;
 
+        setDeletingId(id);
         setMsg("Deleting...");
 
         try {
@@ -351,6 +363,8 @@ export function useInnovationAdmin() {
         } catch (err) {
             console.error(err);
             setMsg("Error deleting innovation.");
+        } finally {
+            setDeletingId(null);
         }
     }, [router]);
 
@@ -367,6 +381,7 @@ export function useInnovationAdmin() {
         setDraft,
         msg,
         submitting,
+        deletingId,
         submit,
         edit,
         remove,
@@ -380,6 +395,7 @@ export function useCourseAdmin() {
     const [draft, setDraft] = useState<CourseDraft>(getEmptyCourse());
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const submit = useCallback(
         async (e: FormEvent) => {
@@ -418,6 +434,7 @@ export function useCourseAdmin() {
     const remove = useCallback(async (id: string, bypassConfirm = false) => {
         if (!bypassConfirm && !confirm("Delete this course?")) return;
 
+        setDeletingId(id);
         setMsg("Deleting...");
 
         try {
@@ -428,6 +445,8 @@ export function useCourseAdmin() {
         } catch (err) {
             console.error(err);
             setMsg("Error deleting course.");
+        } finally {
+            setDeletingId(null);
         }
     }, [router]);
 
@@ -438,6 +457,7 @@ export function useCourseAdmin() {
         setDraft,
         msg,
         submitting,
+        deletingId,
         submit,
         edit,
         remove,

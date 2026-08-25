@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 
 interface AdminFormActionsProps {
   submitting: boolean;
@@ -17,6 +18,8 @@ export function AdminFormActions({
   cancelLabel = "Cancel edit",
   children,
 }: AdminFormActionsProps) {
+  const loadingLabel = isEditing || submitLabel.toLowerCase().includes("update") ? "Updating..." : "Saving...";
+
   return (
     <div
       style={{
@@ -26,8 +29,21 @@ export function AdminFormActions({
         alignItems: "center",
       }}
     >
-      <button type="submit" className="btn-primary" disabled={submitting}>
-        {submitting ? "Saving..." : submitLabel}
+      <button
+        type="submit"
+        className="btn-primary"
+        disabled={submitting}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          opacity: submitting ? 0.65 : 1,
+          cursor: submitting ? "not-allowed" : "pointer",
+          transition: "opacity 0.2s ease, transform 0.15s, box-shadow 0.15s",
+        }}
+      >
+        {submitting && <Loader2 className="animate-spin" size={16} />}
+        <span>{submitting ? loadingLabel : submitLabel}</span>
       </button>
       {isEditing && onCancel && (
         <button
@@ -35,6 +51,11 @@ export function AdminFormActions({
           className="btn-outline"
           onClick={onCancel}
           disabled={submitting}
+          style={{
+            opacity: submitting ? 0.65 : 1,
+            cursor: submitting ? "not-allowed" : "pointer",
+            transition: "opacity 0.2s ease",
+          }}
         >
           {cancelLabel}
         </button>
