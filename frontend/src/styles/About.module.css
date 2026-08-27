@@ -195,3 +195,279 @@
   margin: 0 auto 2rem auto;
 }
 
+/* BORDERLESS TEAM CARDS */
+.team-card-borderless {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f8fafc;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: none;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s, background 0.2s;
+}
+
+.team-card-borderless:hover {
+  transform: translateY(-4px);
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.team-card-media {
+  height: 290px;
+  position: relative;
+  overflow: hidden;
+  background-color: #f1f5f9;
+}
+
+.team-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.team-card-borderless:hover .team-card-img {
+  transform: scale(1.04);
+}
+
+.team-card-body {
+  padding: 1.35rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.team-card-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--jhub-blue);
+  margin: 0 0 0.35rem 0;
+  line-height: 1.3;
+}
+
+.team-card-role {
+  font-size: 0.88rem;
+  color: var(--jhub-green);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+.team-card-expanded {
+  background: #ffffff !important;
+  box-shadow: 0 16px 40px rgba(15, 45, 89, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.team-card-bio-container {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  animation: expandIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.team-card-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--jhub-green);
+  margin-bottom: 0.5rem;
+}
+
+.team-card-bio-text {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.65;
+  margin: 0 0 1rem 0;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.team-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--jhub-blue);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  margin-top: auto;
+  transition: color 0.2s, gap 0.2s;
+}
+
+.team-card-borderless:hover .team-card-btn {
+  color: var(--jhub-green);
+  gap: 0.6rem;
+}
+
+/* POPUP PROFILE MODAL */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2.25rem 2rem;
+  position: relative;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: none;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+  background: #e2e8f0;
+  color: var(--jhub-blue);
+}
+
+.modal-header {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 16px;
+  object-fit: cover;
+  object-position: top center;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+  flex-shrink: 0;
+}
+
+.modal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.modal-category-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--jhub-green);
+  width: fit-content;
+  margin-bottom: 2px;
+}
+
+.modal-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--jhub-blue);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.modal-role {
+  font-size: 0.9rem;
+  color: var(--jhub-green);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.modal-bio {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-main);
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-header {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  .modal-info {
+    align-items: center;
+  }
+  .modal-card {
+    padding: 1.75rem 1.25rem;
+  }
+}
+

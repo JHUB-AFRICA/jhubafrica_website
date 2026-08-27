@@ -7,6 +7,7 @@ import adminUsersRouter from './admin.users.js'
 import adminNewsRouter from './admin.news.js'
 import adminUploadsRouter from './admin.uploads.js'
 import adminImagesRouter from './admin.images.js'
+import adminTeamRouter from './admin.team.js'
 
 export const adminRouter = Router()
 
@@ -17,6 +18,7 @@ adminRouter.use('/events', adminEventsRouter)
 adminRouter.use('/partners', adminPartnersRouter)
 adminRouter.use('/users', adminUsersRouter)
 adminRouter.use('/news', adminNewsRouter)
+adminRouter.use('/team-members', adminTeamRouter)
 adminRouter.use('/uploads', adminUploadsRouter)
 adminRouter.use('/', adminImagesRouter)
 

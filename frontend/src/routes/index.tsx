@@ -111,19 +111,20 @@ export const Route = createFileRoute("/")({
 });
 
 const HOMEPAGE_METRICS = [
-  { n: "2023", l: "Founded", suffix: "" },
-  { n: 400, l: "Innovators Supported", suffix: "+" },
-  { n: 150, l: "Innovations", suffix: "+" },
-  { n: 1000, l: "Students Engaged", suffix: "+" },
-  { n: 12, l: "Partners", suffix: "+" },
+  { n: "2023", l: "Established", suffix: "" },
+  { n: "2024", l: "Launched", suffix: "" },
+  { n: 400, l: "Innovators", suffix: "+" },
+  { n: 56, l: "Current Innovations", suffix: "" },
+  { n: 11, l: "Existing Copyrights", suffix: "" },
 ] as const;
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 
 function formatCount(value: number, metric: { n: number | string }) {
-  return typeof metric.n === "string"
-    ? String(metric.n)
-    : numberFormatter.format(value);
+  if (typeof metric.n === "string" && (metric.n === "2023" || metric.n === "2024")) {
+    return String(value);
+  }
+  return numberFormatter.format(value);
 }
 
 function Index() {

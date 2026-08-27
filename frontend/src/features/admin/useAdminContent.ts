@@ -8,6 +8,7 @@ import { NewsPost } from "../../types/news";
 import { EventItem } from "../../types/events";
 import { InnovationItem } from "../../types/innovations";
 import { CourseItem } from "../../types/courses";
+import { JHubTeamMember } from "../../types/team";
 
 export type NewsDraft = NewsPost | (Omit<NewsPost, "id"> & { id?: string });
 export type EventDraft = EventItem | (Omit<EventItem, "id"> & { id?: string });
@@ -464,3 +465,101 @@ export function useCourseAdmin() {
         resetDraft,
     };
 }
+
+/* ---------- Team admin hook ---------- */
+
+export type TeamMemberDraft = JHubTeamMember | (Omit<JHubTeamMember, "id"> & { id?: string });
+
+export function getEmptyTeamMember(): Omit<JHubTeamMember, "id"> {
+    return {
+        name: "",
+        title: "",
+        bio: "",
+        avatarUrl: "",
+        avatarThumb: "",
+        category: "EXECUTIVE",
+        order: 0,
+    };
+}
+
+export function useTeamAdmin() {
+    const router = useRouter();
+    const [draft, setDraft] = useState<TeamMemberDraft>(getEmptyTeamMember());
+    const [msg, setMsg] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const resetDraft = useCallback(() => {
+        setDraft(getEmptyTeamMember());
+        setMsg("");
+    }, []);
+
+    const edit = useCallback((item: JHubTeamMember) => {
+        setDraft(item);
+        setMsg("");
+        window.scrollTo({ top: 400, behavior: "smooth" });
+    }, []);
+
+    const submit = useCallback(
+        async (e: FormEvent) => {
+            e.preventDefault();
+            setSubmitting(true);
+            setMsg("Saving team member...");
+
+            try {
+                if (draft.id) {
+                    await (await import("../../../axios/api/team")).adminUpdateTeamMember(draft.id, draft);
+                    setMsg("Team member updated successfully.");
+                } else {
+                    await (await import("../../../axios/api/team")).adminCreateTeamMember(draft);
+                    setMsg("Team member created successfully.");
+                }
+                resetDraft();
+                await router.invalidate();
+                setTimeout(() => setMsg(""), 2000);
+            } catch (err: any) {
+                console.error(err);
+                setMsg(err?.response?.data?.error || "Error saving team member.");
+            } finally {
+                setSubmitting(false);
+            }
+        },
+        [draft, resetDraft, router],
+    );
+
+    const remove = useCallback(
+        async (id: string, bypassConfirm = false) => {
+            if (!bypassConfirm && !confirm("Delete this team member?")) return;
+
+            setDeletingId(id);
+            setMsg("Deleting...");
+
+            try {
+                await (await import("../../../axios/api/team")).adminDeleteTeamMember(id);
+                if (draft.id === id) resetDraft();
+                await router.invalidate();
+                setMsg("Deleted.");
+                setTimeout(() => setMsg(""), 1500);
+            } catch (err: any) {
+                console.error(err);
+                setMsg(err?.response?.data?.error || "Error deleting team member.");
+            } finally {
+                setDeletingId(null);
+            }
+        },
+        [draft.id, resetDraft, router],
+    );
+
+    return {
+        draft,
+        setDraft,
+        msg,
+        submitting,
+        deletingId,
+        submit,
+        edit,
+        remove,
+        resetDraft,
+    };
+}
+

@@ -1,0 +1,182 @@
+[
+  {
+    "id": "lawrence-nderu",
+    "name": "Dr. Lawrence Nderu",
+    "title": "Founder and Project Lead",
+    "category": "EXECUTIVE",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/DrLawrenceNderu-scaled.jpg.jpeg",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/DrLawrenceNderu-scaled.jpg.jpeg",
+    "bio": "Project Lead with extensive experience as Chairman, Lecturer, and Researcher in AI/ML and Software Engineering. A Digital Ecosystem Builder and Founder of JKIAN Hub, serving as a Digital Africa Connector.",
+    "order": 1
+  },
+  {
+    "id": "rehema-ndeda",
+    "name": "Dr. Rehema Ndeda",
+    "title": "Co-Founder, Climate Smart Agriculture/ Automation Lead/JKUAT",
+    "category": "EXECUTIVE",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/rehema-ndeda.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/rehema-ndeda-150x150.webp",
+    "bio": "Mechatronics Engineer with a specialization on automation, currently focusing on development and testing of technologies related to precision agriculture.",
+    "order": 2
+  },
+  {
+    "id": "mwangi-karanja",
+    "name": "Dr. Mwangi Karanja",
+    "title": "Innovative Technology and Data Science Lead",
+    "category": "EXECUTIVE",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/mwangi-karanja.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/mwangi-karanja-150x150.webp",
+    "bio": "An Innovative technology diffusion expert with a background in computing, research and innovation management. Have trained Small scale entrepreneurs on data management and research-driven approaches to growth.",
+    "order": 3
+  },
+  {
+    "id": "william-murithi",
+    "name": "Dr. William Murithi",
+    "title": "DIH Business Development/ Strategy Lead",
+    "category": "EXECUTIVE",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/will-muriithi.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/will-muriithi-150x150.webp",
+    "bio": "An expert in business model innovation, digital entrepreneurship & innovation and design thinking. Founder and Lead consultant at EMBC, a premier management consulting firm that offers bespoke and integrated solutions for enterprises.",
+    "order": 4
+  },
+  {
+    "id": "john-kinyuru",
+    "name": "Dr. John Kinyuru",
+    "title": "Research, and Innovation Development Lead, JKUAT",
+    "category": "EXECUTIVE",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/john-kinyuru.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/john-kinyuru.webp",
+    "bio": "Dr John Kinyuru is an esteemed Food and Nutrition Scientist with great leadership and project management capabilities. Director of research and innovation at Jomo Kenyatta University of Agriculture and Technology(JKUAT), and researcher in Agriculture, food, and nutrition. A food systems and nutrition-sensitive agriculture expert, he is typically the insect hunter(specialist of edible insects), passionate about food security through research and implementation. Dr John Kinyuru is a key member of the JHUB Africa project whose role will transform the food and nutrition ecosystem.",
+    "order": 5
+  },
+  {
+    "id": "simon-mwangi",
+    "name": "Simon Mwangi",
+    "title": "Strategic Partnerships and Product Associate, Hub Manager",
+    "category": "SECRETARIAT",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/Simon-JHUB.jpeg",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/Simon-JHUB.jpeg",
+    "bio": "Simon oversees Strategic Partnerships, product management, and communications at JHUB Africa, and manages the hub’s daily operations. He holds a Master’s in Business Administration from JKUAT and has certifications in Artificial Intelligence Career Essentials and Data Analytics from ALX.",
+    "order": 6
+  },
+  {
+    "id": "daisy-ondwari",
+    "name": "Ms. Daisy Ondwari",
+    "title": "Product Development Fellow",
+    "category": "SECRETARIAT",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/ondwari-daisy.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/ondwari-daisy-150x150.webp",
+    "bio": "Ms. Daisy Ondwari, as a Product Development Fellow, serves as the voice of the customer. Her role extends beyond user interface experience, questioning and shaping products to align with user needs.",
+    "order": 7
+  },
+  {
+    "id": "catherine-muraga",
+    "name": "Catherine Muraga",
+    "title": "Managing Director, Microsoft ADC",
+    "category": "ADVISORY_BOARD",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/cate-muraga.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/cate-muraga-150x150.webp",
+    "bio": "Catherine is a purpose-driven tech executive, presently holding the position of Managing Director at Microsoft ADC. In this role, she spearheads a team dedicated to crafting impactful products and services on a global scale. Catherine’s particular focus lies in advancing STEM education in Africa, reflecting her commitment to driving positive change through technology.",
+    "order": 8
+  },
+  {
+    "id": "noumbessy-ghislain",
+    "name": "Noumbessy Ghislain",
+    "title": "Innovation Hub Leader, Bosch EA",
+    "category": "ADVISORY_BOARD",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/noumbessy.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/noumbessy-150x150.webp",
+    "bio": "Ghislain Noumbessy is a visionary professional who has been with BOSCH, working in different capacities. His rich experience working across different regions in Africa make him one of the most knowledgeable individuals on the problems the continent encounters. Noumbessy believes that Africa can move beyond being a consumer of technologies to being creators of it. Currently the Innovation Hub Leader at Bosch EA, he is passionate about nurturing innovations across the region as a way to find suitable solutions to the unique problems we face.",
+    "order": 9
+  },
+  {
+    "id": "irene-kimani",
+    "name": "Irene Kimani",
+    "title": "ICT Specialist & Data Manager, KALRO",
+    "category": "ADVISORY_BOARD",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/irene-kimani.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/irene-kimani.webp",
+    "bio": "Irene Kimani is an ICT Specialist and Data Manager at the Kenya Agriculture and Livestock Research Organization(KALRO). She has expertise in the ICT field, Data Science, Big Data, Artificial Intelligence, and research informatics. She is passionate about innovations and development, especially in the agricultural sector. Irene’s proficiency in agricultural extension services and weather intel has been vital for for digitization of the food, and her role in the JHUB Africa team is valuable.",
+    "order": 10
+  },
+  {
+    "id": "priscilla-muiruri",
+    "name": "Priscilla Muiruri",
+    "title": "Technical Advisor, Ministry of Agriculture & Livestock Development",
+    "category": "ADVISORY_BOARD",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/priscilla-C1euf-1.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/priscilla-C1euf-1.webp",
+    "bio": "Priscilla is a professional Technical Advisor, Ministry of Agriculture & Livestock Development, a Technical Advisor in the Cabinet Secretary’s Office and coordinates the National Food Systems Transformation Working with innovative solutions.",
+    "order": 11
+  },
+  {
+    "id": "mariana-bozesan",
+    "name": "Dr Mariana Bozesan",
+    "title": "AI Pioneer, Integral Investor, Tech Entrepreneur",
+    "category": "ADVISORY_BOARD",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/mariana-bozesan.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/mariana-bozesan-150x150.webp",
+    "bio": "Dr. Mariana Bozesan is an award-winning integral investor, an AI pioneer, and a successful serial tech-entrepreneur who is leveraging exponentially growing technologies to decarbonize the global economy and accelerate the implementation of the UN SDGs within Planetary Boundaries. She studied Computer Science and AI at Stanford University and the Karlsruhe Institute of Technology of which she is a Prominent Alumna. She is also the recipient of the Golden Angelina Award, as Europe’s Female Angel Investor of 2019 and became the Best European Early stage Investor of the Year 2016 awarded by EBAN, the European Business Angel Network. She is also full member of the prominent international Club of Rome, Fellow of the World Academy of Art and Science, and authored several books including Integral Investing: From Profit to Prosperity, a report to the Club of Rome.",
+    "order": 12
+  },
+  {
+    "id": "dominique-kavuisya",
+    "name": "Dominique Kavuisya",
+    "title": "CEO & Co-founder, Taimba Limited",
+    "category": "MENTORS",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/kavuisya-dominique.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/kavuisya-dominique-150x150.webp",
+    "bio": "An accomplished IT practitioner with over 15 years of experience across US and sub-Saharan Africa, deploying transformational digital solutions. Interested in supply chains, route to market models, fintech & eCommerce.",
+    "order": 13
+  },
+  {
+    "id": "samuel-kamochu",
+    "name": "Samuel Kamochu",
+    "title": "CEO & Co-founder, Meliora Technologies Limited",
+    "category": "MENTORS",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/kamochu.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/kamochu.webp",
+    "bio": "Passionate about Africa and the mission is to empower the next generation of software engineers in Kenya and in the continent of Africa. Shares about personal and professional experiences and opinions. Recently recognised by Business Daily Africa as Top 40 under 40 Men in Kenya in 2022. Happy to continue bringing hope to many!",
+    "order": 14
+  },
+  {
+    "id": "brewster-barclay",
+    "name": "Brewster Barclay",
+    "title": "AWS Partner Manager & Business Development Director, Zuhlke Engineering Ltd",
+    "category": "MENTORS",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/Brewster-CbhlanwK.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/Brewster-CbhlanwK-150x150.webp",
+    "bio": "Brewster F. Barclay is an experienced C-level executive with over 40 years in high technology and software industries, specializing in strategic product sales, marketing, business development and new product launches. With extensive global experience, he has held senior roles in companies like Zuhlke Engineering and e2v PLC and managed Clickstream Technologies. Barclay has been a dedicated mentor and advisor to numerous technology startups through programs such as the Royal Academy of Engineering Enterprise Hub and Accelerate Cambridge. His expertise spans mentoring in deep tech, engineering, software startups and advisory roles in cutting-edge sectors like AI, med-tech and cleantech. Barclay holds an MBA from INSED and a BA in Engineering and Economics from Oxford University.",
+    "order": 15
+  },
+  {
+    "id": "wilson-gichuhi",
+    "name": "Wilson Gichuhi",
+    "title": "Fullstack Software Engineer",
+    "category": "DEV_TEAM",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/wilson-gichuhi.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/wilson-gichuhi-150x150.webp",
+    "bio": "Wilson Gichuhi, a Fullstack Software Engineer, dedicated to web, cross-platform mobile solution,cloud-first development, and open-source contribution. He often finds joy in tinkering with various tools and technologies.",
+    "order": 16
+  },
+  {
+    "id": "sonia-lomo",
+    "name": "Sonia Lomo",
+    "title": "Web Developer",
+    "category": "DEV_TEAM",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/sonia.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/sonia-150x150.webp",
+    "bio": "Sonia is a passionate Software Developer with a Computer Science degree. Her journey began with lines of code and blossomed into a love for creating elegant solutions. Armed with years of experience, she thrives on building robust applications and contributing to the open-source community. When she’s not immersed in code, you’ll find him spending time with his feline friends, indulging in his slight obsession with cats.",
+    "order": 17
+  },
+  {
+    "id": "derrick-obwatsa",
+    "name": "Derrick Obwatsa",
+    "title": "DevOps Engineer",
+    "category": "DEV_TEAM",
+    "avatarUrl": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/obwatsa.webp",
+    "avatarThumb": "https://civzobuofwhgpudtlnjm.supabase.co/storage/v1/object/public/team-members/obwatsa-150x150.webp",
+    "bio": "A Computer Science major and skilled DevOps engineer, I specialize in backend development and infrastructure automation. My expertise includes designing and implementing APIs using PHP, Node.js, Python, and Java. I excel in setting up servers, orchestrating CI/CD pipelines, and containerizing applications with Docker and Kubernetes. My troubleshooting skills ensure seamless performance, and I’m passionate about continuous learning.",
+    "order": 18
+  }
+]

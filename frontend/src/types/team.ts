@@ -11,5 +11,7 @@ export interface JHubTeamMember {
   title: string;
   bio?: string;
   avatarUrl?: string;
+  avatarThumb?: string;
   category: JHubTeamCategory;
+  order?: number;
 }

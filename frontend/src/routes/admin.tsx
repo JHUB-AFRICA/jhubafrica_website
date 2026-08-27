@@ -7,10 +7,12 @@ import { getAdminNews } from "../../axios/api/news";
 import { getEvents } from "../../axios/api/events";
 import { getAdminInnovations } from "../../axios/api/admin/innovations";
 import { getAdminCourses } from "../../axios/api/admin/courses";
+import { getTeamMembers } from "../../axios/api/team";
 import { NewsPost } from "../types/news";
 import { EventItem } from "../types/events";
 import { InnovationItem } from "../types/innovations";
 import { CourseItem } from "../types/courses";
+import { JHubTeamMember } from "../types/team";
 import {
   dateToLocalYmd,
   localYmdToDate,
@@ -18,6 +20,7 @@ import {
   useInnovationAdmin,
   useNewsAdmin,
   useCourseAdmin,
+  useTeamAdmin,
 } from "@/features/admin/useAdminContent";
 import { AdminFormActions } from "@/features/admin/components/AdminFormActions";
 import { AdminImageUpload } from "@/features/admin/components/AdminImageUpload";
@@ -50,22 +53,23 @@ export const Route = createFileRoute("/admin")({
     }
 
     if (!token) {
-      return { news: [], events: [], innovations: [], courses: [] };
+      return { news: [], events: [], innovations: [], courses: [], team: [] };
     }
 
     try {
-      const [news, events, innovations, courses] = await Promise.all([
+      const [news, events, innovations, courses, team] = await Promise.all([
         getAdminNews(),
         getEvents(),
         getAdminInnovations(),
         getAdminCourses(),
+        getTeamMembers(),
       ]);
-      return { news, events, innovations, courses };
+      return { news, events, innovations, courses, team };
     } catch (error: any) {
       if (error?.response?.status === 401 || error?.response?.status === 403) {
         setAccessToken(null);
       }
-      return { news: [], events: [], innovations: [], courses: [] };
+      return { news: [], events: [], innovations: [], courses: [], team: [] };
     }
   },
   component: AdminPage,
@@ -78,7 +82,7 @@ function AdminPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  const { news, events, innovations, courses } = Route.useLoaderData();
+  const { news, events, innovations, courses, team } = Route.useLoaderData();
 
   useEffect(() => {
     if (getAccessToken()) {
@@ -230,6 +234,7 @@ function AdminPage() {
       <EventsAdmin items={events} onDeleteRequest={requestDelete} />
       <InnovationsAdmin items={innovations} onDeleteRequest={requestDelete} />
       <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
+      <TeamAdmin items={team} onDeleteRequest={requestDelete} />
 
       {confirmDelete.isOpen && (
         <div className={styles['modal-overlay-style']}>
@@ -1213,4 +1218,216 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
     </section>
   );
 }
+
+/* ---------- Team Members admin ---------- */
+
+interface TeamAdminProps {
+  items: JHubTeamMember[];
+  onDeleteRequest: (title: string, onConfirm: () => Promise<void>) => void;
+}
+
+function TeamAdmin({ items, onDeleteRequest }: TeamAdminProps) {
+  const {
+    draft,
+    setDraft,
+    msg,
+    submitting,
+    deletingId,
+    submit,
+    edit,
+    remove,
+    resetDraft,
+  } = useTeamAdmin();
+
+  return (
+    <section className="content-section">
+      <h2 style={{ marginBottom: "0.5rem" }}>Team Members</h2>
+      <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", marginBottom: "1.5rem" }}>
+        Manage leadership, staff, mentors and advisors displayed in the About page "Meet Our Team" section.
+      </p>
+
+      <form onSubmit={submit} className={styles['form-grid']}>
+        <InputField
+          required
+          label="Full Name"
+          placeholder="e.g. Dr. Lawrence Nderu"
+          value={draft.name}
+          onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+          className={styles['input-style']}
+        />
+
+        <InputField
+          required
+          label="Role / Title"
+          placeholder="e.g. Founder and Project Lead"
+          value={draft.title}
+          onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+          className={styles['input-style']}
+        />
+
+        <SelectField
+          label="Category"
+          value={draft.category}
+          onChange={(e) => setDraft({ ...draft, category: e.target.value as any })}
+          className={styles['select-style']}
+        >
+          <option value="EXECUTIVE">Executive Leadership</option>
+          <option value="ADVISORY_BOARD">Advisory Board</option>
+          <option value="SECRETARIAT">Secretariat / Management</option>
+          <option value="DEV_TEAM">Dev Team / Engineering</option>
+          <option value="MENTORS">Mentors & Partners</option>
+        </SelectField>
+
+        <InputField
+          type="number"
+          label="Display Order (lower numbers appear first)"
+          placeholder="0"
+          value={draft.order ?? 0}
+          onChange={(e) => setDraft({ ...draft, order: Number(e.target.value) })}
+          className={styles['input-style']}
+        />
+
+        <div style={{ gridColumn: "1 / -1", display: "grid", gap: "0.5rem" }}>
+          <InputField
+            label="Profile Photo URL (Large)"
+            placeholder="https://... or upload below"
+            value={draft.avatarUrl || ""}
+            onChange={(e) => setDraft({ ...draft, avatarUrl: e.target.value, avatarThumb: draft.avatarThumb || e.target.value })}
+            className={styles['input-style']}
+          />
+          <AdminImageUpload
+            previewUrl={draft.avatarUrl || undefined}
+            onFileSelected={async (file: File | null) => {
+              if (!file) return;
+              try {
+                const { adminUploadTeamImage } = await import("../../axios/api/team");
+                const uploaded = await adminUploadTeamImage(file);
+                if (uploaded?.url) {
+                  setDraft({ ...draft, avatarUrl: uploaded.url, avatarThumb: draft.avatarThumb || uploaded.url });
+                }
+              } catch (e) {
+                console.error("Image upload failed:", e);
+              }
+            }}
+          />
+        </div>
+
+        <div style={{ gridColumn: "1 / -1", display: "grid", gap: "0.5rem" }}>
+          <InputField
+            label="Thumbnail Photo URL (Optional 150x150)"
+            placeholder="https://... or upload below"
+            value={draft.avatarThumb || ""}
+            onChange={(e) => setDraft({ ...draft, avatarThumb: e.target.value })}
+            className={styles['input-style']}
+          />
+          <AdminImageUpload
+            previewUrl={draft.avatarThumb || undefined}
+            onFileSelected={async (file: File | null) => {
+              if (!file) return;
+              try {
+                const { adminUploadTeamImage } = await import("../../axios/api/team");
+                const uploaded = await adminUploadTeamImage(file);
+                if (uploaded?.url) {
+                  setDraft({ ...draft, avatarThumb: uploaded.url });
+                }
+              } catch (e) {
+                console.error("Image upload failed:", e);
+              }
+            }}
+          />
+        </div>
+
+        <div style={{ gridColumn: "1 / -1" }}>
+          <TextareaField
+            label="Biographical Profile"
+            placeholder="Detailed background, expertise and achievements..."
+            value={draft.bio || ""}
+            onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
+            className={styles['textarea-style']}
+            rows={4}
+          />
+        </div>
+
+        <AdminFormActions
+          isEditing={Boolean(draft.id)}
+          submitting={submitting}
+          submitLabel={draft.id ? "Update Member" : "Add Member"}
+          onCancel={resetDraft}
+        >
+          {msg && (
+            <span style={{ fontSize: "0.9rem", color: msg.includes("Error") ? "#dc2626" : "var(--jhub-green)", fontWeight: 600 }}>
+              {msg}
+            </span>
+          )}
+        </AdminFormActions>
+      </form>
+
+      <h3 style={{ marginTop: "2.5rem", marginBottom: "1rem" }}>
+        Existing Team Members ({items.length})
+      </h3>
+
+      <ul className={styles['list-style']}>
+        {items.map((item) => (
+          <li key={item.id} className={styles['list-item-style']}>
+            <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+              {item.avatarUrl ? (
+                <img
+                  src={item.avatarThumb || item.avatarUrl}
+                  alt={item.name}
+                  style={{ width: 50, height: 50, borderRadius: "10px", objectFit: "cover" }}
+                />
+              ) : (
+                <div style={{ width: 50, height: 50, borderRadius: "10px", backgroundColor: "#e2e8f0", display: "grid", placeItems: "center", fontWeight: 700, color: "#64748b" }}>
+                  {item.name.charAt(0)}
+                </div>
+              )}
+              <div>
+                <strong style={{ fontSize: "1.05rem", color: "var(--jhub-blue)" }}>{item.name}</strong>
+                <span
+                  style={{
+                    fontSize: "0.72rem",
+                    padding: "2px 8px",
+                    borderRadius: "999px",
+                    marginLeft: "0.5rem",
+                    fontWeight: 700,
+                    backgroundColor: "rgba(16, 185, 129, 0.12)",
+                    color: "var(--jhub-green)",
+                  }}
+                >
+                  {item.category.replace(/_/g, " ")}
+                </span>
+                <div style={{ fontSize: "0.88rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                  {item.title} {item.order !== undefined && <span style={{ opacity: 0.6 }}>· Order: {item.order}</span>}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button className="btn-outline" onClick={() => edit(item)} disabled={deletingId === item.id}>
+                Edit
+              </button>
+              <button
+                className="btn-outline"
+                disabled={deletingId === item.id}
+                onClick={() => onDeleteRequest(item.name, () => remove(item.id, true))}
+                style={{
+                  color: "#b91c1c",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  opacity: deletingId === item.id ? 0.65 : 1,
+                  cursor: deletingId === item.id ? "not-allowed" : "pointer",
+                }}
+              >
+                {deletingId === item.id && <Loader2 className="animate-spin" size={14} />}
+                <span>{deletingId === item.id ? "Deleting..." : "Delete"}</span>
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 

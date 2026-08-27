@@ -1,3 +1,9 @@
 .env
 frontend/.env
 backend/.env
+
+# Temporary and raw asset dumps (uploaded to Supabase storage)
+*jhubafrica.com_*
+frontend/src/assets/team/
+frontend/jhubafrica.com_*
+backend/team-image-urls.json

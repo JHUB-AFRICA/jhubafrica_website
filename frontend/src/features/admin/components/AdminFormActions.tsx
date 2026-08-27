@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 
 interface AdminFormActionsProps {
   submitting: boolean;
-  submitLabel: string;
+  submitLabel?: string;
   isEditing?: boolean;
   onCancel?: () => void;
   cancelLabel?: string;
@@ -18,7 +18,8 @@ export function AdminFormActions({
   cancelLabel = "Cancel edit",
   children,
 }: AdminFormActionsProps) {
-  const loadingLabel = isEditing || submitLabel.toLowerCase().includes("update") ? "Updating..." : "Saving...";
+  const finalSubmitLabel = submitLabel || (isEditing ? "Update" : "Save");
+  const loadingLabel = isEditing || finalSubmitLabel.toLowerCase().includes("update") ? "Updating..." : "Saving...";
 
   return (
     <div
@@ -43,7 +44,7 @@ export function AdminFormActions({
         }}
       >
         {submitting && <Loader2 className="animate-spin" size={16} />}
-        <span>{submitting ? loadingLabel : submitLabel}</span>
+        <span>{submitting ? loadingLabel : finalSubmitLabel}</span>
       </button>
       {isEditing && onCancel && (
         <button

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getInnovations } from "../../axios/api/innovations";
 import { InnovationItem } from "../types/innovations";
 import styles from "../styles/Innovations.module.css";
@@ -86,11 +86,46 @@ const SECTORS = [
   "Green Digital Innovationt"
 ] as const;
 
+const INNOVATION_METRICS = [
+  { n: 56, l: "Current Innovations", suffix: "" },
+  { n: 400, l: "Innovators", suffix: "+" },
+  { n: 11, l: "Existing Copyrights", suffix: "" },
+  { n: 8, l: "Priority Sectors", suffix: "" },
+  { n: 5, l: "Pipeline Stages", suffix: "" },
+] as const;
+
 function InnovationPage() {
   const innovations: InnovationItem[] = Route.useLoaderData();
   const [q, setQ] = useState("");
   const [stage, setStage] = useState<(typeof STAGES)[number]>("All");
   const [sector, setSector] = useState<string>("All");
+
+  const [counts, setCounts] = useState(() => Array(INNOVATION_METRICS.length).fill(0));
+
+  useEffect(() => {
+    const targets = [
+      Math.max(innovations?.length || 0, 56),
+      400,
+      11,
+      8,
+      5,
+    ];
+    let cancelled = false;
+    const duration = 1500;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      if (cancelled) return;
+      const progress = Math.min((now - start) / duration, 1);
+      setCounts(targets.map((val) => Math.round(val * progress)));
+      if (progress < 1) window.requestAnimationFrame(animate);
+    };
+
+    window.requestAnimationFrame(animate);
+    return () => {
+      cancelled = true;
+    };
+  }, [innovations?.length]);
 
   const filtered = innovations.filter((p) => {
     const matchQ =
@@ -105,7 +140,7 @@ function InnovationPage() {
 
   return (
     <>
-      <header className="page-header">
+      <header className="page-header" style={{ paddingBottom: "2rem" }}>
         <h1>
           Innovations{" "}
           <span style={{ color: "var(--jhub-green)" }}>Portfolio</span>
@@ -115,6 +150,19 @@ function InnovationPage() {
           by sector, stage or support need — and sponsor a project that fits
           your priorities.
         </p>
+
+        {/* Hero Stats Bar with Counting Animation */}
+        <div className={styles['hero-stats-bar']}>
+          {INNOVATION_METRICS.map((m, index) => (
+            <div key={m.l} className={styles['hero-stat']}>
+              <div className={styles['hero-stat-n']}>
+                {counts[index]}
+                {m.suffix}
+              </div>
+              <div className={styles['hero-stat-l']}>{m.l}</div>
+            </div>
+          ))}
+        </div>
       </header>
 
       <section className="content-section">

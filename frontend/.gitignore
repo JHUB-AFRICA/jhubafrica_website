@@ -32,3 +32,8 @@ dist-ssr
 .env.production.local
 .env.sample
 *.env
+
+# Asset dumps and untracked folders
+*jhubafrica.com_*
+jhubafrica.com_*
+src/assets/team/

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
 import { getTeamMembers } from "../../axios/api/team";
+import { TEAM_MEMBERS } from "../data/team";
 import { JHubTeamMember } from "../types/team";
 import styles from "../styles/About.module.css";
 
@@ -23,23 +24,25 @@ export const Route = createFileRoute("/about")({
   }),
   loader: async () => {
     try {
-      const team = await getTeamMembers();
-      return { team };
+      const apiTeam = await getTeamMembers();
+      return { team: apiTeam.length > 0 ? apiTeam : TEAM_MEMBERS };
     } catch (e) {
       console.error("Failed to fetch team members:", e);
-      return { team: [] };
+      return { team: TEAM_MEMBERS };
     }
   },
   component: AboutPage,
 });
 
 function AboutPage() {
-  const { team }: { team: JHubTeamMember[] } = Route.useLoaderData();
+  const { team: loaderTeam }: { team: JHubTeamMember[] } = Route.useLoaderData();
+  const teamList = loaderTeam && loaderTeam.length > 0 ? loaderTeam : TEAM_MEMBERS;
   const [activeCategory, setActiveCategory] = useState<string>("ALL");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const filteredTeam = activeCategory === "ALL"
-    ? team
-    : team.filter((member) => member.category === activeCategory);
+    ? teamList
+    : teamList.filter((member) => member.category === activeCategory);
 
   return (
     <>
@@ -196,43 +199,60 @@ function AboutPage() {
           ))}
         </div>
 
-        <div className="cards-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
-          {filteredTeam.map(member => (
-            <article
-              key={member.id}
-              className="prog-card"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: "16px",
-                overflow: "hidden",
-                border: "1px solid var(--border-color)",
-                background: "var(--bg-soft)",
-                padding: 0
-              }}
-            >
-              <div style={{ height: "240px", overflow: "hidden", position: "relative" }}>
-                <img
-                  src={member.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=256"}
-                  alt={member.name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              </div>
-              <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>
-                <h3 style={{ fontSize: "1.25rem", fontWeight: "700", color: "var(--jhub-blue)", margin: "0 0 0.25rem 0" }}>
-                  {member.name}
-                </h3>
-                <div style={{ fontSize: "0.95rem", color: "var(--jhub-green)", fontWeight: "600", marginBottom: "0.75rem" }}>
-                  {member.title}
+        <div className="cards-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem", alignItems: "start" }}>
+          {filteredTeam.map(member => {
+            const isExpanded = expandedId === member.id;
+            return (
+              <article
+                key={member.id}
+                className={`${styles['team-card-borderless']} ${isExpanded ? styles['team-card-expanded'] : ''}`}
+                onClick={() => setExpandedId(isExpanded ? null : member.id)}
+              >
+                <div className={styles['team-card-media']}>
+                  <img
+                    src={member.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=256"}
+                    alt={member.name}
+                    className={styles['team-card-img']}
+                    loading="lazy"
+                  />
                 </div>
-                {member.bio && (
-                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0, lineHeight: "1.5" }}>
-                    {member.bio}
-                  </p>
-                )}
-              </div>
-            </article>
-          ))}
+                <div className={styles['team-card-body']}>
+                  <h3 className={styles['team-card-name']}>
+                    <span className="hover-underline-center">{member.name}</span>
+                  </h3>
+                  <div className={styles['team-card-role']}>
+                    {member.title}
+                  </div>
+
+                  {isExpanded && (
+                    <div className={styles['team-card-bio-container']}>
+                      <span className={styles['team-card-badge']}>
+                        {member.category.replace(/_/g, " ")}
+                      </span>
+                      <p className={styles['team-card-bio-text']}>
+                        {member.bio || "Team member at JHUB Africa driving sustainable digital innovation across Africa."}
+                      </p>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    className={styles['team-card-btn']}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedId(isExpanded ? null : member.id);
+                    }}
+                  >
+                    {isExpanded ? (
+                      <>Show Less <span style={{ fontSize: "1rem" }}>↑</span></>
+                    ) : (
+                      <>View Profile <span>→</span></>
+                    )}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
 
           {filteredTeam.length === 0 && (
             <div style={{ textAlign: "center", padding: "3rem", background: "var(--bg-soft)", borderRadius: "12px", border: "1px dashed var(--border-color)", gridColumn: "1 / -1" }}>
