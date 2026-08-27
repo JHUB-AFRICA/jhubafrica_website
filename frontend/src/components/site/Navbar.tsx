@@ -99,9 +99,13 @@ export default function Navbar() {
         </nav>
 
         {/* Global CTA inside sticky header (visible only on desktop) */}
-        <div className={styles['nav-cta']}>
-          <ApplyDialog triggerText="Get Involved" triggerVariant="default" />
-        </div>
+        <Link
+          to="/contact"
+          className={styles['nav-cta']}
+          style={{ textDecoration: "none" }}
+        >
+          Get in Touch
+        </Link>
       </header>
 
       {/* Mobile/Tablet Drawer Sidebar (visible only on mobile/tablet) */}
@@ -176,14 +180,6 @@ export default function Navbar() {
             X
           </a>
           <a
-            href="https://github.com/JHUB-AFRICA"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles['sidebar-social-link']}
-          >
-            GitHub
-          </a>
-          <a
             href="https://youtube.com/"
             target="_blank"
             rel="noopener noreferrer"
@@ -202,7 +198,14 @@ export default function Navbar() {
         </div>
 
         <div className={styles['sidebar-cta-container']}>
-          <ApplyDialog triggerText="Get Involved" triggerVariant="default" />
+          <Link
+            to="/contact"
+            className="btn-primary"
+            onClick={() => setOpen(false)}
+            style={{ width: "100%", textAlign: "center", textDecoration: "none" }}
+          >
+            Get in Touch
+          </Link>
         </div>
       </nav>
 

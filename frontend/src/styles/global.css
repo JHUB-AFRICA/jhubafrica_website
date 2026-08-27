@@ -919,7 +919,8 @@ article:hover .hover-underline-center::after,
 .home-event-item:hover .hover-underline-center::after,
 .home-news-item:hover .hover-underline-center::after,
 .diagonal-vision-cell:hover .hover-underline-center::after,
-.diagonal-mission-cell:hover .hover-underline-center::after {
+.diagonal-mission-cell:hover .hover-underline-center::after,
+[class*="contact-detail-card"]:hover .hover-underline-center::after {
   width: 100%;
   left: 0;
 }

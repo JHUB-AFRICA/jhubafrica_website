@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import ApplyDialog from "../components/site/ApplyDialog";
+import image2 from "../assets/images/image2.jpeg";
+import image4 from "../assets/images/image4.jpeg";
+import image5 from "../assets/images/image5.jpeg";
+import image6 from "../assets/images/images6.jpg";
+import image7 from "../assets/images/images7.jpg";
+import styles from "../styles/Home.module.css";
 
 export const Route = createFileRoute("/for-innovators")({
   head: () => ({
@@ -22,28 +27,38 @@ export const Route = createFileRoute("/for-innovators")({
   component: ForInnovatorsPage,
 });
 
-const SUPPORT = [
+const SUPPORT_STEPS = [
   {
     title: "Incubation",
-    desc: "Structured 12-week programs with workspace, mentors and milestone reviews.",
-    color: "green" as const,
+    description: "Build ideas with coaching, lab access and pilot support.",
+    image: image7,
+    overlay: "linear-gradient(135deg, rgba(15, 45, 89, 0.9), rgba(16, 185, 129, 0.4))",
   },
   {
     title: "Mentorship",
-    desc: "Matched mentors from industry, JKUAT faculty and the JHUB alumni network.",
-    color: "" as const,
+    description: "Connect with experts, investors and industry mentors.",
+    image: image2,
+    overlay: "linear-gradient(135deg, rgba(4, 120, 87, 0.92), rgba(59, 130, 246, 0.35))",
   },
   {
-    title: "Technical support",
-    desc: "Access to labs, cloud credits and engineering reviews with our tech team.",
-    color: "red" as const,
+    title: "Training",
+    description: "Develop tech and innovation skills through applied programs.",
+    image: image6,
+    overlay: "linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(245, 158, 11, 0.35))",
   },
   {
     title: "Funding connections",
-    desc: "Warm introductions to sponsors, grant programs and pre-seed investors.",
-    color: "green" as const,
+    description: "Access partner networks, grant opportunities and strategic support.",
+    image: image4,
+    overlay: "linear-gradient(135deg, rgba(127, 29, 29, 0.9), rgba(14, 165, 233, 0.35))",
   },
-];
+  {
+    title: "Commercialisation",
+    description: "Validate market fit, scale solutions and reach customers.",
+    image: image5,
+    overlay: "linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(16, 185, 129, 0.4))",
+  },
+] as const;
 
 const STEPS = [
   {
@@ -104,7 +119,15 @@ function ForInnovatorsPage() {
           to move your idea toward market readiness.
         </p>
         <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <ApplyDialog triggerText="Submit your innovation" source="For Innovators Page" triggerVariant="default" triggerClassName="btn-primary" />
+          <a
+            href="https://innovation.jhubafrica.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary"
+            style={{ textDecoration: "none" }}
+          >
+            Submit your innovation ↗
+          </a>
           <Link to="/innovation" className="btn-outline">
             See current portfolio
           </Link>
@@ -114,16 +137,24 @@ function ForInnovatorsPage() {
       <section className="content-section">
         <div className="section-eyebrow">What you get</div>
         <h2 className="section-h2">Support offered</h2>
-        <div className="cards-grid" style={{ marginTop: "1.25rem" }}>
-          {SUPPORT.map((s) => (
-            <div key={s.title} className="prog-card">
-              <div className={`prog-title ${s.color}`}>{s.title}</div>
-              <p className="prog-desc">{s.desc}</p>
-            </div>
+        <div className={styles['support-grid']} style={{ marginTop: "1.5rem" }}>
+          {SUPPORT_STEPS.map((step) => (
+            <article key={step.title} className={styles['support-card']}>
+              <div
+                className={styles['support-card-media']}
+                style={{
+                  backgroundImage: `${step.overlay}, url(${step.image})`,
+                }}
+              />
+              <div className={styles['support-card-body']}>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
+            </article>
           ))}
         </div>
 
-        <div style={{ marginTop: "3rem" }}>
+        <div style={{ marginTop: "3.5rem" }}>
           <div className="section-eyebrow">Application process</div>
           <h2 className="section-h2 green">From idea to onboarding</h2>
           <ol className="flow-list">
@@ -214,12 +245,18 @@ function ForInnovatorsPage() {
           </div>
         </div>
 
-        <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <ApplyDialog triggerText="Start your application" source="For Innovators Page" triggerVariant="default" triggerClassName="btn-primary" />
+        <div style={{ marginTop: "3rem", textAlign: "center" }}>
+          <a
+            href="https://innovation.jhubafrica.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary"
+            style={{ textDecoration: "none" }}
+          >
+            Submit your innovation ↗
+          </a>
         </div>
       </section>
-
-      
     </>
   );
 }
