@@ -205,65 +205,65 @@ function InnovationPage() {
           Showing {filtered.length} of {innovations.length} innovations
         </div>
 
-        <div className="cards-grid" style={{ marginTop: "1.25rem" }}>
-          {filtered.map((p) => (
-            <Link
-              key={p.id}
-              to="/innovation/$slug"
-              params={{ slug: p.slug || "" }}
-              style={{ textDecoration: "none", color: "inherit", display: "block" }}
-            >
-              <article className="prog-card" style={{ height: "100%", cursor: "pointer", display: "flex", flexDirection: "column", padding: 0, overflow: "hidden" }}>
-                {p.coverImageUrl ? (
-                  <div style={{ height: "180px", overflow: "hidden", borderBottom: "1px solid var(--border-color)" }}>
-                    <img 
-                      src={p.coverImageUrl} 
-                      alt={p.title} 
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+        <div className="cards-grid" style={{ gap: "2.5rem 2rem", marginTop: "1.5rem" }}>
+          {filtered.map((p) => {
+            return (
+              <Link
+                key={p.id}
+                to="/innovation/$slug"
+                params={{ slug: p.slug || "" }}
+                className="innovation-card-borderless"
+              >
+                <div className="innovation-media-wrap">
+                  {p.coverImageUrl ? (
+                    <img
+                      src={p.coverImageUrl}
+                      alt={p.title}
                     />
-                  </div>
-                ) : (
-                  <div style={{ height: "180px", position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #0f2d59 0%, #1e1b4b 100%)", borderBottom: "1px solid var(--border-color)" }}>
-                    <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }} xmlns="http://www.w3.org/2000/svg">
-                      <defs>
-                        <pattern id="grid-portfolio" width="20" height="20" patternUnits="userSpaceOnUse">
-                          <circle cx="2" cy="2" r="1" fill="#ffffff" />
-                        </pattern>
-                      </defs>
-                      <rect width="100%" height="100%" fill="url(#grid-portfolio)" />
-                    </svg>
-                    <div style={{ position: "absolute", top: "-20px", left: "-20px", width: "120px", height: "120px", borderRadius: "50%", background: "radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%)", filter: "blur(10px)" }} />
-                    <div style={{ position: "absolute", bottom: "-30px", right: "-10px", width: "140px", height: "140px", borderRadius: "50%", background: "radial-gradient(circle, rgba(15, 45, 89, 0.6) 0%, rgba(15, 45, 89, 0) 70%)", filter: "blur(10px)" }} />
-                    <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                      <span style={{ color: "#ffffff", fontSize: "1.25rem", fontWeight: "800", letterSpacing: "0.15em", textTransform: "uppercase", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", borderRadius: "8px", padding: "6px 16px", backdropFilter: "blur(4px)" }}>JHUB</span>
+                  ) : (
+                    <div style={{ height: "100%", width: "100%", position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #0f2d59 0%, #1e1b4b 100%)" }}>
+                      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }} xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                          <pattern id={`grid-portfolio-${p.id}`} width="20" height="20" patternUnits="userSpaceOnUse">
+                            <circle cx="2" cy="2" r="1" fill="#ffffff" />
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill={`url(#grid-portfolio-${p.id})`} />
+                      </svg>
+                      <div style={{ position: "absolute", top: "-20px", left: "-20px", width: "120px", height: "120px", borderRadius: "50%", background: "radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%)", filter: "blur(10px)" }} />
+                      <div style={{ position: "absolute", bottom: "-30px", right: "-10px", width: "140px", height: "140px", borderRadius: "50%", background: "radial-gradient(circle, rgba(15, 45, 89, 0.6) 0%, rgba(15, 45, 89, 0) 70%)", filter: "blur(10px)" }} />
+                      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                        <span style={{ color: "#ffffff", fontSize: "1.25rem", fontWeight: "800", letterSpacing: "0.15em", textTransform: "uppercase", background: "rgba(255, 255, 255, 0.08)", border: "none", borderRadius: "8px", padding: "6px 16px", backdropFilter: "blur(4px)" }}>JHUB</span>
+                      </div>
                     </div>
-                  </div>
-                )}
-                <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>
-                  <div className="prog-title" style={{ marginTop: 0, fontSize: "1.25rem" }}>{p.title}</div>
-                  
-                  {p.description && (
-                    <p className="prog-desc" style={{ marginTop: "0.5rem", color: "#475569", fontSize: "0.95rem", flexGrow: 1 }}>
-                      {p.description}
-                    </p>
                   )}
-                  
-                  <div className="prog-meta" style={{ marginTop: "auto", paddingTop: "0.5rem" }}>
-                    <span className="prog-arrow">
-                      View project details →
-                    </span>
-                  </div>
                 </div>
-              </article>
-            </Link>
-          ))}
+                <div style={{ textTransform: "uppercase", fontSize: "0.75rem", fontWeight: "700", color: "var(--jhub-green)", marginBottom: "0.4rem" }}>
+                  {p.sector} · {p.stage}
+                </div>
+                <div className="prog-title hover-underline-center" style={{ marginTop: 0, fontSize: "1.25rem", fontWeight: "700", lineHeight: "1.3", marginBottom: "0.4rem" }}>
+                  {p.title}
+                </div>
+                {p.description && (
+                  <p className="prog-desc" style={{ flexGrow: 1, margin: "0 0 1.25rem 0", fontSize: "0.92rem", color: "var(--text-muted)", lineHeight: "1.55" }}>
+                    {p.description}
+                  </p>
+                )}
+                <div style={{ marginTop: "auto", paddingTop: "0.25rem" }}>
+                  <span className="prog-arrow" style={{ fontSize: "0.88rem" }}>
+                    View Project →
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
           {filtered.length === 0 && (
             <div
-              className="prog-card"
-              style={{ gridColumn: "1 / -1", textAlign: "center" }}
+              className="innovation-card-borderless"
+              style={{ gridColumn: "1 / -1", textAlign: "center", padding: "3rem 1rem" }}
             >
-              <p className="prog-desc">
-                No innovations match your filters. Try clearing them.
+              <p className="prog-desc" style={{ fontSize: "1.05rem", color: "var(--text-muted)" }}>
+                No innovations match your filters. Try selecting a different sector or stage.
               </p>
             </div>
           )}

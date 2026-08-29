@@ -56,12 +56,27 @@ const mapInnovation = (item: any): InnovationItem => ({
   problem: item.problem || "",
   solution: item.solution || "",
   description: item.description || "",
+  tagline: item.tagline || "",
+  traction: item.traction || "",
+  impactEvidence: item.impact_evidence || item.impactEvidence || "",
+  beneficiaries: item.beneficiaries || "",
+  mediaUrls: item.media_urls || item.mediaUrls || [],
   status: item.status,
   slug: item.slug || "",
   coverImageUrl: item.cover_image_url || item.coverImageUrl || "",
+  website: item.website || item.project_links || item.projectLinks || item.demo_url || item.demoUrl || undefined,
+  projectLinks: item.project_links || item.projectLinks || item.website || undefined,
+  createdAt: item.created_at || item.createdAt,
+  updatedAt: item.updated_at || item.updatedAt,
   teamMembers: item.team_members && item.team_members.length > 0
-    ? item.team_members.map((m: any) => ({ name: `${m.first_name || ""} ${m.last_name || ""}`.trim() || m.name || "Member", role: m.role || "Contributor" }))
+    ? item.team_members.map((m: any) => ({
+        name: `${m.first_name || ""} ${m.last_name || ""}`.trim() || m.name || "Member",
+        role: m.role || "Contributor",
+        email: m.email || undefined,
+        linkedinUrl: m.linkedin_url || m.linkedinUrl || undefined,
+      }))
     : [],
+  sponsorships: item.sponsorships || [],
 });
 
 export const getInnovations = async (): Promise<InnovationItem[]> => {
