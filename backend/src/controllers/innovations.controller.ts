@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { supabase, supabaseAdmin } from '../config/supabase.js'
-import { withCache, CacheKey, CacheTTL } from '../config/redis.js'
+import { redis, withCache, CacheKey, CacheTTL } from '../config/redis.js'
 import { NotFoundError } from '../middleware/error.middleware.js'
 
 export async function getInnovations(req: Request, res: Response, next: NextFunction) {
@@ -337,6 +337,59 @@ export async function updateInnovation(req: Request, res: Response, next: NextFu
 
     if (finalError || !finalData) throw finalError || new NotFoundError('Innovation')
     res.json({ data: finalData })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function deleteInnovation(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id } = req.params
+    const user = req.user
+
+    // Fetch existing
+    const { data: existing, error: fetchErr } = await supabaseAdmin
+      .from('innovations')
+      .select('id, slug, owner_id')
+      .eq('id', id)
+      .single()
+
+    if (fetchErr || !existing) throw new NotFoundError('Innovation')
+
+    // Authorization check: User must be ADMIN or owner
+    if (user?.role?.toLowerCase() !== 'admin' && existing.owner_id !== user?.sub) {
+      return res.status(403).json({ error: 'Forbidden', message: 'You are not authorized to delete this innovation.' })
+    }
+
+    // Cascade team members
+    try {
+      await supabaseAdmin.from('team_members').delete().eq('innovation_id', id)
+    } catch (e) {
+      console.warn('[deleteInnovation] team_members delete error:', e)
+    }
+
+    // Delete innovation
+    const { data, error } = await supabaseAdmin
+      .from('innovations')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    // Invalidate caches
+    if (redis) {
+      try {
+        await redis.del(CacheKey.innovations())
+        await redis.del(CacheKey.innovations('featured'))
+        if (existing.slug) await redis.del(CacheKey.innovations(existing.slug))
+      } catch (cacheErr) {
+        console.warn('[deleteInnovation cache invalidation error]:', cacheErr)
+      }
+    }
+
+    res.json({ success: true, message: 'Innovation deleted successfully', data })
   } catch (err) {
     next(err)
   }

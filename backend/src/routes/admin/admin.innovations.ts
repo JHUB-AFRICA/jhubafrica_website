@@ -1,7 +1,12 @@
 import { Router } from 'express'
 import { validate } from '../../middleware/validate.middleware.js'
 import { updateInnovationStatusSchema } from '../../schemas/innovations.schema.js'
-import { updateSubmissionStatus, toggleFeatured, getAdminInnovations } from '../../controllers/admin/innovations.controller.js'
+import {
+  updateSubmissionStatus,
+  toggleFeatured,
+  getAdminInnovations,
+  deleteAdminInnovation,
+} from '../../controllers/admin/innovations.controller.js'
 
 const router = Router()
 
@@ -13,5 +18,8 @@ router.patch('/:id/status', validate(updateInnovationStatusSchema), updateSubmis
 
 // PATCH /:id/feature
 router.patch('/:id/feature', toggleFeatured)
+
+// DELETE /:id
+router.delete('/:id', deleteAdminInnovation)
 
 export default router

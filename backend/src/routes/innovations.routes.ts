@@ -3,7 +3,16 @@ import { validate } from '../middleware/validate.middleware.js'
 import { requireAuth } from '../middleware/auth.middleware.js'
 import { formLimiter } from '../middleware/rateLimiter.middleware.js'
 import { listQuerySchema, createSchema, submitSchema } from '../schemas/innovations.schema.js'
-import { getInnovations, getFeaturedInnovations, getCategories, getInnovationBySlug, createDraft, submitProposal, updateInnovation } from '../controllers/innovations.controller.js'
+import {
+  getInnovations,
+  getFeaturedInnovations,
+  getCategories,
+  getInnovationBySlug,
+  createDraft,
+  submitProposal,
+  updateInnovation,
+  deleteInnovation,
+} from '../controllers/innovations.controller.js'
 
 const router = Router()
 
@@ -27,5 +36,8 @@ router.post('/submit', formLimiter, validate(submitSchema), submitProposal)
 
 // PATCH /innovations/:id
 router.patch('/:id', requireAuth, updateInnovation)
+
+// DELETE /innovations/:id
+router.delete('/:id', requireAuth, deleteInnovation)
 
 export default router

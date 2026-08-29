@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { supabaseAdmin } from '../../config/supabase.js'
+import { redis, CacheKey } from '../../config/redis.js'
 import { NotFoundError } from '../../middleware/error.middleware.js'
 
 export async function updateSubmissionStatus(req: Request, res: Response, next: NextFunction) {
@@ -15,6 +16,17 @@ export async function updateSubmissionStatus(req: Request, res: Response, next: 
       .single()
 
     if (error || !data) throw new NotFoundError('Innovation')
+
+    if (redis) {
+      try {
+        await redis.del(CacheKey.innovations())
+        await redis.del(CacheKey.innovations('featured'))
+        if (data.slug) await redis.del(CacheKey.innovations(data.slug))
+      } catch (cacheErr) {
+        console.warn('[updateSubmissionStatus cache invalidation warning]:', cacheErr)
+      }
+    }
+
     res.json({ data })
   } catch (err) {
     next(err)
@@ -34,11 +46,23 @@ export async function toggleFeatured(req: Request, res: Response, next: NextFunc
       .single()
 
     if (error || !data) throw new NotFoundError('Innovation')
+
+    if (redis) {
+      try {
+        await redis.del(CacheKey.innovations())
+        await redis.del(CacheKey.innovations('featured'))
+        if (data.slug) await redis.del(CacheKey.innovations(data.slug))
+      } catch (cacheErr) {
+        console.warn('[toggleFeatured cache invalidation warning]:', cacheErr)
+      }
+    }
+
     res.json({ data })
   } catch (err) {
     next(err)
   }
 }
+
 export async function getAdminInnovations(req: Request, res: Response, next: NextFunction) {
   try {
     const { data, error } = await supabaseAdmin
@@ -48,6 +72,73 @@ export async function getAdminInnovations(req: Request, res: Response, next: Nex
 
     if (error) throw error
     res.json({ data })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function deleteAdminInnovation(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id } = req.params
+
+    // 1. Fetch innovation first to obtain metadata and slug
+    const { data: existing } = await supabaseAdmin
+      .from('innovations')
+      .select('id, slug, cover_image_url')
+      .eq('id', id)
+      .single()
+
+    // 2. Cascade delete related child team members
+    try {
+      await supabaseAdmin
+        .from('team_members')
+        .delete()
+        .eq('innovation_id', id)
+    } catch (teamDelErr) {
+      console.warn('[deleteAdminInnovation] team_members delete skipped:', teamDelErr)
+    }
+
+    // 3. Cascade delete any partner requests
+    try {
+      await supabaseAdmin
+        .from('partner_requests')
+        .delete()
+        .eq('innovation_id', id)
+    } catch (partnerDelErr) {
+      console.warn('[deleteAdminInnovation] partner_requests delete skipped:', partnerDelErr)
+    }
+
+    // 4. Delete innovation record
+    const { data, error } = await supabaseAdmin
+      .from('innovations')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('[deleteAdminInnovation error]:', error)
+      throw error
+    }
+
+    // 5. Invalidate caches
+    if (redis) {
+      try {
+        await redis.del(CacheKey.innovations())
+        await redis.del(CacheKey.innovations('featured'))
+        if (existing?.slug) {
+          await redis.del(CacheKey.innovations(existing.slug))
+        }
+      } catch (cacheErr) {
+        console.warn('[deleteAdminInnovation cache invalidation warning]:', cacheErr)
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Innovation deleted successfully',
+      data: data || existing,
+    })
   } catch (err) {
     next(err)
   }

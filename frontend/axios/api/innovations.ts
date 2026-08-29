@@ -155,5 +155,13 @@ export const updateInnovation = async (innovation: InnovationItem): Promise<Inno
 };
 
 export const deleteInnovation = async (id: string): Promise<void> => {
-  console.warn("Delete innovation is not supported directly in backend API endpoints.");
+  try {
+    await api.delete(`/api/v1/admin/innovations/${id}`);
+  } catch (err: any) {
+    if (err?.response?.status === 404) {
+      await api.delete(`/api/v1/innovations/${id}`);
+    } else {
+      throw err;
+    }
+  }
 };

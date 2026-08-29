@@ -63,3 +63,7 @@ export const toggleInnovationFeatured = async (id: string): Promise<{ success: b
   const response = await adminApi.patch<{ data: { success: boolean; isFeatured: boolean } }>(`/api/v1/admin/innovations/${id}/feature`);
   return response.data.data;
 };
+
+export const deleteAdminInnovation = async (id: string): Promise<void> => {
+  await adminApi.delete(`/api/v1/admin/innovations/${id}`);
+};
