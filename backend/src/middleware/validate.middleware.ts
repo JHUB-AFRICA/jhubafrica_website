@@ -9,6 +9,7 @@ export function validate(schema: ZodSchema, target: ValidateTarget = 'body') {
 
     if (!result.success) {
       const errors = formatZodErrors(result.error)
+      console.warn(`[Validation 422 on ${req.method} ${req.originalUrl}]:`, errors)
       return res.status(422).json({
         error: 'Validation failed',
         details: errors,

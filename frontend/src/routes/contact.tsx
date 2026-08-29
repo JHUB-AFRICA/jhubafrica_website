@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { MapPin, Mail, Phone, Clock, Globe, Linkedin, Facebook, Instagram } from "lucide-react";
+import { MapPin, Mail, Phone, Clock, Globe, Linkedin, Facebook, Instagram, Loader2 } from "lucide-react";
+import { submitContactInquiry } from "../../axios/api/contact";
 import styles from "../styles/Contact.module.css";
 
 export const Route = createFileRoute("/contact")({
@@ -24,6 +25,8 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -40,9 +43,61 @@ function ContactPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    if (!formData.name.trim() || !formData.email.trim()) return;
+
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      const roleToCategoryMap: Record<string, "GENERAL" | "INNOVATION_SUBMISSION" | "INCUBATION" | "PARTNERSHIP" | "FUNDING" | "COURSES" | "EVENTS" | "MEDIA" | "OTHER"> = {
+        Student: "COURSES",
+        Innovator: "INNOVATION_SUBMISSION",
+        Partner: "PARTNERSHIP",
+        Sponsor: "FUNDING",
+        Volunteer: "OTHER",
+        "Media / Press": "MEDIA",
+      };
+
+      const category = roleToCategoryMap[formData.role] || "GENERAL";
+      const subject = formData.role ? `Inquiry from ${formData.role} (${formData.name.trim()})` : `Inquiry from ${formData.name.trim()}`;
+      const message = formData.inquiry.trim() || `Inquiry submission from ${formData.name.trim()} (${formData.role}).`;
+
+      await submitContactInquiry({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || undefined,
+        category,
+        subject,
+        message,
+        preferredResponseChannel: "email",
+        role: formData.role,
+        organisation: formData.organisation.trim() || undefined,
+      } as any);
+
+      setSent(true);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        role: "Student",
+        organisation: "",
+        inquiry: "",
+      });
+    } catch (err: any) {
+      console.error("Failed to submit contact inquiry:", err);
+      const details = err?.response?.data?.details;
+      const detailsMsg = details ? Object.entries(details).map(([k, v]) => `${k}: ${(v as string[]).join(', ')}`).join("; ") : "";
+      setErrorMessage(
+        detailsMsg ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Could not send your message at this time. Please try again later or email us directly."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -75,6 +130,7 @@ function ContactPage() {
                 onChange={handleChange}
                 placeholder="First and Last Name"
                 className={styles['contact-form-input']}
+                disabled={loading}
               />
             </div>
 
@@ -89,6 +145,7 @@ function ContactPage() {
                   onChange={handleChange}
                   placeholder="Email"
                   className={styles['contact-form-input']}
+                  disabled={loading}
                 />
               </div>
               <div>
@@ -99,6 +156,7 @@ function ContactPage() {
                   onChange={handleChange}
                   placeholder="+254 720 000 000"
                   className={styles['contact-form-input']}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -112,6 +170,7 @@ function ContactPage() {
                   onChange={handleChange}
                   className={styles['contact-form-input']}
                   title="Select your role"
+                  disabled={loading}
                 >
                   <option>Student</option>
                   <option>Innovator</option>
@@ -129,6 +188,7 @@ function ContactPage() {
                   onChange={handleChange}
                   placeholder="Organisation"
                   className={styles['contact-form-input']}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -142,14 +202,56 @@ function ContactPage() {
                 placeholder="Type Inquiry"
                 rows={4}
                 className={styles['contact-form-input']}
+                disabled={loading}
               />
             </div>
 
+            {errorMessage && (
+              <div
+                style={{
+                  padding: "0.75rem 1rem",
+                  borderRadius: "8px",
+                  fontSize: "0.88rem",
+                  color: "#991b1b",
+                  backgroundColor: "rgba(239, 68, 68, 0.1)",
+                  border: "1px solid #ef4444",
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
+
+            {sent && (
+              <div
+                style={{
+                  padding: "0.85rem 1.15rem",
+                  borderRadius: "8px",
+                  fontSize: "0.92rem",
+                  color: "#065f46",
+                  backgroundColor: "rgba(16, 185, 129, 0.12)",
+                  border: "1px solid var(--jhub-green)",
+                  fontWeight: 600,
+                }}
+              >
+                ✓ Thank you! Your message has been sent successfully. A confirmation email has been dispatched to your inbox.
+              </div>
+            )}
+
             <button
               type="submit"
+              disabled={loading}
               className={`btn-primary ${styles['contact-form-submit']}`}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                opacity: loading ? 0.65 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
             >
-              {sent ? "Message sent ✓" : "Send Message"}
+              {loading && <Loader2 className="animate-spin" size={18} />}
+              <span>{loading ? "Sending Message..." : sent ? "Send Another Message" : "Send Message"}</span>
             </button>
           </form>
         </div>

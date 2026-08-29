@@ -217,11 +217,27 @@ Attachment: ${attachmentUrl || 'None'}
 
     if (error) throw error
 
-    // Notify Innovation Program Lead using professional template
+    // Send email notifications
     try {
       const { compileInnovationSubmissionLeadEmail } = await import('../templates/emails/leads.templates.js')
-      const { sendInnovationLeadNotification } = await import('../services/email.service.js')
+      const { sendInnovationLeadNotification, sendUserAcknowledgment } = await import('../services/email.service.js')
 
+      // 1. Send confirmation to innovator
+      await sendUserAcknowledgment(
+        contactEmail,
+        contactName,
+        `Innovation Submission: ${title}`,
+        `Thank you for submitting "${title}" to JHUB Africa. Your project has been registered in our pipeline and will be evaluated by our Innovation Team.`,
+        data.id,
+        [
+          { label: 'Innovation Title', value: title },
+          { label: 'Sector', value: sector },
+          { label: 'Current Stage', value: stage },
+          { label: 'Support Needed', value: supportRequired || 'Mentorship / Incubation' },
+        ]
+      )
+
+      // 2. Notify Innovation Lead
       const emailHtml = compileInnovationSubmissionLeadEmail({
         contactName,
         contactEmail,
@@ -239,7 +255,7 @@ Attachment: ${attachmentUrl || 'None'}
 
       await sendInnovationLeadNotification(`[Innovation Submission] ${title}`, emailHtml)
     } catch (emailErr) {
-      console.error('Failed to notify Innovation Lead:', emailErr)
+      console.error('Failed to dispatch innovation emails:', emailErr)
     }
 
     res.status(201).json({

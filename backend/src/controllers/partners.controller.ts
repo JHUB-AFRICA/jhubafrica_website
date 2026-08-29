@@ -72,11 +72,27 @@ ${proposedCollaboration}
     })
     if (error) throw error
 
-    // Notify Strategic Partnerships Lead using professional template
+    // Send email notifications
     try {
       const { compilePartnerInquiryLeadEmail } = await import('../templates/emails/leads.templates.js')
-      const { sendPartnershipsLeadNotification } = await import('../services/email.service.js')
+      const { sendPartnershipsLeadNotification, sendUserAcknowledgment } = await import('../services/email.service.js')
 
+      // 1. Send confirmation to partner
+      await sendUserAcknowledgment(
+        contactEmail,
+        contactName,
+        `Partnership Proposal: ${organizationName}`,
+        `Thank you for your interest in partnering with JHUB Africa. We have received your proposal and our Strategic Partnerships team will review it.`,
+        undefined,
+        [
+          { label: 'Organization', value: organizationName },
+          { label: 'Partnership Type', value: partnershipType },
+          { label: 'Sector', value: sector },
+          { label: 'Timeline', value: expectedTimeline || 'Flexible' },
+        ]
+      )
+
+      // 2. Notify Strategic Partnerships Lead
       const emailHtml = compilePartnerInquiryLeadEmail({
         organizationName,
         partnershipType,
@@ -130,7 +146,7 @@ Message: ${message || 'None'}
     })
     if (error) throw error
 
-    // Notify Funding Lead using professional template
+    // Send email notifications
     try {
       let projectTitle = undefined
       if (innovationId) {
@@ -143,8 +159,24 @@ Message: ${message || 'None'}
       }
 
       const { compileSponsorInquiryLeadEmail } = await import('../templates/emails/leads.templates.js')
-      const { sendFundingLeadNotification } = await import('../services/email.service.js')
+      const { sendFundingLeadNotification, sendUserAcknowledgment } = await import('../services/email.service.js')
 
+      // 1. Send confirmation to sponsor
+      await sendUserAcknowledgment(
+        sponsorEmail,
+        sponsorName,
+        `Sponsorship Interest: ${organization}`,
+        `Thank you for your interest in supporting innovation at JHUB Africa. Our Funding & Resource Mobilization team has received your inquiry.`,
+        undefined,
+        [
+          { label: 'Organization', value: organization },
+          { label: 'Sponsorship Type', value: sponsorshipType },
+          { label: 'Interest Area', value: interestArea },
+          { label: 'Target Project', value: projectTitle || 'General Innovation Pool' },
+        ]
+      )
+
+      // 2. Notify Funding Lead
       const emailHtml = compileSponsorInquiryLeadEmail({
         sponsorName,
         sponsorEmail,

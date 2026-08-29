@@ -29,6 +29,7 @@ import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { InputField } from "@/features/admin/components/InputField";
 import { TextareaField } from "@/features/admin/components/TextareaField";
 import { SelectField } from "@/features/admin/components/SelectField";
+import { EmailAdmin } from "@/features/admin/components/EmailAdmin";
 import styles from "../styles/Admin.module.css";
 
 export const Route = createFileRoute("/admin")({
@@ -235,6 +236,7 @@ function AdminPage() {
       <InnovationsAdmin items={innovations} onDeleteRequest={requestDelete} />
       <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
       <TeamAdmin items={team} onDeleteRequest={requestDelete} />
+      <EmailAdmin />
 
       {confirmDelete.isOpen && (
         <div className={styles['modal-overlay-style']}>
@@ -1429,5 +1431,7 @@ function TeamAdmin({ items, onDeleteRequest }: TeamAdminProps) {
     </section>
   );
 }
+
+
 
 
