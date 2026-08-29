@@ -1,4 +1,4 @@
-import { api } from "../../axios.ts";
+import { adminApi } from "../../axios.ts";
 
 export interface PartnerProfile {
   id: string;
@@ -38,17 +38,17 @@ export interface Sponsorship {
 }
 
 export const createPartner = async (partner: Omit<PartnerProfile, "id">): Promise<PartnerProfile> => {
-  const response = await api.post<{ data: PartnerProfile }>("/api/v1/admin/partners", partner);
+  const response = await adminApi.post<{ data: PartnerProfile }>("/api/v1/admin/partners", partner);
   return response.data.data;
 };
 
 export const getPartnerApplications = async (): Promise<PartnerApplication[]> => {
-  const response = await api.get<{ data: PartnerApplication[] }>("/api/v1/admin/partners/applications");
+  const response = await adminApi.get<{ data: PartnerApplication[] }>("/api/v1/admin/partners/applications");
   return response.data.data;
 };
 
 export const getPartnerApplicationById = async (id: string): Promise<PartnerApplication> => {
-  const response = await api.get<{ data: PartnerApplication }>(`/api/v1/admin/partners/applications/${id}`);
+  const response = await adminApi.get<{ data: PartnerApplication }>(`/api/v1/admin/partners/applications/${id}`);
   return response.data.data;
 };
 
@@ -57,7 +57,7 @@ export const updatePartnerApplicationStatus = async (
   status: "PENDING" | "APPROVED" | "REJECTED",
   reviewNotes?: string
 ): Promise<PartnerApplication> => {
-  const response = await api.patch<{ data: PartnerApplication }>(`/api/v1/admin/partners/applications/${id}`, {
+  const response = await adminApi.patch<{ data: PartnerApplication }>(`/api/v1/admin/partners/applications/${id}`, {
     status,
     reviewNotes,
   });
@@ -65,18 +65,18 @@ export const updatePartnerApplicationStatus = async (
 };
 
 export const updatePartner = async (id: string, partner: Partial<PartnerProfile>): Promise<PartnerProfile> => {
-  const response = await api.patch<{ data: PartnerProfile }>(`/api/v1/admin/partners/${id}`, partner);
+  const response = await adminApi.patch<{ data: PartnerProfile }>(`/api/v1/admin/partners/${id}`, partner);
   return response.data.data;
 };
 
 export const deletePartner = async (id: string): Promise<void> => {
-  await api.delete(`/api/v1/admin/partners/${id}`);
+  await adminApi.delete(`/api/v1/admin/partners/${id}`);
 };
 
 export const createSponsorship = async (
   partnerId: string,
   sponsorship: Omit<Sponsorship, "id" | "partnerId">
 ): Promise<Sponsorship> => {
-  const response = await api.post<{ data: Sponsorship }>(`/api/v1/admin/partners/${partnerId}/sponsorships`, sponsorship);
+  const response = await adminApi.post<{ data: Sponsorship }>(`/api/v1/admin/partners/${partnerId}/sponsorships`, sponsorship);
   return response.data.data;
 };

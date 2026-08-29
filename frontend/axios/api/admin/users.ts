@@ -1,4 +1,4 @@
-import { api } from "../../axios.ts";
+import { adminApi } from "../../axios.ts";
 import { AdminUser } from "./auth.ts";
 
 export interface CreateAdminUserRequest {
@@ -15,6 +15,6 @@ interface CreateAdminUserResponse {
 }
 
 export const createAdminUser = async (user: CreateAdminUserRequest): Promise<AdminUser> => {
-  const response = await api.post<CreateAdminUserResponse>("/api/v1/admin/users", user);
+  const response = await adminApi.post<CreateAdminUserResponse>("/api/v1/admin/users", user);
   return response.data.user;
 };
