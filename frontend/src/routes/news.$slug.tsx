@@ -251,16 +251,31 @@ function NewsDetailPage() {
         {/* Editorial Byline */}
         <div
           style={{
-            fontWeight: 700,
-            color: "var(--jhub-blue)",
-            marginBottom: "1.5rem",
+            fontSize: "0.92rem",
+            color: "var(--text-muted)",
+            marginBottom: "2rem",
             display: "flex",
+            flexWrap: "wrap",
             alignItems: "center",
-            gap: "0.5rem",
+            gap: "0.75rem",
           }}
         >
-          <span style={{ width: "24px", height: "2px", backgroundColor: "var(--jhub-green)" }}></span>
-          By {post.author || "JHUB Editorial Team"}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 700, color: "var(--jhub-blue)" }}>
+            <span style={{ width: "20px", height: "2px", backgroundColor: "var(--jhub-green)" }}></span>
+            By {post.author || "JHUB Editorial Team"}
+          </div>
+          {post.date && (
+            <>
+              <span style={{ color: "var(--border-color, #cbd5e1)" }}>•</span>
+              <span style={{ fontWeight: 600, color: "var(--text-main)" }}>
+                {post.date}
+              </span>
+            </>
+          )}
+          <span style={{ color: "var(--border-color, #cbd5e1)" }}>•</span>
+          <span style={{ fontStyle: "italic", color: "var(--text-muted)" }}>
+            {post.date ? `${post.date} | Jomo Kenyatta University of Agriculture and Technology (JKUAT)` : "August 19, 2026 | Jomo Kenyatta University of Agriculture and Technology (JKUAT)"}
+          </span>
         </div>
 
         {/* Article Body Content (Supports TipTap Rich JSON & Plaintext) */}
