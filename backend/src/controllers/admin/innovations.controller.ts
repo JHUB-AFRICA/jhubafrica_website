@@ -88,7 +88,17 @@ export async function deleteAdminInnovation(req: Request, res: Response, next: N
       .eq('id', id)
       .single()
 
-    // 2. Cascade delete related child team members
+    // 2. Cascade delete related sponsorships
+    try {
+      await supabaseAdmin
+        .from('sponsorships')
+        .delete()
+        .eq('innovation_id', id)
+    } catch (sponsorshipDelErr) {
+      console.warn('[deleteAdminInnovation] sponsorships delete skipped:', sponsorshipDelErr)
+    }
+
+    // 3. Cascade delete related child team members
     try {
       await supabaseAdmin
         .from('team_members')
@@ -98,7 +108,27 @@ export async function deleteAdminInnovation(req: Request, res: Response, next: N
       console.warn('[deleteAdminInnovation] team_members delete skipped:', teamDelErr)
     }
 
-    // 3. Cascade delete any partner requests
+    // 4. Cascade delete related innovation images
+    try {
+      await supabaseAdmin
+        .from('innovation_images')
+        .delete()
+        .eq('innovation_id', id)
+    } catch (imgDelErr) {
+      console.warn('[deleteAdminInnovation] innovation_images delete skipped:', imgDelErr)
+    }
+
+    // 5. Cascade delete or unlink innovation submissions
+    try {
+      await supabaseAdmin
+        .from('innovation_submissions')
+        .delete()
+        .eq('innovation_id', id)
+    } catch (subDelErr) {
+      console.warn('[deleteAdminInnovation] innovation_submissions delete skipped:', subDelErr)
+    }
+
+    // 6. Cascade delete any partner requests
     try {
       await supabaseAdmin
         .from('partner_requests')

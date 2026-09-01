@@ -146,6 +146,21 @@ export async function updatePartner(req: Request, res: Response, next: NextFunct
 export async function deletePartner(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params
+
+    // Cascade sponsorships
+    try {
+      await supabaseAdmin.from('sponsorships').delete().eq('partner_id', id)
+    } catch (e) {
+      console.warn('[deletePartner] sponsorships delete error:', e)
+    }
+
+    // Cascade applications
+    try {
+      await supabaseAdmin.from('applications').delete().eq('partner_id', id)
+    } catch (e) {
+      console.warn('[deletePartner] applications delete error:', e)
+    }
+
     const { error } = await supabaseAdmin
       .from('partners')
       .delete()

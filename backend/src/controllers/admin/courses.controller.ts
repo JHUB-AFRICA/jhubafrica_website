@@ -72,6 +72,28 @@ export async function updateCourse(req: Request, res: Response, next: NextFuncti
 export async function deleteCourse(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params
+
+    // Cascade enrollments
+    try {
+      await supabaseAdmin.from('enrollments').delete().eq('course_id', id)
+    } catch (e) {
+      console.warn('[deleteCourse] enrollments delete error:', e)
+    }
+
+    // Cascade lessons
+    try {
+      await supabaseAdmin.from('lessons').delete().eq('course_id', id)
+    } catch (e) {
+      console.warn('[deleteCourse] lessons delete error:', e)
+    }
+
+    // Cascade cohorts
+    try {
+      await supabaseAdmin.from('cohorts').delete().eq('course_id', id)
+    } catch (e) {
+      console.warn('[deleteCourse] cohorts delete error:', e)
+    }
+
     const { error } = await supabaseAdmin
       .from('courses')
       .delete()

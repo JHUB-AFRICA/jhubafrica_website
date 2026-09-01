@@ -361,11 +361,39 @@ export async function deleteInnovation(req: Request, res: Response, next: NextFu
       return res.status(403).json({ error: 'Forbidden', message: 'You are not authorized to delete this innovation.' })
     }
 
+    // Cascade sponsorships
+    try {
+      await supabaseAdmin.from('sponsorships').delete().eq('innovation_id', id)
+    } catch (e) {
+      console.warn('[deleteInnovation] sponsorships delete error:', e)
+    }
+
     // Cascade team members
     try {
       await supabaseAdmin.from('team_members').delete().eq('innovation_id', id)
     } catch (e) {
       console.warn('[deleteInnovation] team_members delete error:', e)
+    }
+
+    // Cascade innovation images
+    try {
+      await supabaseAdmin.from('innovation_images').delete().eq('innovation_id', id)
+    } catch (e) {
+      console.warn('[deleteInnovation] innovation_images delete error:', e)
+    }
+
+    // Cascade innovation submissions
+    try {
+      await supabaseAdmin.from('innovation_submissions').delete().eq('innovation_id', id)
+    } catch (e) {
+      console.warn('[deleteInnovation] innovation_submissions delete error:', e)
+    }
+
+    // Cascade partner requests
+    try {
+      await supabaseAdmin.from('partner_requests').delete().eq('innovation_id', id)
+    } catch (e) {
+      console.warn('[deleteInnovation] partner_requests delete error:', e)
     }
 
     // Delete innovation

@@ -126,6 +126,14 @@ export async function updateAdminEvent(req: Request, res: Response, next: NextFu
 export async function deleteAdminEvent(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params
+
+    // Cascade event_rsvps
+    try {
+      await supabaseAdmin.from('event_rsvps').delete().eq('event_id', id)
+    } catch (e) {
+      console.warn('[deleteAdminEvent] event_rsvps delete error:', e)
+    }
+
     const { error } = await supabaseAdmin
       .from('events')
       .delete()
