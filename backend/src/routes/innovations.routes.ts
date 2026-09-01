@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validate } from '../middleware/validate.middleware.js'
-import { requireAuth } from '../middleware/auth.middleware.js'
+import { requireAuth, optionalAuth } from '../middleware/auth.middleware.js'
 import { formLimiter } from '../middleware/rateLimiter.middleware.js'
 import { listQuerySchema, createSchema, submitSchema } from '../schemas/innovations.schema.js'
 import {
@@ -29,7 +29,7 @@ router.get('/categories', getCategories)
 router.get('/:slug', getInnovationBySlug)
 
 // POST /innovations
-router.post('/', validate(createSchema), createDraft)
+router.post('/', optionalAuth, validate(createSchema), createDraft)
 
 // POST /innovations/submit
 router.post('/submit', formLimiter, validate(submitSchema), submitProposal)

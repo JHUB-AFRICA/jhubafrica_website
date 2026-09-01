@@ -1,4 +1,4 @@
-import { api, adminApi } from "../axios";
+import { api, adminApi, getAccessToken } from "../axios";
 import { InnovationItem } from "../../src/types/innovations";
 
 const STAGE_MAP_FE_TO_BE: Record<string, "IDEA" | "PROTOTYPE" | "PILOT" | "SCALING" | "MATURE"> = {
@@ -68,21 +68,21 @@ export const getInnovationBySlug = async (slug: string): Promise<InnovationItem>
   return mapInnovation(response.data.data);
 };
 
-const getOwnerIdFromToken = (): string => {
+const getOwnerIdFromToken = (): string | undefined => {
   try {
-    const raw = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-    if (!raw) return '00000000-0000-0000-0000-000000000000';
+    const raw = getAccessToken();
+    if (!raw) return undefined;
     const payload = JSON.parse(atob(raw.split('.')[1]));
-    return payload.sub || payload.id || '00000000-0000-0000-0000-000000000000';
+    return payload.sub || payload.id || undefined;
   } catch {
-    return '00000000-0000-0000-0000-000000000000';
+    return undefined;
   }
 };
 
 export const addInnovation = async (innovation: Omit<InnovationItem, "id">): Promise<InnovationItem> => {
   const stage = STAGE_MAP_FE_TO_BE[innovation.stage] || "IDEA";
   const ownerId = getOwnerIdFromToken();
-  const payload = {
+  const payload: any = {
     title: innovation.title,
     sector: innovation.sector,
     stage,
@@ -91,10 +91,13 @@ export const addInnovation = async (innovation: Omit<InnovationItem, "id">): Pro
     solution: innovation.solution.length >= 10 ? innovation.solution : innovation.solution.padEnd(10, " "),
     categories: ["General"],
     supportRequired: innovation.need || "None",
-    ownerId,
     teamMembers: innovation.teamMembers || [],
     coverImageUrl: innovation.coverImageUrl || "",
+    status: ("status" in innovation && innovation.status) ? innovation.status : "APPROVED",
   };
+  if (ownerId) {
+    payload.ownerId = ownerId;
+  }
   const response = await adminApi.post<{ data: any }>("/api/v1/innovations", payload);
   const created = response.data.data;
 

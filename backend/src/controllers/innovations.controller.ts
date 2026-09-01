@@ -109,13 +109,37 @@ export async function createDraft(req: Request, res: Response, next: NextFunctio
     const slugify = (await import('slugify')).default
     const slug = slugify(req.body.title, { lower: true, strict: true })
 
-    const { title, tagline, description, problem, solution, stage, sector, categories, beneficiaries, traction, impactEvidence, supportRequired, ownerId, coverImageUrl } = req.body
+    const { title, tagline, description, problem, solution, stage, sector, categories, beneficiaries, traction, impactEvidence, supportRequired, ownerId, coverImageUrl, status } = req.body
 
-    const owner_id = req.user?.sub || ownerId || null
+    let owner_id = req.user?.sub || (ownerId && ownerId !== '00000000-0000-0000-0000-000000000000' ? ownerId : null)
+
+    // Fallback: If no owner_id in token or body, assign to an existing ADMIN user in the database
+    if (!owner_id) {
+      const { data: adminUser } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .eq('role', 'ADMIN')
+        .limit(1)
+        .maybeSingle()
+
+      if (adminUser?.id) {
+        owner_id = adminUser.id
+      } else {
+        const { data: anyUser } = await supabaseAdmin
+          .from('users')
+          .select('id')
+          .limit(1)
+          .maybeSingle()
+        if (anyUser?.id) {
+          owner_id = anyUser.id
+        }
+      }
+    }
+
     if (!owner_id) {
       return res.status(400).json({
         error: 'Validation Error',
-        message: 'An ownerId is required in the request body, or a valid Authorization Bearer token must be provided.'
+        message: 'A valid ownerId or logged in user is required.'
       })
     }
 
@@ -137,7 +161,7 @@ export async function createDraft(req: Request, res: Response, next: NextFunctio
         support_required: supportRequired,
         cover_image_url: coverImageUrl,
         owner_id,
-        status: 'DRAFT',
+        status: status || 'APPROVED',
       })
       .select()
       .single()
