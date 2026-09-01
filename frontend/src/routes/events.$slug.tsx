@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { getEventBySlug } from "../../axios/api/events";
 import { EventItem } from "../types/events";
-import { MapPin } from "lucide-react";
+import EditorialHero from "../components/site/EditorialHero";
+import { MapPin, Calendar } from "lucide-react";
 
 export const Route = createFileRoute("/events/$slug")({
   head: (ctx: { loaderData?: EventItem }) => {
@@ -32,41 +33,30 @@ function EventDetailPage() {
 
   return (
     <>
-      <header className="page-header" style={{ position: "relative" }}>
-        <Link
-          to="/events"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            color: "var(--jhub-green)",
-            textDecoration: "none",
-            fontWeight: 600,
-            marginBottom: "1.5rem",
-            fontSize: "0.95rem",
-          }}
-        >
-          ← Back to Events
-        </Link>
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
-          <div className="event-date" style={{ width: "70px", padding: "0.4rem" }}>
-            <div className="event-day" style={{ fontSize: "1.5rem", lineHeight: 1 }}>{event.day}</div>
-            <div className="event-month" style={{ fontSize: "0.75rem" }}>{event.month}</div>
-          </div>
-          <div>
-            <h1 style={{ marginTop: 0, fontSize: "2.5rem", color: "var(--jhub-blue)", lineHeight: 1.2, marginBottom: 0 }}>
-              {event.title}
-            </h1>
-          </div>
-        </div>
-
-        {event.location && (
-          <div style={{ display: "flex", gap: "0.4rem", alignItems: "center", fontSize: "1.05rem", color: "var(--text-main)", marginTop: "1rem" }}>
-            <MapPin size={18} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />
-            <span><strong>Venue:</strong> {event.location}</span>
-          </div>
-        )}
-      </header>
+      <EditorialHero
+        themeVariant="navy"
+        backLink={{
+          to: "/events",
+          label: "Back to Events Calendar",
+        }}
+        badges={[
+          {
+            label: `${event.month} ${event.day}`,
+            variant: "accent",
+            icon: <Calendar size={14} />,
+          },
+          ...(event.location
+            ? [
+                {
+                  label: event.location,
+                  variant: "outline" as const,
+                  icon: <MapPin size={14} color="#6ee7b7" />,
+                },
+              ]
+            : []),
+        ]}
+        title={event.title}
+      />
 
       <section className="content-section" style={{ maxWidth: "800px", margin: "0 auto", paddingBottom: "4rem" }}>
         <div

@@ -5,6 +5,8 @@ import { InnovationItem } from "../types/innovations";
 import styles from "../styles/Innovations.module.css";
 import SkeletonCards from "../components/site/SkeletonCards";
 import ResourceFallback from "../components/site/ResourceFallback";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 
 export const Route = createFileRoute("/innovation/")({
   head: () => ({
@@ -28,18 +30,20 @@ export const Route = createFileRoute("/innovation/")({
   component: InnovationPage,
   errorComponent: ({ error, reset }) => (
     <>
-      <header className="page-header">
-        <h1>
-          Innovations{" "}
-          <span style={{ color: "var(--jhub-green)" }}>Portfolio</span>
-        </h1>
-        <p>
-          A searchable portfolio of African innovations in our pipeline. Filter
-          by sector, stage or support need — and sponsor a project that fits
-          your priorities.
-        </p>
-      </header>
-
+      <EditorialHero
+        themeVariant="default"
+        badges={[
+          { label: "VENTURE PORTFOLIO", variant: "sector" },
+          { label: "SPONSOR-READY", variant: "stage" },
+          { label: "JKUAT PIPELINE", variant: "verified" },
+        ]}
+        title={
+          <>
+            Innovations <span style={{ color: "#6ee7b7" }}>Portfolio</span>
+          </>
+        }
+        description="A searchable portfolio of African innovations in our pipeline. Filter by sector, stage or support need — and sponsor a project that fits your priorities."
+      />
       <section className="content-section">
         <ResourceFallback error={error} onRetry={reset} resourceName="Innovations Portfolio" />
       </section>
@@ -47,17 +51,20 @@ export const Route = createFileRoute("/innovation/")({
   ),
   pendingComponent: () => (
     <>
-      <header className="page-header">
-        <h1>
-          Innovations{" "}
-          <span style={{ color: "var(--jhub-green)" }}>Portfolio</span>
-        </h1>
-        <p>
-          A searchable portfolio of African innovations in our pipeline. Filter
-          by sector, stage or support need — and sponsor a project that fits
-          your priorities.
-        </p>
-      </header>
+      <EditorialHero
+        themeVariant="default"
+        badges={[
+          { label: "VENTURE PORTFOLIO", variant: "sector" },
+          { label: "SPONSOR-READY", variant: "stage" },
+          { label: "JKUAT PIPELINE", variant: "verified" },
+        ]}
+        title={
+          <>
+            Innovations <span style={{ color: "#6ee7b7" }}>Portfolio</span>
+          </>
+        }
+        description="A searchable portfolio of African innovations in our pipeline. Filter by sector, stage or support need — and sponsor a project that fits your priorities."
+      />
 
       <section className="content-section">
         <SkeletonCards count={4} hasImage={true} />
@@ -88,44 +95,42 @@ const SECTORS = [
 
 const INNOVATION_METRICS = [
   { n: 56, l: "Current Innovations", suffix: "" },
-  { n: 400, l: "Innovators", suffix: "+" },
-  { n: 11, l: "Existing Copyrights", suffix: "" },
-  { n: 8, l: "Priority Sectors", suffix: "" },
-  { n: 5, l: "Pipeline Stages", suffix: "" },
-] as const;
+  { n: 25, l: "Prototypes Built", suffix: "+" },
+  { n: 12, l: "Pilots Deployed", suffix: "" },
+  { n: 8, l: "Market-Ready Solutions", suffix: "" },
+];
 
 function InnovationPage() {
   const innovations: InnovationItem[] = Route.useLoaderData();
   const [q, setQ] = useState("");
   const [stage, setStage] = useState<(typeof STAGES)[number]>("All");
   const [sector, setSector] = useState<string>("All");
-
-  const [counts, setCounts] = useState(() => Array(INNOVATION_METRICS.length).fill(0));
+  const [counts, setCounts] = useState<number[]>(INNOVATION_METRICS.map(() => 0));
 
   useEffect(() => {
-    const targets = [
-      Math.max(innovations?.length || 0, 56),
-      400,
-      11,
-      8,
-      5,
-    ];
-    let cancelled = false;
-    const duration = 1500;
-    const start = performance.now();
+    const duration = 1500; // ms
+    const steps = 60;
+    const intervalTime = duration / steps;
+    let currentStep = 0;
 
-    const animate = (now: number) => {
-      if (cancelled) return;
-      const progress = Math.min((now - start) / duration, 1);
-      setCounts(targets.map((val) => Math.round(val * progress)));
-      if (progress < 1) window.requestAnimationFrame(animate);
-    };
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
 
-    window.requestAnimationFrame(animate);
-    return () => {
-      cancelled = true;
-    };
-  }, [innovations?.length]);
+      setCounts(
+        INNOVATION_METRICS.map((m) => {
+          return Math.floor(m.n * Math.min(progress, 1));
+        })
+      );
+
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        setCounts(INNOVATION_METRICS.map((m) => m.n));
+      }
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const filtered = innovations.filter((p) => {
     const matchQ =
@@ -140,30 +145,48 @@ function InnovationPage() {
 
   return (
     <>
-      <header className="page-header" style={{ paddingBottom: "2rem" }}>
-        <h1>
-          Innovations{" "}
-          <span style={{ color: "var(--jhub-green)" }}>Portfolio</span>
-        </h1>
-        <p>
-          A searchable portfolio of African innovations in our pipeline. Filter
-          by sector, stage or support need — and sponsor a project that fits
-          your priorities.
-        </p>
-
-        {/* Hero Stats Bar with Counting Animation */}
-        <div className={styles['hero-stats-bar']}>
-          {INNOVATION_METRICS.map((m, index) => (
-            <div key={m.l} className={styles['hero-stat']}>
-              <div className={styles['hero-stat-n']}>
-                {counts[index]}
-                {m.suffix}
+      <EditorialHero
+        themeVariant="default"
+        badges={[
+          { label: "VENTURE PORTFOLIO", variant: "sector" },
+          { label: "SPONSOR-READY", variant: "stage" },
+          { label: "JKUAT PIPELINE", variant: "verified" },
+        ]}
+        title={
+          <>
+            Innovations <span style={{ color: "#6ee7b7" }}>Portfolio</span>
+          </>
+        }
+        description="A searchable portfolio of African innovations in our pipeline. Filter by sector, stage or support need — and sponsor a project that fits your priorities."
+        actions={
+          <>
+            <a
+              href="https://innovation.jhubafrica.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={heroStyles.btnPrimary}
+            >
+              Submit your innovation ↗
+            </a>
+            <Link to="/support" className={heroStyles.btnOutline}>
+              Sponsorship pathways
+            </Link>
+          </>
+        }
+        bottomSlot={
+          <div className={styles['hero-stats-bar']}>
+            {INNOVATION_METRICS.map((m, index) => (
+              <div key={m.l} className={styles['hero-stat']}>
+                <div className={styles['hero-stat-n']}>
+                  {counts[index]}
+                  {m.suffix}
+                </div>
+                <div className={styles['hero-stat-l']}>{m.l}</div>
               </div>
-              <div className={styles['hero-stat-l']}>{m.l}</div>
-            </div>
-          ))}
-        </div>
-      </header>
+            ))}
+          </div>
+        }
+      />
 
       <section className="content-section">
         <div className={styles['filter-bar']}>

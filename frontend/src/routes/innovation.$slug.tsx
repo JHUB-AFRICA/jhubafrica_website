@@ -18,7 +18,9 @@ import {
 import { getInnovationBySlug, getInnovations } from "../../axios/api/innovations";
 import { InnovationItem } from "../types/innovations";
 import ApplyDialog from "../components/site/ApplyDialog";
+import EditorialHero from "../components/site/EditorialHero";
 import jhubSvg from "../assets/svgs/4.svg";
+import heroStyles from "../styles/EditorialHero.module.css";
 import styles from "../styles/IndividualInnovation.module.css";
 
 const STAGES = ["Concept", "Prototype", "Pilot", "Market entry", "Scale"] as const;
@@ -127,93 +129,68 @@ function InnovationDetailPage() {
 
   return (
     <div className={styles['editorial-wrapper']}>
-      {/* 1. IMMERSIVE HERO BANNER WITH SVG ON THE LEFT (NO BACKGROUND, NO BORDERS) */}
-      <section className={styles['hero-editorial']}>
-        <div className={styles['hero-mesh-overlay']} />
-        
-        <div className={styles['hero-inner']}>
-          <Link to="/innovation" className={styles['hero-back-link']}>
-            <ArrowLeft size={16} />
-            <span>Back to Innovations Portfolio</span>
-          </Link>
+      {/* 1. REUSABLE IMMERSIVE HERO BANNER */}
+      <EditorialHero
+        backLink={{
+          to: "/innovation",
+          label: "Back to Innovations Portfolio",
+        }}
+        media={
+          <img
+            src={jhubSvg}
+            alt="JHUB Africa Venture SVG"
+            className={heroStyles.heroMediaMedia}
+          />
+        }
+        mediaPosition="left"
+        badges={[
+          { label: innovation.sector, variant: "sector" },
+          {
+            label: `Stage: ${innovation.stage}`,
+            variant: "stage",
+            icon: <CheckCircle size={14} />,
+          },
+          {
+            label: "Verified by JHUB Secretariat",
+            variant: "verified",
+            icon: <ShieldCheck size={14} color="#6ee7b7" />,
+          },
+        ]}
+        title={innovation.title}
+        tagline={innovation.tagline}
+        description={innovation.description}
+        actions={
+          <>
+            <ApplyDialog
+              triggerText="Sponsor / Partner with this Venture"
+              triggerClassName={heroStyles.btnPrimary}
+              source={`Innovation: ${innovation.title}`}
+            />
 
-          <div className={styles['hero-split-grid']}>
-            {/* Left: 4.svg Vector Asset (Clean, Borderless, Transparent) */}
-            <div className={styles['hero-left-col']}>
-              <div className={styles['hero-svg-frame']}>
-                <img
-                  src={jhubSvg}
-                  alt="JHUB Africa Venture SVG"
-                  className={styles['hero-svg-media']}
-                />
-              </div>
-            </div>
+            {projectUrl && (
+              <a
+                href={projectUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={heroStyles.btnOutline}
+              >
+                <span>Visit Live Project / Demo</span>
+                <ExternalLink size={16} />
+              </a>
+            )}
 
-            {/* Right: Venture Meta, Title, Tagline & CTAs */}
-            <div className={styles['hero-right-col']}>
-              <div className={styles['hero-meta-row']}>
-                <span className={styles['sector-pill']}>
-                  {innovation.sector}
-                </span>
-
-                <span className={styles['stage-pill']}>
-                  <CheckCircle size={14} />
-                  <span>Stage: {innovation.stage}</span>
-                </span>
-
-                <span className={styles['verified-pill']}>
-                  <ShieldCheck size={14} color="#6ee7b7" />
-                  <span>Verified by JHUB Secretariat</span>
-                </span>
-              </div>
-
-              <h1 className={styles['hero-heading']}>{innovation.title}</h1>
-
-              {innovation.tagline && (
-                <p className={styles['hero-summary']} style={{ fontWeight: 600, color: "#e2e8f0" }}>
-                  {innovation.tagline}
-                </p>
-              )}
-
-              {innovation.description && (
-                <p className={styles['hero-summary']}>
-                  {innovation.description}
-                </p>
-              )}
-
-              <div className={styles['hero-actions-row']}>
-                <ApplyDialog
-                  triggerText="Sponsor / Partner with this Venture"
-                  triggerClassName={styles['hero-btn-primary']}
-                  source={`Innovation: ${innovation.title}`}
-                />
-
-                {projectUrl && (
-                  <a
-                    href={projectUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles['hero-btn-outline']}
-                  >
-                    <span>Visit Live Project / Demo</span>
-                    <ExternalLink size={16} />
-                  </a>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className={styles['hero-btn-outline']}
-                  title="Copy Link"
-                >
-                  {copied ? <Check size={16} color="#6ee7b7" /> : <Copy size={16} />}
-                  <span>{copied ? "Link Copied!" : "Share Venture"}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className={heroStyles.btnOutline}
+              title="Copy Link"
+            >
+              {copied ? <Check size={16} color="#6ee7b7" /> : <Copy size={16} />}
+              <span>{copied ? "Link Copied!" : "Share Venture"}</span>
+            </button>
+          </>
+        }
+      />
 
       {/* 2. STICKY SUBHEADER ANCHOR BAR */}
       <nav className={styles['sticky-nav-bar']}>

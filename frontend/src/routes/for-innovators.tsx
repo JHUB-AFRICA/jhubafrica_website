@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 import image2 from "../assets/images/image2.jpeg";
 import image4 from "../assets/images/image4.jpeg";
 import image5 from "../assets/images/image5.jpeg";
@@ -110,29 +112,35 @@ function ForInnovatorsPage() {
 
   return (
     <>
-      <header className="page-header">
-        <h1>
-          For <span style={{ color: "var(--jhub-green)" }}>Innovators</span>
-        </h1>
-        <p>
-          Get incubation, mentorship, technical support and funding connections
-          to move your idea toward market readiness.
-        </p>
-        <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <a
-            href="https://innovation.jhubafrica.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-            style={{ textDecoration: "none" }}
-          >
-            Submit your innovation ↗
-          </a>
-          <Link to="/innovation" className="btn-outline">
-            See current portfolio
-          </Link>
-        </div>
-      </header>
+      <EditorialHero
+        themeVariant="emerald"
+        badges={[
+          { label: "INCUBATION", variant: "sector" },
+          { label: "MENTORSHIP", variant: "stage" },
+          { label: "GRANT PATHWAYS", variant: "verified" },
+        ]}
+        title={
+          <>
+            For <span style={{ color: "#6ee7b7" }}>Innovators</span>
+          </>
+        }
+        description="Get incubation, mentorship, technical support and funding connections to move your idea toward market readiness."
+        actions={
+          <>
+            <a
+              href="https://innovation.jhubafrica.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={heroStyles.btnPrimary}
+            >
+              Submit your innovation ↗
+            </a>
+            <Link to="/innovation" className={heroStyles.btnOutline}>
+              See current portfolio
+            </Link>
+          </>
+        }
+      />
 
       <section className="content-section">
         <div className="section-eyebrow">What you get</div>

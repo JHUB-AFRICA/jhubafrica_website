@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ApplyDialog from "../components/site/ApplyDialog";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 
 export const Route = createFileRoute("/for-partners")({
   head: () => ({
@@ -68,24 +70,31 @@ const PROCESS = [
 function ForPartnersPage() {
   return (
     <>
-      <header className="page-header">
-        <h1>
-          For Partners &amp;{" "}
-          <span style={{ color: "var(--jhub-green)" }}>Funders</span>
-        </h1>
-        <p>
-          Discover sponsor-ready projects with clear stages, impact areas, teams
-          and support needs — backed by transparent reporting.
-        </p>
-        <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <Link to="/contact" className="btn-primary">
-            Request portfolio brief
-          </Link>
-          <Link to="/innovation" className="btn-outline">
-            Browse fundable projects
-          </Link>
-        </div>
-      </header>
+      <EditorialHero
+        themeVariant="navy"
+        badges={[
+          { label: "PARTNERSHIP & FUNDING", variant: "sector" },
+          { label: "PORTFOLIO BRIEFS", variant: "stage" },
+          { label: "TRANSPARENT REPORTING", variant: "verified" },
+        ]}
+        title={
+          <>
+            For Partners &amp;{" "}
+            <span style={{ color: "#6ee7b7" }}>Funders</span>
+          </>
+        }
+        description="Discover sponsor-ready projects with clear stages, impact areas, teams and support needs — backed by transparent reporting."
+        actions={
+          <>
+            <Link to="/contact" className={heroStyles.btnPrimary}>
+              Request portfolio brief
+            </Link>
+            <Link to="/innovation" className={heroStyles.btnOutline}>
+              Browse fundable projects
+            </Link>
+          </>
+        }
+      />
 
       <section className="content-section">
         <div className="section-eyebrow">Partnership models</div>

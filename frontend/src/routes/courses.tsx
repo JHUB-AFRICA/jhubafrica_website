@@ -5,6 +5,8 @@ import { getPublicCourses } from "../../axios/api/courses";
 import { CourseItem } from "../types/courses";
 import SkeletonCards from "../components/site/SkeletonCards";
 import ResourceFallback from "../components/site/ResourceFallback";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 
 export const Route = createFileRoute("/courses")({
   head: (ctx: { loaderData?: CourseItem[] }) => {
@@ -63,16 +65,20 @@ export const Route = createFileRoute("/courses")({
   component: CoursesPage,
   errorComponent: ({ error, reset }) => (
     <>
-      <header className="page-header">
-        <h1>
-          Our <span style={{ color: "var(--jhub-green)" }}>Courses</span>
-        </h1>
-        <p>
-          Practical, instructor-led programs designed with industry partners.
-          Cohort-based, with no upfront payment for accepted learners on
-          subsidised tracks.
-        </p>
-      </header>
+      <EditorialHero
+        themeVariant="emerald"
+        badges={[
+          { label: "INSTRUCTOR-LED", variant: "sector" },
+          { label: "INDUSTRY-ALIGNED", variant: "stage" },
+          { label: "COHORT-BASED", variant: "verified" },
+        ]}
+        title={
+          <>
+            Our <span style={{ color: "#6ee7b7" }}>Courses</span>
+          </>
+        }
+        description="Practical, instructor-led programs designed with industry partners. Cohort-based, with no upfront payment for accepted learners on subsidised tracks."
+      />
       <section className="content-section">
         <ResourceFallback error={error} onRetry={reset} resourceName="Courses" />
       </section>
@@ -80,16 +86,20 @@ export const Route = createFileRoute("/courses")({
   ),
   pendingComponent: () => (
     <>
-      <header className="page-header">
-        <h1>
-          Our <span style={{ color: "var(--jhub-green)" }}>Courses</span>
-        </h1>
-        <p>
-          Practical, instructor-led programs designed with industry partners.
-          Cohort-based, with no upfront payment for accepted learners on
-          subsidised tracks.
-        </p>
-      </header>
+      <EditorialHero
+        themeVariant="emerald"
+        badges={[
+          { label: "INSTRUCTOR-LED", variant: "sector" },
+          { label: "INDUSTRY-ALIGNED", variant: "stage" },
+          { label: "COHORT-BASED", variant: "verified" },
+        ]}
+        title={
+          <>
+            Our <span style={{ color: "#6ee7b7" }}>Courses</span>
+          </>
+        }
+        description="Practical, instructor-led programs designed with industry partners. Cohort-based, with no upfront payment for accepted learners on subsidised tracks."
+      />
 
       <section className="content-section">
         <SkeletonCards count={3} />
@@ -117,16 +127,20 @@ function CoursesPage() {
 
   return (
     <>
-      <header className="page-header">
-        <h1>
-          Our <span style={{ color: "var(--jhub-green)" }}>Courses</span>
-        </h1>
-        <p>
-          Practical, instructor-led programs designed with industry partners.
-          Cohort-based, with no upfront payment for accepted learners on
-          subsidised tracks.
-        </p>
-      </header>
+      <EditorialHero
+        themeVariant="emerald"
+        badges={[
+          { label: "INSTRUCTOR-LED", variant: "sector" },
+          { label: "INDUSTRY-ALIGNED", variant: "stage" },
+          { label: "COHORT-BASED", variant: "verified" },
+        ]}
+        title={
+          <>
+            Our <span style={{ color: "#6ee7b7" }}>Courses</span>
+          </>
+        }
+        description="Practical, instructor-led programs designed with industry partners. Cohort-based, with no upfront payment for accepted learners on subsidised tracks."
+      />
 
       <section className="content-section">
         <div className="filter-bar">

@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ApplyDialog from "../components/site/ApplyDialog";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
@@ -73,22 +75,32 @@ const THEMES = [
 function SupportPage() {
   return (
     <>
-      <header className="page-header">
-        <h1>
-          Fund a <span style={{ color: "var(--jhub-green)" }}>Project</span>
-        </h1>
-        <p>
-          Back credible African innovations with transparent reporting. Choose a
-          project, a theme or a strategic partnership — and see your sponsorship
-          turn into measurable impact.
-        </p>
-        <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <ApplyDialog triggerText="Request a funding conversation" source="Support page" />
-          <Link to="/innovation" className="btn-outline">
-            View fundable innovations
-          </Link>
-        </div>
-      </header>
+      <EditorialHero
+        themeVariant="green"
+        badges={[
+          { label: "SPONSORSHIP PACKAGES", variant: "sector" },
+          { label: "THEMATIC FUNDS", variant: "stage" },
+          { label: "TRANSPARENT REPORTING", variant: "verified" },
+        ]}
+        title={
+          <>
+            Fund a <span style={{ color: "#6ee7b7" }}>Project</span>
+          </>
+        }
+        description="Back credible African innovations with transparent reporting. Choose a project, a theme or a strategic partnership — and see your sponsorship turn into measurable impact."
+        actions={
+          <>
+            <ApplyDialog
+              triggerText="Request a funding conversation"
+              triggerClassName={heroStyles.btnPrimary}
+              source="Support page"
+            />
+            <Link to="/innovation" className={heroStyles.btnOutline}>
+              View fundable innovations
+            </Link>
+          </>
+        }
+      />
 
       <section className="content-section">
         <div className="section-eyebrow">Sponsor packages</div>

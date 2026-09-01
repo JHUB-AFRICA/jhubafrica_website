@@ -4,6 +4,8 @@ import { IMPACT_METRICS, FOUNDED_YEAR } from "../data/impact";
 import { getTeamMembers } from "../../axios/api/team";
 import { TEAM_MEMBERS } from "../data/team";
 import { JHubTeamMember } from "../types/team";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 import styles from "../styles/About.module.css";
 
 export const Route = createFileRoute("/about")({
@@ -46,18 +48,30 @@ function AboutPage() {
 
   return (
     <>
-      <header className="page-header">
-        <h1>
-          About <span className={styles['about-header-span']}>JHUB Africa</span>
-        </h1>
-        <p>
-          Founded in {FOUNDED_YEAR} at Jomo Kenyatta University of Agriculture
-          and Technology, JHUB Africa is a place where ideas become products
-          that serve Africa. Since our founding, we have supported over 400
-          innovators, nurtured 150+ innovations and now engage 1,000+ students
-          in cutting-edge projects.
-        </p>
-      </header>
+      <EditorialHero
+        themeVariant="navy"
+        badges={[
+          { label: `EST. ${FOUNDED_YEAR}`, variant: "sector" },
+          { label: "JKUAT INNOVATION HUB", variant: "stage" },
+          { label: "400+ INNOVATORS SUPPORTED", variant: "verified" },
+        ]}
+        title={
+          <>
+            About <span style={{ color: "#6ee7b7" }}>JHUB Africa</span>
+          </>
+        }
+        description={`Founded in ${FOUNDED_YEAR} at Jomo Kenyatta University of Agriculture and Technology, JHUB Africa is a place where ideas become products that serve Africa. Since our founding, we have supported over 400 innovators, nurtured 150+ innovations and now engage 1,000+ students in cutting-edge projects.`}
+        actions={
+          <>
+            <Link to="/innovation" className={heroStyles.btnPrimary}>
+              Explore our portfolio
+            </Link>
+            <Link to="/contact" className={heroStyles.btnOutline}>
+              Get in touch
+            </Link>
+          </>
+        }
+      />
 
       <section className="content-section">
         <div className="section-eyebrow">Impact at a glance</div>

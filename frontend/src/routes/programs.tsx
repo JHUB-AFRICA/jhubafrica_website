@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 
 export const Route = createFileRoute("/programs")({
   head: () => ({
@@ -61,16 +63,31 @@ const UPCOMING = [
 function ProgramsPage() {
   return (
     <>
-      <header className="page-header">
-        <h1>
-          Programs &amp;{" "}
-          <span style={{ color: "var(--jhub-green)" }}>Events</span>
-        </h1>
-        <p>
-          Innovation programs and hands-on events that bring the JHUB community
-          together — with partners, investors and mentors.
-        </p>
-      </header>
+      <EditorialHero
+        themeVariant="default"
+        badges={[
+          { label: "STARTUP INCUBATION", variant: "sector" },
+          { label: "APPLIED R&D", variant: "stage" },
+          { label: "INNOVATION CHALLENGES", variant: "verified" },
+        ]}
+        title={
+          <>
+            Programs &amp;{" "}
+            <span style={{ color: "#6ee7b7" }}>Events</span>
+          </>
+        }
+        description="Innovation programs and hands-on events that bring the JHUB community together — with partners, investors and mentors."
+        actions={
+          <>
+            <Link to="/contact" className={heroStyles.btnPrimary}>
+              Apply for incubation
+            </Link>
+            <Link to="/events" className={heroStyles.btnOutline}>
+              View upcoming events
+            </Link>
+          </>
+        }
+      />
 
       <section className="content-section">
         <div className="section-eyebrow">Programs</div>

@@ -4,6 +4,8 @@ import { getEvents } from "../../axios/api/events";
 import { EventItem } from "../types/events";
 import SkeletonCards from "../components/site/SkeletonCards";
 import ResourceFallback from "../components/site/ResourceFallback";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 import { MapPin, Search } from "lucide-react";
 
 export const Route = createFileRoute("/events/")({
@@ -69,10 +71,20 @@ export const Route = createFileRoute("/events/")({
   component: EventsPage,
   errorComponent: ({ error, reset }) => (
     <>
-      <header className="page-header">
-        <h1>Upcoming <span style={{ color: "var(--jhub-green)" }}>Events</span></h1>
-        <p>Hands-on opportunities to learn, build and connect with Africa's tech ecosystem.</p>
-      </header>
+      <EditorialHero
+        themeVariant="navy"
+        badges={[
+          { label: "EVENTS CALENDAR", variant: "sector" },
+          { label: "HACKATHONS", variant: "stage" },
+          { label: "DEMO DAYS", variant: "verified" },
+        ]}
+        title={
+          <>
+            Upcoming <span style={{ color: "#6ee7b7" }}>Events</span>
+          </>
+        }
+        description="Hands-on opportunities to learn, build and connect with Africa's tech ecosystem."
+      />
       <section className="content-section">
         <ResourceFallback error={error} onRetry={reset} resourceName="Events Calendar" />
       </section>
@@ -80,10 +92,20 @@ export const Route = createFileRoute("/events/")({
   ),
   pendingComponent: () => (
     <>
-      <header className="page-header">
-        <h1>Upcoming <span style={{ color: "var(--jhub-green)" }}>Events</span></h1>
-        <p>Hands-on opportunities to learn, build and connect with Africa's tech ecosystem.</p>
-      </header>
+      <EditorialHero
+        themeVariant="navy"
+        badges={[
+          { label: "EVENTS CALENDAR", variant: "sector" },
+          { label: "HACKATHONS", variant: "stage" },
+          { label: "DEMO DAYS", variant: "verified" },
+        ]}
+        title={
+          <>
+            Upcoming <span style={{ color: "#6ee7b7" }}>Events</span>
+          </>
+        }
+        description="Hands-on opportunities to learn, build and connect with Africa's tech ecosystem."
+      />
 
       <section className="content-section">
         <SkeletonCards count={3} hasImage={true} />
@@ -121,10 +143,20 @@ function EventsPage() {
 
   return (
     <>
-      <header className="page-header">
-        <h1>Upcoming <span style={{ color: "var(--jhub-green)" }}>Events</span></h1>
-        <p>Hands-on opportunities to learn, build and connect with Africa's tech ecosystem.</p>
-      </header>
+      <EditorialHero
+        themeVariant="navy"
+        badges={[
+          { label: "EVENTS CALENDAR", variant: "sector" },
+          { label: "HACKATHONS", variant: "stage" },
+          { label: "DEMO DAYS", variant: "verified" },
+        ]}
+        title={
+          <>
+            Upcoming <span style={{ color: "#6ee7b7" }}>Events</span>
+          </>
+        }
+        description="Hands-on opportunities to learn, build and connect with Africa's tech ecosystem."
+      />
 
       <section className="content-section" style={{ minHeight: "50vh" }}>
         {/* Search & Tabs Controls */}

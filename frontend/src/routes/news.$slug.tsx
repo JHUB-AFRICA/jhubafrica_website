@@ -4,6 +4,7 @@ import { getNewsBySlug } from "../../axios/api/news";
 import { NewsPost } from "../types/news";
 import { RichContentRenderer } from "../components/ui/RichContentRenderer";
 import ResourceFallback from "../components/site/ResourceFallback";
+import EditorialHero from "../components/site/EditorialHero";
 
 export const Route = createFileRoute("/news/$slug")({
   head: (ctx: { loaderData?: NewsPost }) => {
@@ -76,48 +77,25 @@ function NewsDetailPage() {
 
   return (
     <>
-      <header className="page-header" style={{ position: "relative" }}>
-        <Link
-          to="/news"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            color: "var(--jhub-green)",
-            textDecoration: "none",
-            fontWeight: 600,
-            marginBottom: "1.5rem",
-            fontSize: "0.95rem",
-          }}
-        >
-          ← Back to News
-        </Link>
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.75rem" }}>
-          <span
-            className={`badge badge-${post.color}`}
-            style={{ textTransform: "uppercase", fontSize: "0.8rem", fontWeight: 700 }}
-          >
-            {post.tag}
-          </span>
-          <span style={{ fontSize: "0.9rem", color: "#64748b" }}>· {post.date}</span>
-        </div>
-        <h1 style={{ marginTop: 0, fontSize: "2.5rem", color: "var(--jhub-blue)", lineHeight: 1.2 }}>
-          {post.title}
-        </h1>
-        {post.excerpt && (
-          <p
-            style={{
-              fontSize: "1.15rem",
-              color: "#475569",
-              lineHeight: "1.6",
-              fontWeight: 500,
-              marginTop: "1rem",
-            }}
-          >
-            {post.excerpt}
-          </p>
-        )}
-      </header>
+      <EditorialHero
+        themeVariant="dark"
+        backLink={{
+          to: "/news",
+          label: "Back to News & Updates",
+        }}
+        badges={[
+          {
+            label: post.tag,
+            variant: "sector",
+          },
+          {
+            label: post.date,
+            variant: "outline",
+          },
+        ]}
+        title={post.title}
+        description={post.excerpt}
+      />
 
       <section className="content-section" style={{ maxWidth: "860px", margin: "0 auto", paddingBottom: "4rem" }}>
         {/* Multi-Image Gallery Area */}

@@ -3,6 +3,7 @@ import { getNews } from "../../axios/api/news";
 import { NewsPost } from "../types/news";
 import SkeletonCards from "../components/site/SkeletonCards";
 import ResourceFallback from "../components/site/ResourceFallback";
+import EditorialHero from "../components/site/EditorialHero";
 
 export const Route = createFileRoute("/news/")({
   head: () => ({
@@ -26,10 +27,20 @@ export const Route = createFileRoute("/news/")({
   component: NewsIndexPage,
   errorComponent: ({ error, reset }) => (
     <>
-      <header className="page-header">
-        <h1>News & <span style={{ color: "var(--jhub-green)" }}>Updates</span></h1>
-        <p>Stay current with announcements, partnerships and the latest wins from the JHUB Africa community.</p>
-      </header>
+      <EditorialHero
+        themeVariant="dark"
+        badges={[
+          { label: "ANNOUNCEMENTS", variant: "sector" },
+          { label: "STORIES", variant: "stage" },
+          { label: "ECOSYSTEM UPDATES", variant: "verified" },
+        ]}
+        title={
+          <>
+            News &amp; <span style={{ color: "#6ee7b7" }}>Updates</span>
+          </>
+        }
+        description="Stay current with announcements, partnerships and the latest wins from the JHUB Africa community."
+      />
       <section className="content-section">
         <ResourceFallback error={error} onRetry={reset} resourceName="News & Updates" />
       </section>
@@ -37,10 +48,20 @@ export const Route = createFileRoute("/news/")({
   ),
   pendingComponent: () => (
     <>
-      <header className="page-header">
-        <h1>News & <span style={{ color: "var(--jhub-green)" }}>Updates</span></h1>
-        <p>Stay current with announcements, partnerships and the latest wins from the JHUB Africa community.</p>
-      </header>
+      <EditorialHero
+        themeVariant="dark"
+        badges={[
+          { label: "ANNOUNCEMENTS", variant: "sector" },
+          { label: "STORIES", variant: "stage" },
+          { label: "ECOSYSTEM UPDATES", variant: "verified" },
+        ]}
+        title={
+          <>
+            News &amp; <span style={{ color: "#6ee7b7" }}>Updates</span>
+          </>
+        }
+        description="Stay current with announcements, partnerships and the latest wins from the JHUB Africa community."
+      />
       <section className="content-section">
         <SkeletonCards count={3} hasImage={true} />
       </section>
@@ -62,10 +83,20 @@ function NewsIndexPage() {
 
   return (
     <>
-      <header className="page-header">
-        <h1>News & <span style={{ color: "var(--jhub-green)" }}>Updates</span></h1>
-        <p>Stay current with announcements, partnerships and the latest wins from the JHUB Africa community.</p>
-      </header>
+      <EditorialHero
+        themeVariant="dark"
+        badges={[
+          { label: "ANNOUNCEMENTS", variant: "sector" },
+          { label: "STORIES", variant: "stage" },
+          { label: "ECOSYSTEM UPDATES", variant: "verified" },
+        ]}
+        title={
+          <>
+            News &amp; <span style={{ color: "#6ee7b7" }}>Updates</span>
+          </>
+        }
+        description="Stay current with announcements, partnerships and the latest wins from the JHUB Africa community."
+      />
 
       <section className="content-section">
         <div className="cards-grid" style={{ gap: "2.5rem 2rem" }}>

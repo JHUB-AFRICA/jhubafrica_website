@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ContactModal } from "../components/site/ContactModal";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 
 export const Route = createFileRoute("/for-students")({
   head: () => ({
@@ -59,26 +61,33 @@ function ForStudentsPage() {
 
   return (
     <>
-      <header className="page-header">
-        <h1>
-          For <span style={{ color: "var(--jhub-green)" }}>Students</span>
-        </h1>
-        <p>
-          Join a community of builders, attend workshops, access courses and
-          work on real-world innovation challenges.
-        </p>
-        <div className="hero-btns" style={{ marginTop: "1.25rem" }}>
-          <Link to="/courses" className="btn-primary">
-            Explore courses
-          </Link>
-          <button
-            className="btn-outline"
-            onClick={() => setIsContactModalOpen(true)}
-          >
-            Join the club
-          </button>
-        </div>
-      </header>
+      <EditorialHero
+        themeVariant="default"
+        badges={[
+          { label: "BUILDERS COMMUNITY", variant: "sector" },
+          { label: "CAMPUS CLUBS", variant: "stage" },
+          { label: "APPLIED HACKATHONS", variant: "verified" },
+        ]}
+        title={
+          <>
+            For <span style={{ color: "#6ee7b7" }}>Students</span>
+          </>
+        }
+        description="Join a community of builders, attend workshops, access courses and work on real-world innovation challenges."
+        actions={
+          <>
+            <Link to="/courses" className={heroStyles.btnPrimary}>
+              Explore courses
+            </Link>
+            <button
+              className={heroStyles.btnOutline}
+              onClick={() => setIsContactModalOpen(true)}
+            >
+              Join the club
+            </button>
+          </>
+        }
+      />
 
       <section className="content-section">
         <div className="cards-grid">

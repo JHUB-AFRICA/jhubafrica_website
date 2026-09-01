@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import EditorialHero from "../components/site/EditorialHero";
+import heroStyles from "../styles/EditorialHero.module.css";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
@@ -55,15 +57,30 @@ const ITEMS = [
 function ResourcesPage() {
   return (
     <>
-      <header className="page-header">
-        <h1>
-          <span style={{ color: "var(--jhub-green)" }}>Resources</span>
-        </h1>
-        <p>
-          Toolkits, templates and briefs to help innovators, students and
-          partners work with JHUB Africa.
-        </p>
-      </header>
+      <EditorialHero
+        themeVariant="default"
+        badges={[
+          { label: "TOOLKITS & TEMPLATES", variant: "sector" },
+          { label: "BRAND & MEDIA KIT", variant: "stage" },
+          { label: "GUIDANCE BRIEFS", variant: "verified" },
+        ]}
+        title={
+          <>
+            Innovator &amp; Partner <span style={{ color: "#6ee7b7" }}>Resources</span>
+          </>
+        }
+        description="Toolkits, templates and briefs to help innovators, students and partners collaborate and build with JHUB Africa."
+        actions={
+          <>
+            <Link to="/contact" className={heroStyles.btnPrimary}>
+              Request custom toolkit
+            </Link>
+            <Link to="/innovation" className={heroStyles.btnOutline}>
+              Browse portfolio
+            </Link>
+          </>
+        }
+      />
 
       <section className="content-section">
         <div className="cards-grid">

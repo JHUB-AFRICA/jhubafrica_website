@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { MapPin, Mail, Phone, Clock, Globe, Linkedin, Facebook, Instagram, Loader2 } from "lucide-react";
 import { submitContactInquiry } from "../../axios/api/contact";
+import EditorialHero from "../components/site/EditorialHero";
 import styles from "../styles/Contact.module.css";
 
 export const Route = createFileRoute("/contact")({
@@ -102,14 +103,21 @@ function ContactPage() {
 
   return (
     <>
-      <header className={styles['contact-page-header']}>
-        <h1>
-          Contact <span>Us</span>
-        </h1>
-        <p>
-          LET'S BUILD THE FUTURE TOGETHER
-        </p>
-      </header>
+      <EditorialHero
+        themeVariant="navy"
+        badges={[
+          { label: "GET IN TOUCH", variant: "sector" },
+          { label: "TECHNOLOGY HOUSE, JKUAT", variant: "stage" },
+          { label: "PARTNERSHIP & INQUIRIES", variant: "verified" },
+        ]}
+        title={
+          <>
+            Contact <span style={{ color: "#6ee7b7" }}>Us</span>
+          </>
+        }
+        tagline="LET'S BUILD THE FUTURE TOGETHER"
+        description="Are you looking to partner, sponsor, volunteer, or just connect with the JHUB team? We'd love to hear from you."
+      />
 
       <section className="feature-split">
         <div className="split-copy">
