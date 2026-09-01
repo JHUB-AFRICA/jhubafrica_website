@@ -141,6 +141,17 @@ function AdminPage() {
   });
   const [isDeleting, setIsDeleting] = useState(false);
 
+  useEffect(() => {
+    if (confirmDelete.isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [confirmDelete.isOpen]);
+
   const requestDelete = (title: string, onConfirm: () => Promise<void>) => {
     setConfirmDelete({
       isOpen: true,
@@ -268,8 +279,14 @@ function AdminPage() {
                 onClick={async () => {
                   try {
                     setIsDeleting(true);
+                    const scrollPos = typeof window !== "undefined" ? window.scrollY : 0;
                     await confirmDelete.onConfirm();
                     setConfirmDelete({ ...confirmDelete, isOpen: false });
+                    setTimeout(() => {
+                      if (typeof window !== "undefined") {
+                        window.scrollTo({ top: scrollPos, behavior: "instant" });
+                      }
+                    }, 50);
                   } finally {
                     setIsDeleting(false);
                   }
@@ -322,7 +339,7 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
   } = useNewsAdmin();
 
   return (
-    <section className="content-section">
+    <section id="admin-news-section" className="content-section">
       <h2 style={{ marginBottom: "1rem" }}>News posts</h2>
 
       <form onSubmit={submit} className={styles['form-grid']}>
@@ -610,7 +627,7 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
   } = useEventAdmin();
 
   return (
-    <section className="content-section">
+    <section id="admin-events-section" className="content-section">
       <h2 style={{ marginBottom: "1rem" }}>Events</h2>
 
       <form onSubmit={submit} className={styles['form-grid']}>
@@ -745,7 +762,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
     useInnovationAdmin();
 
   return (
-    <section className="content-section">
+    <section id="admin-innovations-section" className="content-section">
       <h2 style={{ marginBottom: "1rem" }}>Innovations</h2>
 
       <form onSubmit={submit} className={styles['form-grid']}>
@@ -1047,7 +1064,7 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
     useCourseAdmin();
 
   return (
-    <section className="content-section">
+    <section id="admin-courses-section" className="content-section">
       <h2 style={{ marginBottom: "1rem" }}>Courses</h2>
 
       <form onSubmit={submit} className={styles['form-grid']}>
@@ -1242,7 +1259,7 @@ function TeamAdmin({ items, onDeleteRequest }: TeamAdminProps) {
   } = useTeamAdmin();
 
   return (
-    <section className="content-section">
+    <section id="admin-team-section" className="content-section">
       <h2 style={{ marginBottom: "0.5rem" }}>Team Members</h2>
       <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", marginBottom: "1.5rem" }}>
         Manage leadership, staff, mentors and advisors displayed in the About page "Meet Our Team" section.

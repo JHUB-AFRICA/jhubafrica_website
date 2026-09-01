@@ -114,6 +114,19 @@ export function getEmptyCourse(): Omit<CourseItem, "id"> {
     };
 }
 
+export function scrollToForm(sectionId: string) {
+    if (typeof window === "undefined") return;
+    const run = () => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    };
+    run();
+    setTimeout(run, 80);
+    setTimeout(run, 300);
+}
+
 export function useNewsAdmin() {
     const router = useRouter();
     const [draft, setDraft] = useState<NewsDraft>(getEmptyNews());
@@ -149,10 +162,11 @@ export function useNewsAdmin() {
                     await addNews(payload as Omit<NewsPost, "id">);
                 }
 
-                await router.invalidate();
                 setDraft(getEmptyNews());
                 setMsg("Saved.");
                 setTimeout(() => setMsg(""), 1500);
+                await router.invalidate();
+                scrollToForm("admin-news-section");
             } catch (err) {
                 console.error(err);
                 setMsg("Error saving changes.");
@@ -183,7 +197,7 @@ export function useNewsAdmin() {
             images: rawImages,
             image: rawImages[0]?.url || post.image || "",
         });
-        window.scrollTo({ top: 300, behavior: "smooth" });
+        scrollToForm("admin-news-section");
     }, []);
 
     const remove = useCallback(async (id: string, bypassConfirm = false) => {
@@ -195,6 +209,7 @@ export function useNewsAdmin() {
         try {
             await deleteNews(id);
             await router.invalidate();
+            scrollToForm("admin-news-section");
             setMsg("Deleted.");
             setTimeout(() => setMsg(""), 1500);
         } catch (err) {
@@ -249,10 +264,11 @@ export function useEventAdmin() {
                     await addEvent(draft as Omit<EventItem, "id">);
                 }
 
-                await router.invalidate();
                 setDraft(getEmptyEvent());
                 setMsg("Saved.");
                 setTimeout(() => setMsg(""), 1500);
+                await router.invalidate();
+                scrollToForm("admin-events-section");
             } catch (err) {
                 console.error(err);
                 setMsg("Error saving changes.");
@@ -265,7 +281,7 @@ export function useEventAdmin() {
 
     const edit = useCallback((event: EventItem) => {
         setDraft(event);
-        window.scrollTo({ top: 300, behavior: "smooth" });
+        scrollToForm("admin-events-section");
     }, []);
 
     const remove = useCallback(async (id: string, bypassConfirm = false) => {
@@ -277,6 +293,7 @@ export function useEventAdmin() {
         try {
             await deleteEvent(id);
             await router.invalidate();
+            scrollToForm("admin-events-section");
             setMsg("Deleted.");
             setTimeout(() => setMsg(""), 1500);
         } catch (err) {
@@ -331,10 +348,11 @@ export function useInnovationAdmin() {
                     await addInnovation(draft as Omit<InnovationItem, "id">);
                 }
 
-                await router.invalidate();
                 setDraft(getEmptyInnovation());
                 setMsg("Saved.");
                 setTimeout(() => setMsg(""), 1500);
+                await router.invalidate();
+                scrollToForm("admin-innovations-section");
             } catch (err) {
                 console.error(err);
                 setMsg("Error saving changes.");
@@ -347,7 +365,7 @@ export function useInnovationAdmin() {
 
     const edit = useCallback((item: InnovationItem) => {
         setDraft(item);
-        window.scrollTo({ top: 300, behavior: "smooth" });
+        scrollToForm("admin-innovations-section");
     }, []);
 
     const remove = useCallback(async (id: string, bypassConfirm = false) => {
@@ -359,6 +377,7 @@ export function useInnovationAdmin() {
         try {
             await deleteInnovation(id);
             await router.invalidate();
+            scrollToForm("admin-innovations-section");
             setMsg("Deleted.");
             setTimeout(() => setMsg(""), 1500);
         } catch (err) {
@@ -413,10 +432,11 @@ export function useCourseAdmin() {
                     await createCourse(draft as Omit<CourseItem, "id">);
                 }
 
-                await router.invalidate();
                 setDraft(getEmptyCourse());
                 setMsg("Saved.");
                 setTimeout(() => setMsg(""), 1500);
+                await router.invalidate();
+                scrollToForm("admin-courses-section");
             } catch (err) {
                 console.error(err);
                 setMsg("Error saving changes.");
@@ -429,7 +449,7 @@ export function useCourseAdmin() {
 
     const edit = useCallback((course: CourseItem) => {
         setDraft(course);
-        window.scrollTo({ top: 300, behavior: "smooth" });
+        scrollToForm("admin-courses-section");
     }, []);
 
     const remove = useCallback(async (id: string, bypassConfirm = false) => {
@@ -441,6 +461,7 @@ export function useCourseAdmin() {
         try {
             await deleteCourse(id);
             await router.invalidate();
+            scrollToForm("admin-courses-section");
             setMsg("Deleted.");
             setTimeout(() => setMsg(""), 1500);
         } catch (err) {
@@ -497,7 +518,7 @@ export function useTeamAdmin() {
     const edit = useCallback((item: JHubTeamMember) => {
         setDraft(item);
         setMsg("");
-        window.scrollTo({ top: 400, behavior: "smooth" });
+        scrollToForm("admin-team-section");
     }, []);
 
     const submit = useCallback(
@@ -515,8 +536,9 @@ export function useTeamAdmin() {
                     setMsg("Team member created successfully.");
                 }
                 resetDraft();
-                await router.invalidate();
                 setTimeout(() => setMsg(""), 2000);
+                await router.invalidate();
+                scrollToForm("admin-team-section");
             } catch (err: any) {
                 console.error(err);
                 setMsg(err?.response?.data?.error || "Error saving team member.");
@@ -538,6 +560,7 @@ export function useTeamAdmin() {
                 await (await import("../../../axios/api/team")).adminDeleteTeamMember(id);
                 if (draft.id === id) resetDraft();
                 await router.invalidate();
+                scrollToForm("admin-team-section");
                 setMsg("Deleted.");
                 setTimeout(() => setMsg(""), 1500);
             } catch (err: any) {
