@@ -13,6 +13,7 @@ export interface InnovationItem {
     beneficiaries?: string;
     mediaUrls?: string[];
     status?: string;
+    isFeatured?: boolean;
     slug?: string;
     coverImageUrl?: string;
     website?: string;
