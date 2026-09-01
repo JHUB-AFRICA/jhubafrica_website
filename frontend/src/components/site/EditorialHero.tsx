@@ -223,25 +223,25 @@ export function EditorialHero({
     <div className={`${styles.heroContentCol} ${isCentered ? styles.centerAligned : ""}`}>
       {renderBadges()}
 
-      {typeof title === "string" ? (
-        <h1 className={styles.heroHeading}>{title}</h1>
-      ) : (
+      {React.isValidElement(title) && (title.type === "h1" || (typeof title.type === "string" && title.type === "h1")) ? (
         title
+      ) : (
+        <h1 className={styles.heroHeading}>{title}</h1>
       )}
 
       {tagline && (
-        typeof tagline === "string" ? (
-          <p className={styles.heroTagline}>{tagline}</p>
-        ) : (
+        React.isValidElement(tagline) && tagline.type === "p" ? (
           tagline
+        ) : (
+          <p className={styles.heroTagline}>{tagline}</p>
         )
       )}
 
       {description && (
-        typeof description === "string" ? (
-          <p className={styles.heroSummary}>{description}</p>
-        ) : (
+        React.isValidElement(description) && description.type === "p" ? (
           description
+        ) : (
+          <p className={styles.heroSummary}>{description}</p>
         )
       )}
 

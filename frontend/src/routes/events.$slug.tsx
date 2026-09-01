@@ -87,22 +87,7 @@ function EventDetailPage() {
           )}
         </div>
 
-        <div style={{ display: "flex", gap: "1rem", marginTop: "3rem", borderTop: "1px solid #e2e8f0", paddingTop: "2rem", flexWrap: "wrap" }}>
-          {event.registrationUrl ? (
-            <a
-              href={event.registrationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-              style={{ display: "inline-block", textDecoration: "none" }}
-            >
-              Register for Event
-            </a>
-          ) : (
-            <Link to="/contact" className="btn-primary" style={{ display: "inline-block", textDecoration: "none" }}>
-              Register for Event
-            </Link>
-          )}
+        <div style={{ display: "flex", gap: "1rem", marginTop: "3rem", borderTop: "1px solid #e2e8f0", paddingTop: "2rem", flexWrap: "wrap", alignItems: "center" }}>
           {event.meetingUrl && (
             <a
               href={event.meetingUrl}
@@ -112,9 +97,10 @@ function EventDetailPage() {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
+                gap: "0.5rem",
                 textDecoration: "none",
-                background: "var(--jhub-blue)",
-                borderColor: "var(--jhub-blue)"
+                background: "var(--jhub-green)",
+                borderColor: "var(--jhub-green)"
               }}
             >
               Join Online Meeting →
@@ -130,7 +116,7 @@ function EventDetailPage() {
               textDecoration: "none",
             }}
           >
-            ← Back to Events
+            ← Back to Events Calendar
           </Link>
         </div>
       </section>

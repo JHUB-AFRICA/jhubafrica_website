@@ -283,7 +283,7 @@ function EventsPage() {
                         className="prog-link-button"
                         style={{ display: "inline-block" }}
                       >
-                        Read More →
+                        View Details →
                       </span>
                     </div>
                   </div>

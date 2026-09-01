@@ -285,53 +285,157 @@ function Index() {
 
       <section className="content-section">
         <div className="section-eyebrow">Audience-based navigation</div>
-        <h2 className="section-h2">Find what matters to you</h2>
-        <div className={`cards-grid ${styles['audience-grid']}`}>
-          <Link to="/innovation" className={`prog-card ${styles['audience-card']}`}>
-            <div className="prog-title green">Innovators</div>
-            <p className="prog-desc">
-              Get support to build, test and scale your solution.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-arrow">Start Your Journey →</span>
+        <h2 className="section-h2" style={{ marginBottom: "2.5rem" }}>Find what matters to you</h2>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "2.25rem" }}>
+          {/* 1. Innovators */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "2rem",
+              alignItems: "center",
+              padding: "2.25rem 2rem",
+              borderRadius: "18px",
+              background: "var(--bg-soft, #f8fafc)",
+              border: "none",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--jhub-green)", marginBottom: "0.5rem" }}>
+                INNOVATION PIPELINE
+              </div>
+              <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--jhub-blue)", margin: "0 0 0.75rem 0" }}>
+                Innovators &amp; Founders
+              </h3>
+              <p style={{ fontSize: "1rem", lineHeight: 1.7, color: "var(--text-muted)", margin: 0 }}>
+                Get structured incubation support, coaching, maker space access, pilot funding connections, and commercialisation guidance to build and scale your venture.
+              </p>
             </div>
-          </Link>
-          <Link to="/for-students" className={`prog-card ${styles['audience-card']}`}>
-            <div className="prog-title">Students</div>
-            <p className="prog-desc">
-              Learn, innovate and grow your ideas with JHUB.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-arrow">Explore Programs →</span>
+            <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+              <Link
+                to="/innovation"
+                className="btn-primary"
+                style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}
+              >
+                Start Your Journey →
+              </Link>
             </div>
-          </Link>
-          <Link to="/support" className={`prog-card ${styles['audience-card']}`}>
-            <div className="prog-title red">Funders & Investors</div>
-            <p className="prog-desc">
-              Discover high-potential innovations ready for support.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-arrow">View Opportunities →</span>
+          </div>
+
+          {/* 2. Students */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "2rem",
+              alignItems: "center",
+              padding: "2.25rem 2rem",
+              borderRadius: "18px",
+              background: "#ffffff",
+              border: "none",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#3b82f6", marginBottom: "0.5rem" }}>
+                CAMPUS TALENT
+              </div>
+              <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--jhub-blue)", margin: "0 0 0.75rem 0" }}>
+                Students &amp; Campus Builders
+              </h3>
+              <p style={{ fontSize: "1rem", lineHeight: 1.7, color: "var(--text-muted)", margin: 0 }}>
+                Join weekly innovation clubs, compete in hackathons, master in-demand technical skills through bootcamps, and build high-impact projects from campus.
+              </p>
             </div>
-          </Link>
-          <Link to="/for-partners" className={`prog-card ${styles['audience-card']}`}>
-            <div className="prog-title">Partners & Researchers</div>
-            <p className="prog-desc">
-              Collaborate on research, pilots and applied innovation.
-            </p>
-            <div className="prog-meta">
-              <span className="prog-arrow">Partner With Us →</span>
+            <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+              <Link
+                to="/for-students"
+                className="btn-outline"
+                style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", textDecoration: "none", borderColor: "#3b82f6", color: "var(--jhub-blue)" }}
+              >
+                Explore Student Programs →
+              </Link>
             </div>
-          </Link>
+          </div>
+
+          {/* 3. Funders & Investors */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "2rem",
+              alignItems: "center",
+              padding: "2.25rem 2rem",
+              borderRadius: "18px",
+              background: "var(--bg-soft, #f8fafc)",
+              border: "none",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--jhub-red)", marginBottom: "0.5rem" }}>
+                CAPITAL &amp; SPONSORSHIP
+              </div>
+              <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--jhub-blue)", margin: "0 0 0.75rem 0" }}>
+                Funders &amp; Impact Investors
+              </h3>
+              <p style={{ fontSize: "1rem", lineHeight: 1.7, color: "var(--text-muted)", margin: 0 }}>
+                Discover high-potential, stage-verified African innovations across AgriTech, AI, and Green Digital Innovation with rigorous quarterly reporting.
+              </p>
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+              <Link
+                to="/support"
+                className="btn-outline"
+                style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", textDecoration: "none", borderColor: "var(--jhub-red)", color: "var(--jhub-blue)" }}
+              >
+                View Opportunities →
+              </Link>
+            </div>
+          </div>
+
+          {/* 4. Partners & Researchers */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "2rem",
+              alignItems: "center",
+              padding: "2.25rem 2rem",
+              borderRadius: "18px",
+              background: "#ffffff",
+              border: "none",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8b5cf6", marginBottom: "0.5rem" }}>
+                ECOSYSTEM COLLABORATION
+              </div>
+              <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--jhub-blue)", margin: "0 0 0.75rem 0" }}>
+                Partners &amp; Researchers
+              </h3>
+              <p style={{ fontSize: "1rem", lineHeight: 1.7, color: "var(--text-muted)", margin: 0 }}>
+                Co-design thematic challenge calls, execute applied research with JKUAT faculty, deploy pilot programs, and scale proven solutions across the continent.
+              </p>
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+              <Link
+                to="/for-partners"
+                className="btn-outline"
+                style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", textDecoration: "none", borderColor: "#8b5cf6", color: "var(--jhub-blue)" }}
+              >
+                Partner With Us →
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="content-section">
         <div className="section-eyebrow">Our focus areas</div>
-        <p className="section-copy section-copy--right">
+        <p className="section-copy" style={{ marginBottom: "2.75rem", marginTop: "0.5rem", fontSize: "1.05rem", lineHeight: 1.75, color: "var(--text-muted)", maxWidth: "840px" }}>
           At JHUB Africa, we pride ourselves in fostering groundbreaking solutions that address pressing challenges. Our featured innovations span various sectors, showcasing the creativity and dedication of our innovators. Explore our transformative solutions that are making a real difference.
         </p>
-        <h2 className="section-h2">Themes driving our innovation portfolio</h2>
+        <h2 className="section-h2" style={{ marginTop: "1.5rem" }}>Themes driving our innovation portfolio</h2>
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.5rem", marginTop: "3rem" }}>
           {[
             { icon: <Sprout size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "Climate Smart Agriculture", desc: "Digital tools for resilient, sustainable food systems." },
