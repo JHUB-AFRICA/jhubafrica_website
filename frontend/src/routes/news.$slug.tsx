@@ -274,7 +274,7 @@ function NewsDetailPage() {
           )}
           <span style={{ color: "var(--border-color, #cbd5e1)" }}>•</span>
           <span style={{ fontStyle: "italic", color: "var(--text-muted)" }}>
-            {post.date ? `${post.date} | Jomo Kenyatta University of Agriculture and Technology (JKUAT)` : "August 19, 2026 | Jomo Kenyatta University of Agriculture and Technology (JKUAT)"}
+            Jomo Kenyatta University of Agriculture and Technology (JKUAT)
           </span>
         </div>
 
