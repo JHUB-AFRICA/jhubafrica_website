@@ -3,8 +3,11 @@ import { supabase, supabaseAdmin } from '../config/supabase.js'
 import { signToken, signRefreshToken, blacklistToken } from '../middleware/auth.middleware.js'
 import { CookieOptions } from 'express'
 import { redis } from '../config/redis.js'
-import { NODE_ENV } from '../config/env.js'
+import { NODE_ENV, JWT_SECRET, CORS_ORIGINS } from '../config/env.js'
 import crypto from 'crypto'
+import jwt from 'jsonwebtoken'
+import { sendEmail } from '../services/email.service.js'
+import { compileResetPasswordEmail } from '../templates/emails/reset-password.template.js'
 
 // CHANGED: derive isProd once, reuse below
 const isProd = NODE_ENV === 'production'
@@ -368,6 +371,118 @@ export async function getMe(req: Request, res: Response, next: NextFunction) {
       role: user.user.user_metadata?.role,
       isVerified: user.user.email_confirmed_at != null,
       ...user.user.user_metadata,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function forgotPassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email } = req.body
+
+    // 1. Verify user exists in DB and has ADMIN privileges
+    const { data: dbUser } = await supabaseAdmin
+      .from('users')
+      .select('id, email, first_name, last_name, role')
+      .ilike('email', email.trim())
+      .maybeSingle()
+
+    // Generic safe response message to prevent email harvesting
+    const successMsg = 'If an administrator account with this email exists, password reset instructions have been sent.'
+
+    if (!dbUser || (dbUser.role || '').toLowerCase() !== 'admin') {
+      return res.json({ message: successMsg })
+    }
+
+    // 2. Generate signed reset JWT (valid for 15 minutes)
+    const resetToken = jwt.sign(
+      {
+        sub: dbUser.id,
+        email: dbUser.email,
+        purpose: 'admin_password_reset',
+      },
+      JWT_SECRET as string,
+      { expiresIn: '15m' }
+    )
+
+    // 3. Resolve frontend URL
+    const frontendUrl =
+      req.headers.origin ||
+      (CORS_ORIGINS ? CORS_ORIGINS.split(',')[0].trim() : 'http://localhost:5173')
+    const resetUrl = `${frontendUrl}/admin?resetToken=${encodeURIComponent(resetToken)}`
+
+    // 4. Send email
+    const recipientName = dbUser.first_name ? `${dbUser.first_name} ${dbUser.last_name || ''}`.trim() : 'Administrator'
+    const emailHtml = compileResetPasswordEmail({
+      recipientName,
+      resetUrl,
+      expiresInMinutes: 15,
+    })
+
+    await sendEmail({
+      to: dbUser.email,
+      subject: '🔒 Reset Your JHUB Africa Administrator Password',
+      html: emailHtml,
+    })
+
+    console.info(`🔑 [ADMIN PASSWORD RESET LINK]: ${resetUrl}`)
+
+    res.json({
+      message: successMsg,
+      // In development or simulation mode, return the resetUrl for ease of testing
+      ...(!isProd ? { devResetUrl: resetUrl } : {})
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function resetPassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { token, newPassword } = req.body
+
+    // 1. Verify reset token
+    let payload: { sub: string; email: string; purpose: string }
+    try {
+      payload = jwt.verify(token, JWT_SECRET as string) as any
+    } catch (jwtErr: any) {
+      if (jwtErr?.name === 'TokenExpiredError') {
+        return res.status(400).json({ error: 'This password reset link has expired. Please request a new one.' })
+      }
+      return res.status(400).json({ error: 'Invalid or malformed password reset link.' })
+    }
+
+    if (payload.purpose !== 'admin_password_reset' || !payload.sub) {
+      return res.status(400).json({ error: 'Invalid reset token purpose.' })
+    }
+
+    // 2. Verify user in DB is still an admin
+    const { data: dbUser } = await supabaseAdmin
+      .from('users')
+      .select('id, email, role')
+      .eq('id', payload.sub)
+      .maybeSingle()
+
+    if (!dbUser || (dbUser.role || '').toLowerCase() !== 'admin') {
+      return res.status(403).json({ error: 'User is not authorized for administrator password reset.' })
+    }
+
+    // 3. Update password in Supabase Auth
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(payload.sub, {
+      password: newPassword,
+    })
+
+    if (updateError) {
+      console.error('[resetPassword] Supabase update password failed:', updateError)
+      throw updateError
+    }
+
+    // 4. Invalidate all active refresh tokens for this user
+    await supabaseAdmin.from('refresh_tokens').delete().eq('user_id', payload.sub)
+
+    res.json({
+      message: 'Password has been successfully updated. You can now log in with your new password.'
     })
   } catch (err) {
     next(err)

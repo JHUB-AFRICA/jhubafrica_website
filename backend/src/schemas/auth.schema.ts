@@ -16,3 +16,13 @@ export const loginSchema = z.object({
 export const refreshSchema = z.object({
   refreshToken: z.string().min(1),
 })
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Please provide a valid email address'),
+})
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Reset token is required'),
+  newPassword: z.string().min(8, 'New password must be at least 8 characters'),
+})
+

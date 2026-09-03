@@ -1,7 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
-import { adminLogin, adminLogout } from "../../axios/api/admin/auth";
+import { Loader2, Eye, EyeOff, UserPlus, ArrowLeft } from "lucide-react";
+import { adminLogin, adminLogout, requestPasswordReset, submitPasswordReset } from "../../axios/api/admin/auth";
+import { getAdminUsers, createAdminUser, AdminAccountItem } from "../../axios/api/admin/users";
 import { getAccessToken, setAccessToken, refreshSession } from "../../axios/axios";
 import { getAdminNews } from "../../axios/api/news";
 import { getEvents } from "../../axios/api/events";
@@ -30,6 +31,7 @@ import { InputField } from "@/features/admin/components/InputField";
 import { TextareaField } from "@/features/admin/components/TextareaField";
 import { SelectField } from "@/features/admin/components/SelectField";
 import { EmailAdmin } from "@/features/admin/components/EmailAdmin";
+import { AdminUsersManager } from "@/features/admin/components/AdminUsersManager";
 import styles from "../styles/Admin.module.css";
 
 export const Route = createFileRoute("/admin")({
@@ -79,10 +81,19 @@ export const Route = createFileRoute("/admin")({
 function AdminPage() {
   const router = useRouter();
   const [unlocked, setUnlocked] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "forgot" | "reset">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetToken, setResetToken] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [devResetUrl, setDevResetUrl] = useState<string | null>(null);
   const { news, events, innovations, courses, team } = Route.useLoaderData();
 
   useEffect(() => {
@@ -96,12 +107,23 @@ function AdminPage() {
         }
       });
     }
+
+    // Check for resetToken in query parameters
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("resetToken");
+      if (token) {
+        setResetToken(token);
+        setAuthMode("reset");
+      }
+    }
   }, []);
 
   async function tryUnlock(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setErr("");
+    setSuccessMsg("");
     try {
       const response = await adminLogin(email, password);
       setAccessToken(response.token);
@@ -111,6 +133,69 @@ function AdminPage() {
     } catch (error: any) {
       console.error(error);
       const errMsg = error?.response?.data?.error || "Invalid email or password.";
+      setErr(errMsg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleRequestReset(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setErr("");
+    setSuccessMsg("");
+    setDevResetUrl(null);
+    try {
+      const response = await requestPasswordReset(email);
+      setSuccessMsg(response.message || "Password reset instructions have been sent.");
+      if (response.devResetUrl) {
+        setDevResetUrl(response.devResetUrl);
+      }
+    } catch (error: any) {
+      console.error(error);
+      const errMsg = error?.response?.data?.error || "Failed to request password reset.";
+      setErr(errMsg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleCompleteReset(e: React.FormEvent) {
+    e.preventDefault();
+    setErr("");
+    setSuccessMsg("");
+
+    if (newPassword.length < 8) {
+      setErr("Password must be at least 8 characters long.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErr("Passwords do not match.");
+      return;
+    }
+
+    if (!resetToken) {
+      setErr("Reset token is missing. Please request a new password reset link.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await submitPasswordReset(resetToken, newPassword);
+      setSuccessMsg(response.message || "Password updated successfully!");
+      setNewPassword("");
+      setConfirmPassword("");
+      if (typeof window !== "undefined") {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      setTimeout(() => {
+        setAuthMode("login");
+        setResetToken(null);
+      }, 2500);
+    } catch (error: any) {
+      console.error(error);
+      const errMsg = error?.response?.data?.error || "Failed to reset password. The link may have expired.";
       setErr(errMsg);
     } finally {
       setLoading(false);
@@ -127,6 +212,7 @@ function AdminPage() {
     setUnlocked(false);
     setEmail("");
     setPassword("");
+    setAuthMode("login");
     await router.invalidate();
   }
 
@@ -161,6 +247,293 @@ function AdminPage() {
   };
 
   if (!unlocked) {
+    if (authMode === "forgot") {
+      return (
+        <>
+          <header className="page-header">
+            <h1>
+              Reset <span style={{ color: "var(--jhub-green)" }}>Password</span>
+            </h1>
+            <p>
+              Enter your administrator email to receive a secure link to reset your password.
+            </p>
+          </header>
+          <section
+            className="content-section"
+            style={{ maxWidth: 460, margin: "0 auto" }}
+          >
+            {successMsg ? (
+              <div
+                style={{
+                  padding: "1.5rem",
+                  backgroundColor: "#f0fdf4",
+                  border: "1px solid #bbf7d0",
+                  borderRadius: "12px",
+                  textAlign: "center",
+                  display: "grid",
+                  gap: "1rem",
+                }}
+              >
+                <div style={{ color: "#166534", fontSize: "0.95rem", lineHeight: 1.5 }}>
+                  {successMsg}
+                </div>
+                {devResetUrl && (
+                  <div style={{ marginTop: "0.5rem", padding: "0.75rem", backgroundColor: "#dcfce7", borderRadius: "8px", fontSize: "0.85rem" }}>
+                    <div style={{ fontWeight: 700, marginBottom: "0.25rem", color: "#14532d" }}>Dev Quick Link:</div>
+                    <a href={devResetUrl} style={{ color: "#15803d", wordBreak: "break-all" }}>
+                      Click here to reset password directly
+                    </a>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("login");
+                    setErr("");
+                    setSuccessMsg("");
+                  }}
+                  className="btn-outline"
+                  style={{ justifySelf: "center", marginTop: "0.5rem" }}
+                >
+                  Return to Sign In
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleRequestReset}
+                style={{ display: "grid", gap: "1rem" }}
+              >
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "0.4rem" }}>
+                    Administrator Email Address
+                  </label>
+                  <input
+                    autoFocus
+                    required
+                    type="email"
+                    placeholder="admin@jhub.africa"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={styles['input-style']}
+                    style={{ width: "100%" }}
+                    aria-label="Admin email"
+                  />
+                </div>
+
+                {err && (
+                  <div style={{ color: "#b91c1c", fontSize: "0.9rem" }}>{err}</div>
+                )}
+
+                <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", marginTop: "0.5rem" }}>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn-primary"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      opacity: loading ? 0.65 : 1,
+                      cursor: loading ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {loading && <Loader2 className="animate-spin" size={16} />}
+                    <span>{loading ? "Sending link..." : "Send Reset Link"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode("login");
+                      setErr("");
+                      setSuccessMsg("");
+                    }}
+                    className="btn-outline"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+                  >
+                    <ArrowLeft size={16} />
+                    <span>Back</span>
+                  </button>
+                </div>
+              </form>
+            )}
+          </section>
+        </>
+      );
+    }
+
+    if (authMode === "reset") {
+      return (
+        <>
+          <header className="page-header">
+            <h1>
+              Set New <span style={{ color: "var(--jhub-green)" }}>Password</span>
+            </h1>
+            <p>
+              Choose a strong, secure password for your administrator account.
+            </p>
+          </header>
+          <section
+            className="content-section"
+            style={{ maxWidth: 460, margin: "0 auto" }}
+          >
+            {successMsg ? (
+              <div
+                style={{
+                  padding: "1.5rem",
+                  backgroundColor: "#f0fdf4",
+                  border: "1px solid #bbf7d0",
+                  borderRadius: "12px",
+                  textAlign: "center",
+                  display: "grid",
+                  gap: "1rem",
+                }}
+              >
+                <div style={{ color: "#166534", fontSize: "1rem", fontWeight: 700 }}>
+                  {successMsg}
+                </div>
+                <p style={{ color: "#15803d", fontSize: "0.9rem", margin: 0 }}>
+                  Redirecting you to sign in...
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("login");
+                    setResetToken(null);
+                    setErr("");
+                    setSuccessMsg("");
+                  }}
+                  className="btn-primary"
+                  style={{ justifySelf: "center", marginTop: "0.5rem" }}
+                >
+                  Sign In Now
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleCompleteReset}
+                style={{ display: "grid", gap: "1rem" }}
+              >
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "0.4rem" }}>
+                    New Password (min. 8 characters)
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      autoFocus
+                      required
+                      type={showNewPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className={styles['input-style']}
+                      style={{ paddingRight: "2.75rem", width: "100%" }}
+                      aria-label="New password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "#64748b",
+                        padding: "4px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      aria-label={showNewPassword ? "Hide password" : "Show password"}
+                    >
+                      {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "0.4rem" }}>
+                    Confirm New Password
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      required
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={styles['input-style']}
+                      style={{ paddingRight: "2.75rem", width: "100%" }}
+                      aria-label="Confirm new password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "#64748b",
+                        padding: "4px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                {err && (
+                  <div style={{ color: "#b91c1c", fontSize: "0.9rem" }}>{err}</div>
+                )}
+
+                <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", marginTop: "0.5rem" }}>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn-primary"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      opacity: loading ? 0.65 : 1,
+                      cursor: loading ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {loading && <Loader2 className="animate-spin" size={16} />}
+                    <span>{loading ? "Updating password..." : "Update Password"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode("login");
+                      setErr("");
+                      setSuccessMsg("");
+                    }}
+                    className="btn-outline"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+          </section>
+        </>
+      );
+    }
+
+    // Default: Login View
     return (
       <>
         <header className="page-header">
@@ -175,32 +548,108 @@ function AdminPage() {
           className="content-section"
           style={{ maxWidth: 460, margin: "0 auto" }}
         >
+          {successMsg && (
+            <div
+              style={{
+                padding: "0.85rem 1.25rem",
+                backgroundColor: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                borderRadius: "8px",
+                color: "#166534",
+                fontSize: "0.9rem",
+                marginBottom: "1rem",
+              }}
+            >
+              {successMsg}
+            </div>
+          )}
+
           <form
             onSubmit={tryUnlock}
-            style={{ display: "grid", gap: "0.85rem" }}
+            style={{ display: "grid", gap: "1rem" }}
           >
-            <input
-              autoFocus
-              required
-              type="email"
-              placeholder="Admin email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles['input-style']}
-              aria-label="Admin email"
-            />
-            <input
-              required
-              type="password"
-              placeholder="Admin password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={styles['input-style']}
-              aria-label="Admin password"
-            />
+            <div>
+              <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "0.4rem" }}>
+                Admin Email
+              </label>
+              <input
+                autoFocus
+                required
+                type="email"
+                placeholder="admin@jhub.africa"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles['input-style']}
+                style={{ width: "100%" }}
+                aria-label="Admin email"
+              />
+            </div>
+
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
+                <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)" }}>
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("forgot");
+                    setErr("");
+                    setSuccessMsg("");
+                  }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--jhub-green)",
+                    cursor: "pointer",
+                    fontSize: "0.82rem",
+                    fontWeight: 600,
+                    padding: 0,
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+              <div style={{ position: "relative" }}>
+                <input
+                  required
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Admin password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={styles['input-style']}
+                  style={{ paddingRight: "2.75rem", width: "100%" }}
+                  aria-label="Admin password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#64748b",
+                    padding: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
             {err && (
               <div style={{ color: "#b91c1c", fontSize: "0.9rem" }}>{err}</div>
             )}
+
             <button
               type="submit"
               disabled={loading}
@@ -212,6 +661,7 @@ function AdminPage() {
                 gap: "0.5rem",
                 opacity: loading ? 0.65 : 1,
                 cursor: loading ? "not-allowed" : "pointer",
+                marginTop: "0.25rem",
               }}
             >
               {loading && <Loader2 className="animate-spin" size={16} />}
@@ -247,6 +697,7 @@ function AdminPage() {
       <InnovationsAdmin items={innovations} onDeleteRequest={requestDelete} />
       <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
       <TeamAdmin items={team} onDeleteRequest={requestDelete} />
+      <AdminUsersManager />
       <EmailAdmin />
 
       {confirmDelete.isOpen && (
