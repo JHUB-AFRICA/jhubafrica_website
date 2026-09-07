@@ -13,6 +13,7 @@ import { reportLovableError } from "../lib/lovable-error";
 import Navbar from "../components/site/Navbar";
 import Footer from "../components/site/Footer";
 import ResourceFallback from "../components/site/ResourceFallback";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -145,6 +146,7 @@ function RootComponent() {
         </main>
         <Footer />
       </div>
+      <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
   );
 }

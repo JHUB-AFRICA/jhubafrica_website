@@ -1,70 +1,545 @@
+/* ==========================================================================
+   Admin Modern Dashboard & Workspace - Conventional Semantic Design System
+   ========================================================================== */
+
+/* Page Shell & Container */
+.adminShell {
+  min-height: calc(100vh - 72px);
+  background-color: #f8fafc;
+  padding: 3rem 2.5rem 8rem;
+}
+
+.adminContainer {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Reset public content-section quirks within admin workspace */
+.adminWorkspace {
+  width: 100%;
+}
+
+.adminWorkspace :global(.content-section) {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  scroll-margin-top: 0 !important;
+}
+
+/* ==========================================================================
+   1. Executive Header Card
+   ========================================================================== */
+.adminHeaderCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 2.75rem 3.25rem;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+}
+
+.adminHeaderCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.adminStatusGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.adminStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1.15rem;
+  border-radius: 9999px;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.adminStatusDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #10b981;
+  animation: adminPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes adminPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+}
+
+.adminGovernanceTag {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.adminHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.adminLiveSiteLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1.35rem;
+  border-radius: 14px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s ease;
+}
+
+.adminLiveSiteLink:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+.adminProfileChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: 14px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+.adminProfileAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #10b981;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adminProfileText {
+  display: flex;
+  flex-direction: column;
+}
+
+.adminProfileName {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.adminProfileRole {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.adminLockBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1.35rem;
+  border-radius: 14px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s ease;
+}
+
+.adminLockBtn:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+}
+
+/* Header Middle & Title Section */
+.adminHeaderMain {
+  display: flex;
+  flex-direction: column;
+}
+
+.adminHeaderTitle {
+  font-size: 2.65rem;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.adminHeaderTitleAccent {
+  color: #10b981;
+}
+
+.adminHeaderSubtitle {
+  font-size: 1.05rem;
+  color: #64748b;
+  margin-top: 0.95rem;
+  margin-bottom: 0;
+  line-height: 1.65;
+  max-width: 820px;
+}
+
+/* Header Telemetry Metric Buttons */
+.adminMetricsRail {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  flex-wrap: wrap;
+  margin-top: 0.85rem;
+}
+
+.adminMetricButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.15rem;
+  padding: 1rem 1.5rem;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.adminMetricButton:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+.adminMetricButtonActive {
+  background: #ffffff !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3.5px rgba(16, 185, 129, 0.18), 0 6px 20px rgba(16, 185, 129, 0.08) !important;
+}
+
+.adminMetricIcon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.adminMetricContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.adminMetricValue {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.adminMetricLabel {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.35rem;
+}
+
+/* ==========================================================================
+   2. Spacious Executive Navigation Tabs Bar (Row Above Sections)
+   ========================================================================== */
+.adminNavContainer {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 0.85rem;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04);
+  margin-bottom: 3rem;
+  position: sticky;
+  top: 1.25rem;
+  z-index: 25;
+}
+
+.adminNavList {
+  display: flex !important;
+  height: auto !important;
+  background: transparent !important;
+  padding: 0 !important;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.adminNavTrigger {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1.6rem !important;
+  border-radius: 14px !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.adminNavTrigger:hover {
+  color: #0f172a !important;
+  background-color: #f1f5f9 !important;
+}
+
+.adminNavTrigger[data-state="active"] {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.16) !important;
+}
+
+.adminNavBadge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  background-color: #e2e8f0;
+  color: #334155;
+  margin-left: 0.25rem;
+}
+
+.adminNavTrigger[data-state="active"] .adminNavBadge {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   3. Section Header (Spacious, Clear Title & Subtitle Separation)
+   ========================================================================== */
+.adminSectionHeader {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 2.25rem 2.75rem;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.03);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.adminSectionTitleGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.adminSectionHeadingRow {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.adminSectionIconBadge {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.adminSectionTitle {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.adminSectionSubtitle {
+  font-size: 1rem;
+  color: #64748b;
+  margin-top: 1rem;
+  margin-bottom: 0;
+  line-height: 1.65;
+  max-width: 800px;
+}
+
+.adminSectionCountBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 1.35rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   4. Form Grid & Form Controls
+   ========================================================================== */
+.form-grid {
+  display: grid;
+  gap: 1.75rem 2.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  padding: 2.75rem 3.25rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 8px 30px -4px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  margin-bottom: 3.5rem;
+}
+
 .input-style {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1.5px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 0.95rem;
+  padding: 0.95rem 1.25rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 1rem;
   font-family: inherit;
   background: #ffffff;
-  color: var(--text-main);
+  color: #0f172a;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .input-style:focus {
-  border-color: var(--jhub-green);
-  box-shadow: 0 0 0 3.5px rgba(16, 185, 129, 0.12);
+  border-color: #10b981;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14);
 }
 
 .input-style::placeholder {
-  color: var(--text-muted);
-  opacity: 0.6;
+  color: #94a3b8;
 }
 
 .input-style:disabled {
-  background: var(--bg-soft);
+  background: #f1f5f9;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
-.form-grid {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  padding: 2rem;
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
+.textarea-style {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
   background: #ffffff;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
-  margin-bottom: 2rem;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
+.textarea-style:focus {
+  border-color: #10b981;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14);
+}
+
+.select-style {
+  width: 100%;
+  padding: 0.95rem 1.25rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.select-style:focus {
+  border-color: #10b981;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14);
+}
+
+/* ==========================================================================
+   5. Item Records List & Rows
+   ========================================================================== */
 .list-style {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: 1.25rem;
 }
 
+.list-item-style,
 .row-style {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  gap: 2rem;
+  padding: 1.45rem 2rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
-  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
 }
 
+.list-item-style:hover,
 .row-style:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(16, 185, 129, 0.15);
 }
 
+/* Legacy Modal Overlay */
 .modal-overlay-style {
   position: fixed;
   inset: 0;
@@ -110,15 +585,285 @@
   }
 }
 
-@media (max-width: 600px) {
-  .row-style {
+/* ==========================================================================
+   6. Authentication Views (Sign In, Forgot Password, Reset Password)
+   ========================================================================== */
+.authShell {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background-color: #f8fafc;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 450px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 2.75rem 2.5rem;
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(15, 23, 42, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+.authHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.authIconWrapper {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.authTitle {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.authSubtitle {
+  font-size: 0.925rem;
+  color: #64748b;
+  margin-top: 0.65rem;
+  margin-bottom: 0;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.authField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.authLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.authLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.authForgotBtn {
+  background: none;
+  border: none;
+  color: #059669;
+  font-size: 0.825rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.authForgotBtn:hover {
+  color: #047857;
+  text-decoration: underline;
+}
+
+.authInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.authInput {
+  width: 100%;
+  padding: 0.85rem 1.15rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.authInput:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14);
+}
+
+.authInput::placeholder {
+  color: #94a3b8;
+}
+
+.authEyeBtn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.authEyeBtn:hover {
+  color: #475569;
+}
+
+.authSubmitBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  border-radius: 12px;
+  font-size: 0.975rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #10b981;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+  margin-top: 0.25rem;
+}
+
+.authSubmitBtn:hover {
+  background-color: #059669;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
+.authSubmitBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.authActionsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.authSecondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #475569;
+  background-color: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.authSecondaryBtn:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
+.authSecondaryBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.authErrorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.authSuccessBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.authFooterLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 2rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  text-align: center;
+}
+
+.authFooterLink:hover {
+  color: #475569;
+}
+
+@media (max-width: 768px) {
+  .adminShell {
+    padding: 1.5rem 1rem 4rem;
+  }
+  .adminHeaderCard {
+    padding: 1.75rem 1.5rem;
+    gap: 1.5rem;
+  }
+  .adminSectionHeader {
+    padding: 1.5rem;
+  }
+  .row-style,
+  .list-item-style {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
+    gap: 1rem;
+    padding: 1.25rem;
   }
   .form-grid {
     grid-template-columns: 1fr;
-    padding: 1.25rem;
+    padding: 1.75rem 1.5rem;
   }
   .modal-content-style {
     padding: 1.5rem;

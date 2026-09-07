@@ -1,9 +1,41 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Eye, EyeOff, UserPlus, ArrowLeft } from "lucide-react";
+import {
+  Loader2,
+  Eye,
+  EyeOff,
+  UserPlus,
+  ArrowLeft,
+  Newspaper,
+  Calendar,
+  Lightbulb,
+  GraduationCap,
+  Users,
+  ShieldCheck,
+  Mail,
+  Trash2,
+  LogOut,
+  ExternalLink,
+  Sparkles,
+  LayoutDashboard,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { adminLogin, adminLogout, requestPasswordReset, submitPasswordReset } from "../../axios/api/admin/auth";
 import { getAdminUsers, createAdminUser, AdminAccountItem } from "../../axios/api/admin/users";
 import { getAccessToken, setAccessToken, refreshSession } from "../../axios/axios";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 import { getAdminNews } from "../../axios/api/news";
 import { getEvents } from "../../axios/api/events";
 import { getAdminInnovations } from "../../axios/api/admin/innovations";
@@ -129,11 +161,13 @@ function AdminPage() {
       setAccessToken(response.token);
       setUnlocked(true);
       setErr("");
+      toast.success("Welcome back! Signed in as administrator.");
       await router.invalidate();
     } catch (error: any) {
       console.error(error);
       const errMsg = error?.response?.data?.error || "Invalid email or password.";
       setErr(errMsg);
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }
@@ -147,7 +181,9 @@ function AdminPage() {
     setDevResetUrl(null);
     try {
       const response = await requestPasswordReset(email);
-      setSuccessMsg(response.message || "Password reset instructions have been sent.");
+      const msg = response.message || "Password reset instructions have been sent.";
+      setSuccessMsg(msg);
+      toast.success(msg);
       if (response.devResetUrl) {
         setDevResetUrl(response.devResetUrl);
       }
@@ -155,6 +191,7 @@ function AdminPage() {
       console.error(error);
       const errMsg = error?.response?.data?.error || "Failed to request password reset.";
       setErr(errMsg);
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }
@@ -166,24 +203,32 @@ function AdminPage() {
     setSuccessMsg("");
 
     if (newPassword.length < 8) {
-      setErr("Password must be at least 8 characters long.");
+      const msg = "Password must be at least 8 characters long.";
+      setErr(msg);
+      toast.error(msg);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setErr("Passwords do not match.");
+      const msg = "Passwords do not match.";
+      setErr(msg);
+      toast.error(msg);
       return;
     }
 
     if (!resetToken) {
-      setErr("Reset token is missing. Please request a new password reset link.");
+      const msg = "Reset token is missing. Please request a new password reset link.";
+      setErr(msg);
+      toast.error(msg);
       return;
     }
 
     setLoading(true);
     try {
       const response = await submitPasswordReset(resetToken, newPassword);
-      setSuccessMsg(response.message || "Password updated successfully!");
+      const msg = response.message || "Password updated successfully!";
+      setSuccessMsg(msg);
+      toast.success(msg);
       setNewPassword("");
       setConfirmPassword("");
       if (typeof window !== "undefined") {
@@ -197,6 +242,7 @@ function AdminPage() {
       console.error(error);
       const errMsg = error?.response?.data?.error || "Failed to reset password. The link may have expired.";
       setErr(errMsg);
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }
@@ -213,6 +259,7 @@ function AdminPage() {
     setEmail("");
     setPassword("");
     setAuthMode("login");
+    toast.info("Admin session locked.");
     await router.invalidate();
   }
 
@@ -226,17 +273,7 @@ function AdminPage() {
     onConfirm: async () => {},
   });
   const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    if (confirmDelete.isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [confirmDelete.isOpen]);
+  const [activeTab, setActiveTab] = useState<string>("news");
 
   const requestDelete = (title: string, onConfirm: () => Promise<void>) => {
     setConfirmDelete({
@@ -249,26 +286,27 @@ function AdminPage() {
   if (!unlocked) {
     if (authMode === "forgot") {
       return (
-        <>
-          <header className="page-header">
-            <h1>
-              Reset <span style={{ color: "var(--jhub-green)" }}>Password</span>
-            </h1>
-            <p>
-              Enter your administrator email to receive a secure link to reset your password.
-            </p>
-          </header>
-          <section
-            className="content-section"
-            style={{ maxWidth: 460, margin: "0 auto" }}
-          >
+        <div className={styles.authShell}>
+          <div className={styles.authCard}>
+            <div className={styles.authHeader}>
+              <div className={styles.authIconWrapper}>
+                <ShieldCheck size={26} />
+              </div>
+              <h1 className={styles.authTitle}>
+                Reset <span style={{ color: "#10b981" }}>Password</span>
+              </h1>
+              <p className={styles.authSubtitle}>
+                Enter your administrator email to receive a secure password reset link.
+              </p>
+            </div>
+
             {successMsg ? (
               <div
                 style={{
                   padding: "1.5rem",
                   backgroundColor: "#f0fdf4",
                   border: "1px solid #bbf7d0",
-                  borderRadius: "12px",
+                  borderRadius: "14px",
                   textAlign: "center",
                   display: "grid",
                   gap: "1rem",
@@ -292,50 +330,46 @@ function AdminPage() {
                     setErr("");
                     setSuccessMsg("");
                   }}
-                  className="btn-outline"
+                  className={styles.authSecondaryBtn}
                   style={{ justifySelf: "center", marginTop: "0.5rem" }}
                 >
                   Return to Sign In
                 </button>
               </div>
             ) : (
-              <form
-                onSubmit={handleRequestReset}
-                style={{ display: "grid", gap: "1rem" }}
-              >
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "0.4rem" }}>
+              <form onSubmit={handleRequestReset} className={styles.authForm}>
+                <div className={styles.authField}>
+                  <label htmlFor="forgot-email" className={styles.authLabel}>
                     Administrator Email Address
                   </label>
-                  <input
-                    autoFocus
-                    required
-                    type="email"
-                    placeholder="admin@jhub.africa"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className={styles['input-style']}
-                    style={{ width: "100%" }}
-                    aria-label="Admin email"
-                  />
+                  <div className={styles.authInputWrapper}>
+                    <input
+                      id="forgot-email"
+                      autoFocus
+                      required
+                      type="email"
+                      placeholder="admin@jhub.africa"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className={styles.authInput}
+                      aria-label="Admin email"
+                    />
+                  </div>
                 </div>
 
                 {err && (
-                  <div style={{ color: "#b91c1c", fontSize: "0.9rem" }}>{err}</div>
+                  <div className={styles.authErrorBanner}>
+                    <AlertCircle size={18} style={{ flexShrink: 0, marginTop: "2px" }} />
+                    <span>{err}</span>
+                  </div>
                 )}
 
-                <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", marginTop: "0.5rem" }}>
+                <div className={styles.authActionsGroup}>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="btn-primary"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      opacity: loading ? 0.65 : 1,
-                      cursor: loading ? "not-allowed" : "pointer",
-                    }}
+                    className={styles.authSubmitBtn}
+                    style={{ flex: 1, marginTop: 0 }}
                   >
                     {loading && <Loader2 className="animate-spin" size={16} />}
                     <span>{loading ? "Sending link..." : "Send Reset Link"}</span>
@@ -348,8 +382,7 @@ function AdminPage() {
                       setErr("");
                       setSuccessMsg("");
                     }}
-                    className="btn-outline"
-                    style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+                    className={styles.authSecondaryBtn}
                   >
                     <ArrowLeft size={16} />
                     <span>Back</span>
@@ -357,33 +390,34 @@ function AdminPage() {
                 </div>
               </form>
             )}
-          </section>
-        </>
+          </div>
+        </div>
       );
     }
 
     if (authMode === "reset") {
       return (
-        <>
-          <header className="page-header">
-            <h1>
-              Set New <span style={{ color: "var(--jhub-green)" }}>Password</span>
-            </h1>
-            <p>
-              Choose a strong, secure password for your administrator account.
-            </p>
-          </header>
-          <section
-            className="content-section"
-            style={{ maxWidth: 460, margin: "0 auto" }}
-          >
+        <div className={styles.authShell}>
+          <div className={styles.authCard}>
+            <div className={styles.authHeader}>
+              <div className={styles.authIconWrapper}>
+                <ShieldCheck size={26} />
+              </div>
+              <h1 className={styles.authTitle}>
+                Set New <span style={{ color: "#10b981" }}>Password</span>
+              </h1>
+              <p className={styles.authSubtitle}>
+                Choose a strong, secure password for your administrator account.
+              </p>
+            </div>
+
             {successMsg ? (
               <div
                 style={{
                   padding: "1.5rem",
                   backgroundColor: "#f0fdf4",
                   border: "1px solid #bbf7d0",
-                  borderRadius: "12px",
+                  borderRadius: "14px",
                   textAlign: "center",
                   display: "grid",
                   gap: "1rem",
@@ -403,90 +437,65 @@ function AdminPage() {
                     setErr("");
                     setSuccessMsg("");
                   }}
-                  className="btn-primary"
+                  className={styles.authSubmitBtn}
                   style={{ justifySelf: "center", marginTop: "0.5rem" }}
                 >
                   Sign In Now
                 </button>
               </div>
             ) : (
-              <form
-                onSubmit={handleCompleteReset}
-                style={{ display: "grid", gap: "1rem" }}
-              >
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "0.4rem" }}>
+              <form onSubmit={handleCompleteReset} className={styles.authForm}>
+                <div className={styles.authField}>
+                  <label htmlFor="new-password" className={styles.authLabel}>
                     New Password (min. 8 characters)
                   </label>
-                  <div style={{ position: "relative" }}>
+                  <div className={styles.authInputWrapper}>
                     <input
+                      id="new-password"
                       autoFocus
                       required
                       type={showNewPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className={styles['input-style']}
-                      style={{ paddingRight: "2.75rem", width: "100%" }}
+                      className={styles.authInput}
+                      style={{ paddingRight: "2.85rem" }}
                       aria-label="New password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        background: "transparent",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "#64748b",
-                        padding: "4px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className={styles.authEyeBtn}
                       aria-label={showNewPassword ? "Hide password" : "Show password"}
+                      title={showNewPassword ? "Hide password" : "Show password"}
                     >
                       {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "0.4rem" }}>
+                <div className={styles.authField}>
+                  <label htmlFor="confirm-password" className={styles.authLabel}>
                     Confirm New Password
                   </label>
-                  <div style={{ position: "relative" }}>
+                  <div className={styles.authInputWrapper}>
                     <input
+                      id="confirm-password"
                       required
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={styles['input-style']}
-                      style={{ paddingRight: "2.75rem", width: "100%" }}
+                      className={styles.authInput}
+                      style={{ paddingRight: "2.85rem" }}
                       aria-label="Confirm new password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        background: "transparent",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "#64748b",
-                        padding: "4px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className={styles.authEyeBtn}
                       aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                      title={showConfirmPassword ? "Hide password" : "Show password"}
                     >
                       {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -494,21 +503,18 @@ function AdminPage() {
                 </div>
 
                 {err && (
-                  <div style={{ color: "#b91c1c", fontSize: "0.9rem" }}>{err}</div>
+                  <div className={styles.authErrorBanner}>
+                    <AlertCircle size={18} style={{ flexShrink: 0, marginTop: "2px" }} />
+                    <span>{err}</span>
+                  </div>
                 )}
 
-                <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", marginTop: "0.5rem" }}>
+                <div className={styles.authActionsGroup}>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="btn-primary"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      opacity: loading ? 0.65 : 1,
-                      cursor: loading ? "not-allowed" : "pointer",
-                    }}
+                    className={styles.authSubmitBtn}
+                    style={{ flex: 1, marginTop: 0 }}
                   >
                     {loading && <Loader2 className="animate-spin" size={16} />}
                     <span>{loading ? "Updating password..." : "Update Password"}</span>
@@ -521,73 +527,64 @@ function AdminPage() {
                       setErr("");
                       setSuccessMsg("");
                     }}
-                    className="btn-outline"
+                    className={styles.authSecondaryBtn}
                   >
                     Cancel
                   </button>
                 </div>
               </form>
             )}
-          </section>
-        </>
+          </div>
+        </div>
       );
     }
 
-    // Default: Login View
+    // Default: Login View (Main Sign In Admin Page)
     return (
-      <>
-        <header className="page-header">
-          <h1>
-            Admin <span style={{ color: "var(--jhub-green)" }}>Access</span>
-          </h1>
-          <p>
-            Sign in with your email and password to manage news, events and innovations.
-          </p>
-        </header>
-        <section
-          className="content-section"
-          style={{ maxWidth: 460, margin: "0 auto" }}
-        >
+      <div className={styles.authShell}>
+        <div className={styles.authCard}>
+          <div className={styles.authHeader}>
+            <div className={styles.authIconWrapper}>
+              <ShieldCheck size={28} />
+            </div>
+            <h1 className={styles.authTitle}>
+              Admin <span style={{ color: "#10b981" }}>Access</span>
+            </h1>
+            <p className={styles.authSubtitle}>
+              Sign in with your administrator credentials to manage news, events, and platform operations.
+            </p>
+          </div>
+
           {successMsg && (
-            <div
-              style={{
-                padding: "0.85rem 1.25rem",
-                backgroundColor: "#f0fdf4",
-                border: "1px solid #bbf7d0",
-                borderRadius: "8px",
-                color: "#166534",
-                fontSize: "0.9rem",
-                marginBottom: "1rem",
-              }}
-            >
-              {successMsg}
+            <div className={styles.authSuccessBanner} style={{ marginBottom: "1.25rem" }}>
+              <CheckCircle2 size={18} style={{ flexShrink: 0, marginTop: "2px" }} />
+              <span>{successMsg}</span>
             </div>
           )}
 
-          <form
-            onSubmit={tryUnlock}
-            style={{ display: "grid", gap: "1rem" }}
-          >
-            <div>
-              <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)", marginBottom: "0.4rem" }}>
+          <form onSubmit={tryUnlock} className={styles.authForm}>
+            <div className={styles.authField}>
+              <label htmlFor="admin-email" className={styles.authLabel}>
                 Admin Email
               </label>
-              <input
-                autoFocus
-                required
-                type="email"
-                placeholder="admin@jhub.africa"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={styles['input-style']}
-                style={{ width: "100%" }}
-                aria-label="Admin email"
-              />
+              <div className={styles.authInputWrapper}>
+                <input
+                  id="admin-email"
+                  autoFocus
+                  required
+                  type="email"
+                  placeholder="admin@jhub.africa"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={styles.authInput}
+                  aria-label="Admin email"
+                />
+              </div>
             </div>
 
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
-                <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--jhub-blue)" }}>
+            <div className={styles.authField}>
+              <div className={styles.authLabelRow}>
+                <label htmlFor="admin-password" className={styles.authLabel}>
                   Password
                 </label>
                 <button
@@ -597,47 +594,27 @@ function AdminPage() {
                     setErr("");
                     setSuccessMsg("");
                   }}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--jhub-green)",
-                    cursor: "pointer",
-                    fontSize: "0.82rem",
-                    fontWeight: 600,
-                    padding: 0,
-                  }}
+                  className={styles.authForgotBtn}
                 >
                   Forgot password?
                 </button>
               </div>
-              <div style={{ position: "relative" }}>
+              <div className={styles.authInputWrapper}>
                 <input
+                  id="admin-password"
                   required
                   type={showPassword ? "text" : "password"}
                   placeholder="Admin password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={styles['input-style']}
-                  style={{ paddingRight: "2.75rem", width: "100%" }}
+                  className={styles.authInput}
+                  style={{ paddingRight: "2.85rem" }}
                   aria-label="Admin password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: "absolute",
-                    right: "10px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "#64748b",
-                    padding: "4px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  className={styles.authEyeBtn}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   title={showPassword ? "Hide password" : "Show password"}
                 >
@@ -647,125 +624,312 @@ function AdminPage() {
             </div>
 
             {err && (
-              <div style={{ color: "#b91c1c", fontSize: "0.9rem" }}>{err}</div>
+              <div className={styles.authErrorBanner}>
+                <AlertCircle size={18} style={{ flexShrink: 0, marginTop: "2px" }} />
+                <span>{err}</span>
+              </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary"
-              style={{
-                justifySelf: "start",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                opacity: loading ? 0.65 : 1,
-                cursor: loading ? "not-allowed" : "pointer",
-                marginTop: "0.25rem",
-              }}
+              className={styles.authSubmitBtn}
             >
-              {loading && <Loader2 className="animate-spin" size={16} />}
-              <span>{loading ? "Signing in..." : "Sign In"}</span>
+              {loading && <Loader2 className="animate-spin" size={18} />}
+              <span>{loading ? "Signing in..." : "Sign In to Admin"}</span>
             </button>
           </form>
-        </section>
-      </>
+
+          <Link to="/" className={styles.authFooterLink}>
+            <ArrowLeft size={14} />
+            <span>Return to public website</span>
+          </Link>
+        </div>
+      </div>
     );
   }
 
   return (
-    <>
-      <header className="page-header">
-        <h1>
-          Manage <span style={{ color: "var(--jhub-green)" }}>Content</span>
-        </h1>
-        <p>
-          Add, edit or remove news posts, events and innovations. Changes save
-          to the server database instantly.
-        </p>
-        <button
-          onClick={lock}
-          className="btn-outline"
-          style={{ marginTop: "0.75rem" }}
-        >
-          Lock admin
-        </button>
-      </header>
+    <div className={styles.adminShell}>
+      <div className={styles.adminContainer}>
+        {/* Executive Command Header Card */}
+        <header className={styles.adminHeaderCard}>
+          {/* Top Row: Status Group on Left, Quick Actions on Right */}
+          <div className={styles.adminHeaderCardTop}>
+            <div className={styles.adminStatusGroup}>
+              <span className={styles.adminStatusBadge}>
+                <span className={styles.adminStatusDot}></span>
+                JHUB Engine • Active Session
+              </span>
+              <span style={{ color: "#cbd5e1" }}>•</span>
+              <span className={styles.adminGovernanceTag}>JKUAT Tech Hub Governance</span>
+            </div>
 
-      <NewsAdmin items={news} onDeleteRequest={requestDelete} />
-      <EventsAdmin items={events} onDeleteRequest={requestDelete} />
-      <InnovationsAdmin items={innovations} onDeleteRequest={requestDelete} />
-      <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
-      <TeamAdmin items={team} onDeleteRequest={requestDelete} />
-      <AdminUsersManager />
-      <EmailAdmin />
+            <div className={styles.adminHeaderActions}>
+              <Link
+                to="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.adminLiveSiteLink}
+                title="Open public website in a new tab"
+              >
+                <ExternalLink size={16} />
+                <span>View Live Site</span>
+              </Link>
 
-      {confirmDelete.isOpen && (
-        <div className={styles['modal-overlay-style']}>
-          <div className={styles['modal-content-style']}>
-            <h3 style={{ margin: "0 0 1rem 0", color: "#1e293b", fontSize: "1.25rem", fontWeight: 700 }}>Confirm Deletion</h3>
-            <p style={{ margin: "0 0 1.5rem 0", color: "#64748b", fontSize: "0.95rem", lineHeight: 1.5 }}>
-              Are you sure you want to delete <strong>{confirmDelete.title}</strong>? This action is permanent and cannot be undone.
-            </p>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+              <div className={styles.adminProfileChip}>
+                <div className={styles.adminProfileAvatar}>
+                  <ShieldCheck size={16} />
+                </div>
+                <div className={styles.adminProfileText}>
+                  <span className={styles.adminProfileName}>
+                    {email ? email.split("@")[0] : "Administrator"}
+                  </span>
+                  <span className={styles.adminProfileRole}>Active Session</span>
+                </div>
+              </div>
+
               <button
-                className="btn-outline"
-                type="button"
+                onClick={lock}
+                className={styles.adminLockBtn}
+                aria-label="Lock administrator session"
+                title="Lock session and return to sign in"
+              >
+                <LogOut size={16} />
+                <span>Lock Session</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Middle Row: Prominent Title and Subtitle with clear separation */}
+          <div className={styles.adminHeaderMain}>
+            <h1 className={styles.adminHeaderTitle}>
+              Manage <span className={styles.adminHeaderTitleAccent}>Content &amp; Systems</span>
+            </h1>
+            <p className={styles.adminHeaderSubtitle}>
+              Publish news stories, schedule events, showcase innovations, oversee training tracks, and govern platform security.
+            </p>
+          </div>
+
+          {/* Bottom Row: Spacious Interactive Metric Buttons */}
+          <div className={styles.adminMetricsRail}>
+            <button
+              type="button"
+              onClick={() => setActiveTab("news")}
+              className={`${styles.adminMetricButton} ${activeTab === "news" ? styles.adminMetricButtonActive : ""}`}
+              title="Switch to News Posts"
+            >
+              <div className={styles.adminMetricIcon} style={{ backgroundColor: "#ecfdf5", color: "#059669" }}>
+                <Newspaper size={22} />
+              </div>
+              <div className={styles.adminMetricContent}>
+                <span className={styles.adminMetricValue}>{news.length}</span>
+                <span className={styles.adminMetricLabel}>News Posts</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("events")}
+              className={`${styles.adminMetricButton} ${activeTab === "events" ? styles.adminMetricButtonActive : ""}`}
+              title="Switch to Events"
+            >
+              <div className={styles.adminMetricIcon} style={{ backgroundColor: "#eff6ff", color: "#2563eb" }}>
+                <Calendar size={22} />
+              </div>
+              <div className={styles.adminMetricContent}>
+                <span className={styles.adminMetricValue}>{events.length}</span>
+                <span className={styles.adminMetricLabel}>Events</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("innovations")}
+              className={`${styles.adminMetricButton} ${activeTab === "innovations" ? styles.adminMetricButtonActive : ""}`}
+              title="Switch to Innovations"
+            >
+              <div className={styles.adminMetricIcon} style={{ backgroundColor: "#fffbeb", color: "#d97706" }}>
+                <Lightbulb size={22} />
+              </div>
+              <div className={styles.adminMetricContent}>
+                <span className={styles.adminMetricValue}>{innovations.length}</span>
+                <span className={styles.adminMetricLabel}>Innovations</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("courses")}
+              className={`${styles.adminMetricButton} ${activeTab === "courses" ? styles.adminMetricButtonActive : ""}`}
+              title="Switch to Courses"
+            >
+              <div className={styles.adminMetricIcon} style={{ backgroundColor: "#faf5ff", color: "#9333ea" }}>
+                <GraduationCap size={22} />
+              </div>
+              <div className={styles.adminMetricContent}>
+                <span className={styles.adminMetricValue}>{courses.length}</span>
+                <span className={styles.adminMetricLabel}>Courses</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("team")}
+              className={`${styles.adminMetricButton} ${activeTab === "team" ? styles.adminMetricButtonActive : ""}`}
+              title="Switch to Team Directory"
+            >
+              <div className={styles.adminMetricIcon} style={{ backgroundColor: "#eef2ff", color: "#4f46e5" }}>
+                <Users size={22} />
+              </div>
+              <div className={styles.adminMetricContent}>
+                <span className={styles.adminMetricValue}>{team.length}</span>
+                <span className={styles.adminMetricLabel}>Team</span>
+              </div>
+            </button>
+          </div>
+        </header>
+
+        {/* The Body: Workspace & Tabs Dock */}
+        <div className={styles.adminWorkspace}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* The Row above the Section: Spacious Executive Navigation Dock */}
+            <div className={styles.adminNavContainer}>
+              <TabsList className={styles.adminNavList}>
+                <TabsTrigger value="news" className={styles.adminNavTrigger}>
+                  <Newspaper size={18} />
+                  <span>News</span>
+                  <span className={styles.adminNavBadge}>{news.length}</span>
+                </TabsTrigger>
+
+                <TabsTrigger value="events" className={styles.adminNavTrigger}>
+                  <Calendar size={18} />
+                  <span>Events</span>
+                  <span className={styles.adminNavBadge}>{events.length}</span>
+                </TabsTrigger>
+
+                <TabsTrigger value="innovations" className={styles.adminNavTrigger}>
+                  <Lightbulb size={18} />
+                  <span>Innovations</span>
+                  <span className={styles.adminNavBadge}>{innovations.length}</span>
+                </TabsTrigger>
+
+                <TabsTrigger value="courses" className={styles.adminNavTrigger}>
+                  <GraduationCap size={18} />
+                  <span>Courses</span>
+                  <span className={styles.adminNavBadge}>{courses.length}</span>
+                </TabsTrigger>
+
+                <TabsTrigger value="team" className={styles.adminNavTrigger}>
+                  <Users size={18} />
+                  <span>Team</span>
+                  <span className={styles.adminNavBadge}>{team.length}</span>
+                </TabsTrigger>
+
+                <TabsTrigger value="users" className={styles.adminNavTrigger}>
+                  <ShieldCheck size={18} />
+                  <span>Admin Accounts</span>
+                </TabsTrigger>
+
+                <TabsTrigger value="email" className={styles.adminNavTrigger}>
+                  <Mail size={18} />
+                  <span>Email System</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="news" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+              <NewsAdmin items={news} onDeleteRequest={requestDelete} />
+            </TabsContent>
+
+            <TabsContent value="events" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+              <EventsAdmin items={events} onDeleteRequest={requestDelete} />
+            </TabsContent>
+
+            <TabsContent value="innovations" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+              <InnovationsAdmin items={innovations} onDeleteRequest={requestDelete} />
+            </TabsContent>
+
+            <TabsContent value="courses" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+              <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
+            </TabsContent>
+
+            <TabsContent value="team" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+              <TeamAdmin items={team} onDeleteRequest={requestDelete} />
+            </TabsContent>
+
+            <TabsContent value="users" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+              <AdminUsersManager />
+            </TabsContent>
+
+            <TabsContent value="email" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+              <EmailAdmin />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <AlertDialog
+          open={confirmDelete.isOpen}
+          onOpenChange={(open) => {
+            if (!isDeleting) {
+              setConfirmDelete((prev) => ({ ...prev, isOpen: open }));
+            }
+          }}
+        >
+          <AlertDialogContent className="sm:max-w-[480px]">
+            <AlertDialogHeader>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <AlertDialogTitle className="text-xl font-bold text-slate-900">
+                    Confirm Deletion
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-sm text-slate-500 mt-1">
+                    This action cannot be undone.
+                  </AlertDialogDescription>
+                </div>
+              </div>
+              <p className="text-slate-600 text-sm leading-relaxed mt-3">
+                Are you sure you want to delete <strong className="text-slate-900">{confirmDelete.title}</strong>? This item will be permanently removed from the database.
+              </p>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="mt-5 gap-2">
+              <AlertDialogCancel
                 disabled={isDeleting}
-                onClick={() => !isDeleting && setConfirmDelete({ ...confirmDelete, isOpen: false })}
-                style={{
-                  padding: "0.5rem 1.25rem",
-                  borderRadius: "6px",
-                  cursor: isDeleting ? "not-allowed" : "pointer",
-                  opacity: isDeleting ? 0.65 : 1,
-                  fontSize: "0.9rem",
-                  transition: "opacity 0.2s ease",
-                }}
+                onClick={() => setConfirmDelete((prev) => ({ ...prev, isOpen: false }))}
+                className="rounded-lg border-slate-300 hover:bg-slate-100 text-slate-700"
               >
                 Cancel
-              </button>
-              <button
-                type="button"
+              </AlertDialogCancel>
+              <AlertDialogAction
                 disabled={isDeleting}
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.preventDefault();
                   try {
                     setIsDeleting(true);
-                    const scrollPos = typeof window !== "undefined" ? window.scrollY : 0;
+                    const targetTitle = confirmDelete.title;
                     await confirmDelete.onConfirm();
-                    setConfirmDelete({ ...confirmDelete, isOpen: false });
-                    setTimeout(() => {
-                      if (typeof window !== "undefined") {
-                        window.scrollTo({ top: scrollPos, behavior: "instant" });
-                      }
-                    }, 50);
+                    toast.success(`"${targetTitle}" deleted successfully.`);
+                    setConfirmDelete((prev) => ({ ...prev, isOpen: false }));
+                  } catch (err: any) {
+                    const errorMsg = err?.response?.data?.error || err?.message || "Failed to delete item.";
+                    toast.error(errorMsg);
                   } finally {
                     setIsDeleting(false);
                   }
                 }}
-                style={{
-                  backgroundColor: "#dc2626",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "0.5rem 1.25rem",
-                  cursor: isDeleting ? "not-allowed" : "pointer",
-                  opacity: isDeleting ? 0.65 : 1,
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  transition: "opacity 0.2s ease",
-                }}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-sm"
               >
-                {isDeleting && <Loader2 className="animate-spin" size={16} />}
-                <span>{isDeleting ? "Deleting..." : "Yes, Delete"}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+                {isDeleting && <Loader2 className="animate-spin mr-2" size={16} />}
+                <span>{isDeleting ? "Deleting..." : "Yes, Delete Permanently"}</span>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
   );
 }
 
@@ -791,7 +955,22 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
 
   return (
     <section id="admin-news-section" className="content-section">
-      <h2 style={{ marginBottom: "1rem" }}>News posts</h2>
+      <div className={styles.adminSectionHeader}>
+        <div className={styles.adminSectionTitleGroup}>
+          <div className={styles.adminSectionHeadingRow}>
+            <div className={styles.adminSectionIconBadge} style={{ backgroundColor: "#ecfdf5", color: "#059669", border: "1px solid #a7f3d0" }}>
+              <Newspaper size={24} />
+            </div>
+            <h2 className={styles.adminSectionTitle}>News &amp; Editorial Posts</h2>
+          </div>
+          <p className={styles.adminSectionSubtitle}>
+            Draft, edit, and publish stories with TipTap rich content, multiple images, and automatic summaries.
+          </p>
+        </div>
+        <span className={styles.adminSectionCountBadge} style={{ backgroundColor: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+          {items.length} Published Posts
+        </span>
+      </div>
 
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
@@ -1079,7 +1258,22 @@ function EventsAdmin({ items, onDeleteRequest }: EventsAdminProps) {
 
   return (
     <section id="admin-events-section" className="content-section">
-      <h2 style={{ marginBottom: "1rem" }}>Events</h2>
+      <div className={styles.adminSectionHeader}>
+        <div className={styles.adminSectionTitleGroup}>
+          <div className={styles.adminSectionHeadingRow}>
+            <div className={styles.adminSectionIconBadge} style={{ backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe" }}>
+              <Calendar size={24} />
+            </div>
+            <h2 className={styles.adminSectionTitle}>Events &amp; Programs Schedule</h2>
+          </div>
+          <p className={styles.adminSectionSubtitle}>
+            Create, update, and manage upcoming hackathons, tech workshops, and innovation challenges.
+          </p>
+        </div>
+        <span className={styles.adminSectionCountBadge} style={{ backgroundColor: "#eff6ff", color: "#1e40af", border: "1px solid #bfdbfe" }}>
+          {items.length} Total Events
+        </span>
+      </div>
 
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
@@ -1214,7 +1408,22 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
 
   return (
     <section id="admin-innovations-section" className="content-section">
-      <h2 style={{ marginBottom: "1rem" }}>Innovations</h2>
+      <div className={styles.adminSectionHeader}>
+        <div className={styles.adminSectionTitleGroup}>
+          <div className={styles.adminSectionHeadingRow}>
+            <div className={styles.adminSectionIconBadge} style={{ backgroundColor: "#fffbeb", color: "#d97706", border: "1px solid #fde68a" }}>
+              <Lightbulb size={24} />
+            </div>
+            <h2 className={styles.adminSectionTitle}>Innovations &amp; Venture Directory</h2>
+          </div>
+          <p className={styles.adminSectionSubtitle}>
+            Manage student and researcher innovations across AI, climate smart agriculture, and digital transformation.
+          </p>
+        </div>
+        <span className={styles.adminSectionCountBadge} style={{ backgroundColor: "#fffbeb", color: "#92400e", border: "1px solid #fde68a" }}>
+          {items.length} Total Innovations
+        </span>
+      </div>
 
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
@@ -1516,7 +1725,22 @@ function CoursesAdmin({ items, onDeleteRequest }: CoursesAdminProps) {
 
   return (
     <section id="admin-courses-section" className="content-section">
-      <h2 style={{ marginBottom: "1rem" }}>Courses</h2>
+      <div className={styles.adminSectionHeader}>
+        <div className={styles.adminSectionTitleGroup}>
+          <div className={styles.adminSectionHeadingRow}>
+            <div className={styles.adminSectionIconBadge} style={{ backgroundColor: "#faf5ff", color: "#9333ea", border: "1px solid #e9d5ff" }}>
+              <GraduationCap size={24} />
+            </div>
+            <h2 className={styles.adminSectionTitle}>Short Courses &amp; Skills Catalog</h2>
+          </div>
+          <p className={styles.adminSectionSubtitle}>
+            Publish courses, set category tracks, duration, and delivery modes (Online, In-Person, Hybrid).
+          </p>
+        </div>
+        <span className={styles.adminSectionCountBadge} style={{ backgroundColor: "#faf5ff", color: "#6b21a8", border: "1px solid #e9d5ff" }}>
+          {items.length} Total Courses
+        </span>
+      </div>
 
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
@@ -1711,10 +1935,22 @@ function TeamAdmin({ items, onDeleteRequest }: TeamAdminProps) {
 
   return (
     <section id="admin-team-section" className="content-section">
-      <h2 style={{ marginBottom: "0.5rem" }}>Team Members</h2>
-      <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", marginBottom: "1.5rem" }}>
-        Manage leadership, staff, mentors and advisors displayed in the About page "Meet Our Team" section.
-      </p>
+      <div className={styles.adminSectionHeader}>
+        <div className={styles.adminSectionTitleGroup}>
+          <div className={styles.adminSectionHeadingRow}>
+            <div className={styles.adminSectionIconBadge} style={{ backgroundColor: "#eef2ff", color: "#4f46e5", border: "1px solid #c7d2fe" }}>
+              <Users size={24} />
+            </div>
+            <h2 className={styles.adminSectionTitle}>JHUB Team &amp; Faculty Directory</h2>
+          </div>
+          <p className={styles.adminSectionSubtitle}>
+            Manage leadership, staff, mentors, and advisors displayed in the About page "Meet Our Team" section.
+          </p>
+        </div>
+        <span className={styles.adminSectionCountBadge} style={{ backgroundColor: "#eef2ff", color: "#3730a3", border: "1px solid #c7d2fe" }}>
+          {items.length} Staff Profiles
+        </span>
+      </div>
 
       <form onSubmit={submit} className={styles['form-grid']}>
         <InputField
