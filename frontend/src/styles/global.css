@@ -681,7 +681,7 @@ p + h2,
   content: "";
   position: absolute;
   bottom: 0px;
-  left: 55%;
+  left: 0px;
   right: 0px;
   height: 2px;
   background-color: var(--jhub-green);
@@ -1261,4 +1261,61 @@ article:hover .hover-underline-center::after,
   font-style: italic;
   line-height: 1.45;
   text-align: center;
+}
+
+/* ==========================================================================
+   SMOOTH RADIX SHEET / MOBILE SIDEBAR ANIMATIONS
+   ========================================================================== */
+@keyframes sheetSlideInRight {
+  0% {
+    transform: translate3d(100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes sheetSlideOutRight {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes sheetOverlayFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes sheetOverlayFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+[data-slot="sheet-overlay"][data-state="open"] {
+  animation: sheetOverlayFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-slot="sheet-overlay"][data-state="closed"] {
+  animation: sheetOverlayFadeOut 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-slot="sheet-content"][data-side="right"][data-state="open"] {
+  animation: sheetSlideInRight 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
+}
+
+[data-slot="sheet-content"][data-side="right"][data-state="closed"] {
+  animation: sheetSlideOutRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
 }

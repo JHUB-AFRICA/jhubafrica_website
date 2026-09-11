@@ -4,6 +4,7 @@ import { MapPin, Mail, Phone, Clock, Globe, Linkedin, Facebook, Instagram, Loade
 import { submitContactInquiry } from "../../axios/api/contact";
 import EditorialHero from "../components/site/EditorialHero";
 import styles from "../styles/Contact.module.css";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -77,192 +78,205 @@ function ContactPage() {
         organisation: formData.organisation.trim() || undefined,
       } as any);
 
-      setSent(true);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        role: "Student",
-        organisation: "",
-        inquiry: "",
-      });
-    } catch (err: any) {
-      console.error("Failed to submit contact inquiry:", err);
-      const details = err?.response?.data?.details;
-      const detailsMsg = details ? Object.entries(details).map(([k, v]) => `${k}: ${(v as string[]).join(', ')}`).join("; ") : "";
-      setErrorMessage(
-        detailsMsg ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Could not send your message at this time. Please try again later or email us directly."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+        setSent(true);
+        toast.success("Thank you! Your inquiry has been submitted successfully.");
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          role: "Student",
+          organisation: "",
+          inquiry: "",
+        });
+      } catch (err: any) {
+        console.error("Failed to submit contact inquiry:", err);
+        const details = err?.response?.data?.details;
+        const detailsMsg = details ? Object.entries(details).map(([k, v]) => `${k}: ${(v as string[]).join(', ')}`).join("; ") : "";
+        const errorMsg = detailsMsg ||
+          err?.response?.data?.error ||
+          err?.message ||
+          "Could not send your message at this time. Please try again later or email us directly.";
+        setErrorMessage(errorMsg);
+        toast.error(errorMsg);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  return (
-    <>
-      <EditorialHero
-        themeVariant="navy"
-        badges={[
-          { label: "GET IN TOUCH", variant: "sector" },
-          { label: "TECHNOLOGY HOUSE, JKUAT", variant: "stage" },
-          { label: "PARTNERSHIP & INQUIRIES", variant: "verified" },
-        ]}
-        title={
-          <>
-            Contact <span style={{ color: "#6ee7b7" }}>Us</span>
-          </>
-        }
-        tagline="LET'S BUILD THE FUTURE TOGETHER"
-        description="Are you looking to partner, sponsor, volunteer, or just connect with the JHUB team? We'd love to hear from you."
-      />
+    return (
+      <>
+        <EditorialHero
+          themeVariant="navy"
+          badges={[
+            { label: "GET IN TOUCH", variant: "sector" },
+            { label: "TECHNOLOGY HOUSE, JKUAT", variant: "stage" },
+            { label: "PARTNERSHIP & INQUIRIES", variant: "verified" },
+          ]}
+          title={
+            <>
+              Contact <span style={{ color: "#6ee7b7" }}>Us</span>
+            </>
+          }
+          tagline="LET'S BUILD THE FUTURE TOGETHER"
+          description="Are you looking to partner, sponsor, volunteer, or just connect with the JHUB team? We'd love to hear from you."
+        />
 
-      <section className="feature-split">
-        <div className="split-copy">
-          <h2>Your Details</h2>
-          <p>
-            Are you looking to partner, sponsor, volunteer, or just to talk with us? Feel free to leave your details in the form below and we will get back to you as soon as possible.
-          </p>
-          <form
-            onSubmit={handleSubmit}
-            className={styles['contact-form-container']}
-          >
-            <div>
-              <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>Your Name (Required) *</label>
-              <input
-                required
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="First and Last Name"
-                className={styles['contact-form-input']}
-                disabled={loading}
-              />
-            </div>
-
-            <div className={styles['contact-form-row']}>
-              <div>
-                <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>Your Email Address (Required) *</label>
+        <section className="feature-split">
+          <div className="split-copy">
+            <h2>Your Details</h2>
+            <p>
+              Are you looking to partner, sponsor, volunteer, or just to talk with us? Feel free to leave your details in the form below and we will get back to you as soon as possible.
+            </p>
+            <form
+              onSubmit={handleSubmit}
+              className={styles['contact-form-container']}
+            >
+              <div className={styles['contact-form-field']}>
+                <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
+                  Your Name *
+                </label>
                 <input
                   required
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
-                  placeholder="Email"
+                  placeholder="First and Last Name"
                   className={styles['contact-form-input']}
                   disabled={loading}
                 />
               </div>
-              <div>
-                <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>Your phone number (Optional)</label>
-                <input
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+254 720 000 000"
-                  className={styles['contact-form-input']}
-                  disabled={loading}
-                />
-              </div>
-            </div>
 
-            <div className={styles['contact-form-row']}>
-              <div>
-                <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>Who are you?</label>
-                <select
-                  name="role"
-                  value={formData.role}
+              <div className={styles['contact-form-row']}>
+                <div className={styles['contact-form-field']}>
+                  <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
+                    Email Address *
+                  </label>
+                  <input
+                    required
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="name@example.com"
+                    className={styles['contact-form-input']}
+                    disabled={loading}
+                  />
+                </div>
+                <div className={styles['contact-form-field']}>
+                  <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
+                    Phone Number (Optional)
+                  </label>
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="+254 720 000 000"
+                    className={styles['contact-form-input']}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              <div className={styles['contact-form-row']}>
+                <div className={styles['contact-form-field']}>
+                  <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
+                    Who are you? *
+                  </label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className={styles['contact-form-input']}
+                    title="Select your role"
+                    disabled={loading}
+                  >
+                    <option>Student</option>
+                    <option>Innovator</option>
+                    <option>Partner</option>
+                    <option>Sponsor</option>
+                    <option>Volunteer</option>
+                    <option>Media / Press</option>
+                  </select>
+                </div>
+                <div className={styles['contact-form-field']}>
+                  <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
+                    Organization (Optional)
+                  </label>
+                  <input
+                    name="organisation"
+                    value={formData.organisation}
+                    onChange={handleChange}
+                    placeholder="Company or Institution"
+                    className={styles['contact-form-input']}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              <div className={styles['contact-form-field']}>
+                <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
+                  Detailed Inquiry (Optional)
+                </label>
+                <textarea
+                  name="inquiry"
+                  value={formData.inquiry}
                   onChange={handleChange}
+                  placeholder="How can we assist you?"
+                  rows={4}
                   className={styles['contact-form-input']}
-                  title="Select your role"
                   disabled={loading}
+                />
+              </div>
+
+              {errorMessage && (
+                <div
+                  style={{
+                    padding: "0.75rem 1rem",
+                    borderRadius: "10px",
+                    fontSize: "0.88rem",
+                    color: "#991b1b",
+                    backgroundColor: "rgba(239, 68, 68, 0.08)",
+                    border: "1px solid rgba(239, 68, 68, 0.3)",
+                  }}
                 >
-                  <option>Student</option>
-                  <option>Innovator</option>
-                  <option>Partner</option>
-                  <option>Sponsor</option>
-                  <option>Volunteer</option>
-                  <option>Media / Press</option>
-                </select>
-              </div>
-              <div>
-                <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>Where Are you from? (Optional)</label>
-                <input
-                  name="organisation"
-                  value={formData.organisation}
-                  onChange={handleChange}
-                  placeholder="Organisation"
-                  className={styles['contact-form-input']}
-                  disabled={loading}
-                />
-              </div>
-            </div>
+                  {errorMessage}
+                </div>
+              )}
 
-            <div>
-              <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>Detailed Inquiry (Optional)</label>
-              <textarea
-                name="inquiry"
-                value={formData.inquiry}
-                onChange={handleChange}
-                placeholder="Type Inquiry"
-                rows={4}
-                className={styles['contact-form-input']}
+              {sent && (
+                <div
+                  style={{
+                    padding: "0.85rem 1.15rem",
+                    borderRadius: "10px",
+                    fontSize: "0.92rem",
+                    color: "#065f46",
+                    backgroundColor: "rgba(16, 185, 129, 0.1)",
+                    border: "1.5px solid rgba(16, 185, 129, 0.4)",
+                    fontWeight: 600,
+                  }}
+                >
+                  ✓ Thank you! Your message has been sent successfully. A confirmation email has been dispatched to your inbox.
+                </div>
+              )}
+
+              <button
+                type="submit"
                 disabled={loading}
-              />
-            </div>
-
-            {errorMessage && (
-              <div
+                className={`btn-primary ${styles['contact-form-submit']}`}
                 style={{
-                  padding: "0.75rem 1rem",
-                  borderRadius: "8px",
-                  fontSize: "0.88rem",
-                  color: "#991b1b",
-                  backgroundColor: "rgba(239, 68, 68, 0.1)",
-                  border: "1px solid #ef4444",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  opacity: loading ? 0.65 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
-                {errorMessage}
-              </div>
-            )}
-
-            {sent && (
-              <div
-                style={{
-                  padding: "0.85rem 1.15rem",
-                  borderRadius: "8px",
-                  fontSize: "0.92rem",
-                  color: "#065f46",
-                  backgroundColor: "rgba(16, 185, 129, 0.12)",
-                  border: "1px solid var(--jhub-green)",
-                  fontWeight: 600,
-                }}
-              >
-                ✓ Thank you! Your message has been sent successfully. A confirmation email has been dispatched to your inbox.
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className={`btn-primary ${styles['contact-form-submit']}`}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "0.5rem",
-                opacity: loading ? 0.65 : 1,
-                cursor: loading ? "not-allowed" : "pointer",
-              }}
-            >
-              {loading && <Loader2 className="animate-spin" size={18} />}
-              <span>{loading ? "Sending Message..." : sent ? "Send Another Message" : "Send Message"}</span>
-            </button>
-          </form>
-        </div>
+                {loading && <Loader2 className="animate-spin" size={18} />}
+                <span>{loading ? "Sending Message..." : sent ? "Send Another Message" : "Send Message"}</span>
+              </button>
+            </form>
+          </div>
 
         <div className={`split-panel ${styles['contact-split-panel']}`}>
           <h3 className={styles['contact-panel-h3']}>

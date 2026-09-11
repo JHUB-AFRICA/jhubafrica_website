@@ -248,13 +248,18 @@ function ForStudentsPage() {
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "0.5rem",
                       padding: "0.75rem 1.5rem",
                       borderRadius: "10px",
                       fontWeight: 700,
                       fontSize: "0.92rem",
+                      fontFamily: "inherit",
+                      minHeight: "44px",
+                      boxSizing: "border-box",
                       background: track.accentColor,
-                      borderColor: track.accentColor,
+                      border: `1.5px solid ${track.accentColor}`,
+                      color: "#ffffff",
                       cursor: "pointer",
                     }}
                   >
@@ -267,12 +272,16 @@ function ForStudentsPage() {
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "0.5rem",
                       padding: "0.75rem 1.5rem",
                       borderRadius: "10px",
                       fontWeight: 700,
                       fontSize: "0.92rem",
-                      borderColor: track.accentColor,
+                      fontFamily: "inherit",
+                      minHeight: "44px",
+                      boxSizing: "border-box",
+                      border: `1.5px solid ${track.accentColor}`,
                       color: "var(--jhub-blue, #07152b)",
                       textDecoration: "none",
                     }}

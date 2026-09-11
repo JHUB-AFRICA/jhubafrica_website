@@ -172,7 +172,11 @@ function SupportPage() {
         </div>
 
         <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
-          <ApplyDialog triggerText="Start the conversation" source="Support page" />
+          <ApplyDialog
+            triggerText="Start the conversation"
+            source="Support page"
+            triggerClassName={heroStyles.btnPrimary}
+          />
         </div>
       </section>
     </>

@@ -320,78 +320,68 @@
 }
 
 /* Action Buttons */
-.btnPrimary {
+.btnPrimary,
+.btnOutline,
+.btnSecondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: var(--jhub-green, #10b981);
-  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.95rem;
   font-weight: 700;
-  font-size: 0.98rem;
-  padding: 0.9rem 1.65rem;
+  line-height: 1.4;
+  padding: 0.85rem 1.75rem;
   border-radius: 12px;
   text-decoration: none;
   cursor: pointer;
-  border: none;
+  box-sizing: border-box;
+  min-height: 48px;
+  white-space: nowrap;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.btnPrimary {
+  background: var(--jhub-green, #10b981);
+  color: #ffffff;
+  border: 1.5px solid var(--jhub-green, #10b981);
   box-shadow: 0 4px 18px rgba(16, 185, 129, 0.4);
-  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btnPrimary:hover {
   background: #059669;
+  border-color: #059669;
   transform: translateY(-2px);
   box-shadow: 0 6px 22px rgba(16, 185, 129, 0.5);
   color: #ffffff;
 }
 
 .btnOutline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   background: rgba(255, 255, 255, 0.1);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   color: #ffffff;
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.9rem 1.6rem;
-  border-radius: 12px;
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
 }
 
 .btnOutline:hover {
   background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.45);
   transform: translateY(-2px);
   color: #ffffff;
 }
 
 .btnSecondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   background: rgba(15, 23, 42, 0.6);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   color: #f8fafc;
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.9rem 1.6rem;
-  border-radius: 12px;
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
 }
 
 .btnSecondary:hover {
   background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
   color: #ffffff;
 }

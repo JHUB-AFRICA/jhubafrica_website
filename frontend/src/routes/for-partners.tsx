@@ -198,23 +198,11 @@ function ForPartnersPage() {
               <ApplyDialog
                 triggerText="Start the conversation"
                 source="Partners Page Banner CTA"
-                triggerClassName="btn-primary"
+                triggerClassName={heroStyles.btnPrimary}
               />
               <Link
                 to="/innovation"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  padding: "0.85rem 1.65rem",
-                  fontSize: "0.95rem",
-                  fontWeight: 600,
-                  borderRadius: "12px",
-                  background: "rgba(255, 255, 255, 0.12)",
-                  color: "#ffffff",
-                  textDecoration: "none",
-                  border: "1px solid rgba(255, 255, 255, 0.2)",
-                  backdropFilter: "blur(8px)",
-                }}
+                className={heroStyles.btnOutline}
               >
                 Browse Active Projects →
               </Link>

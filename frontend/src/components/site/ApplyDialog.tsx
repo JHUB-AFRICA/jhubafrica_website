@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { submitApplication, submitInnovationSubmission } from "../../../axios/api/applications";
+import { cn } from "@/lib/utils";
 
 const ROLES = ["Student", "Innovator", "Partner", "Sponsor", "Volunteer"] as const;
 
@@ -21,6 +22,7 @@ interface ApplyDialogProps {
   triggerText: string;
   triggerVariant?: "default" | "outline" | "secondary" | "ghost";
   triggerClassName?: string;
+  triggerStyle?: CSSProperties;
   source?: string;
 }
 
@@ -56,6 +58,7 @@ export default function ApplyDialog({
   triggerText,
   triggerVariant = "default",
   triggerClassName,
+  triggerStyle,
   source,
 }: ApplyDialogProps) {
   const [open, setOpen] = useState(false);
@@ -320,7 +323,12 @@ export default function ApplyDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button" variant={triggerVariant} className={triggerClassName}>
+        <Button
+          type="button"
+          variant={triggerVariant}
+          className={cn("h-auto min-h-[44px]", triggerClassName)}
+          style={triggerStyle}
+        >
           {triggerText}
         </Button>
       </DialogTrigger>

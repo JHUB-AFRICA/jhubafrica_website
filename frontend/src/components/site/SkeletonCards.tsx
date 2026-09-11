@@ -1,3 +1,5 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
 interface SkeletonCardsProps {
   count?: number;
   hasImage?: boolean;
@@ -13,58 +15,18 @@ export default function SkeletonCards({ count = 3, hasImage = false }: SkeletonC
           style={{
             borderStyle: "solid",
             borderColor: "var(--border-color)",
-            opacity: 0.7,
+            opacity: 0.85,
             display: "flex",
             flexDirection: "column",
           }}
         >
           {hasImage && (
-            <div
-              className="skeleton-pulse"
-              style={{
-                height: "180px",
-                borderRadius: "8px",
-                marginBottom: "1rem",
-                width: "100%",
-              }}
-            />
+            <Skeleton className="h-[180px] w-full rounded-xl mb-4" />
           )}
-          <div
-            className="skeleton-pulse"
-            style={{
-              height: "22px",
-              width: "60%",
-              borderRadius: "6px",
-              marginBottom: "1rem",
-            }}
-          />
-          <div
-            className="skeleton-pulse"
-            style={{
-              height: "15px",
-              width: "90%",
-              borderRadius: "4px",
-              marginBottom: "0.5rem",
-            }}
-          />
-          <div
-            className="skeleton-pulse"
-            style={{
-              height: "15px",
-              width: "80%",
-              borderRadius: "4px",
-              marginBottom: "1.5rem",
-            }}
-          />
-          <div
-            className="skeleton-pulse"
-            style={{
-              height: "30px",
-              width: "40%",
-              borderRadius: "999px",
-              marginTop: "auto",
-            }}
-          />
+          <Skeleton className="h-6 w-3/5 rounded-md mb-3" />
+          <Skeleton className="h-4 w-full rounded mb-2" />
+          <Skeleton className="h-4 w-4/5 rounded mb-5" />
+          <Skeleton className="h-9 w-28 rounded-full mt-auto" />
         </div>
       ))}
     </div>
