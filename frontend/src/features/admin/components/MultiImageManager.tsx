@@ -403,7 +403,7 @@ export function MultiImageManager({
           textAlign: 'center',
           backgroundColor: isDragOver ? '#f0fdf4' : '#f8fafc',
           cursor: uploading ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s ease',
+          transition: 'border-color 0.2s ease, background-color 0.2s ease',
         }}
       >
         <input

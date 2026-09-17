@@ -111,7 +111,7 @@ export function ContactModal({ isOpen, onClose, source = "General" }: ContactMod
               onChange={handleChange}
               placeholder="First and Last Name"
               disabled={loading}
-              className="w-full h-[46px] px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+              className="w-full h-[46px] px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors disabled:bg-slate-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -129,7 +129,7 @@ export function ContactModal({ isOpen, onClose, source = "General" }: ContactMod
                 onChange={handleChange}
                 placeholder="name@example.com"
                 disabled={loading}
-                className="w-full h-[46px] px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+                className="w-full h-[46px] px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors disabled:bg-slate-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -145,7 +145,7 @@ export function ContactModal({ isOpen, onClose, source = "General" }: ContactMod
                 onChange={handleChange}
                 placeholder="+254 720 000 000"
                 disabled={loading}
-                className="w-full h-[46px] px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+                className="w-full h-[46px] px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors disabled:bg-slate-50 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -161,7 +161,7 @@ export function ContactModal({ isOpen, onClose, source = "General" }: ContactMod
               value={formData.reason}
               onChange={handleChange}
               disabled={loading}
-              className="w-full h-[46px] px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer disabled:bg-slate-50 disabled:cursor-not-allowed"
+              className="w-full h-[46px] px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors cursor-pointer disabled:bg-slate-50 disabled:cursor-not-allowed"
             >
               <option value="Student">Student</option>
               <option value="Innovator">Innovator</option>
@@ -184,7 +184,7 @@ export function ContactModal({ isOpen, onClose, source = "General" }: ContactMod
               placeholder="Write your message here..."
               rows={4}
               disabled={loading}
-              className="w-full min-h-[110px] p-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-vertical disabled:bg-slate-50 disabled:cursor-not-allowed"
+              className="w-full min-h-[110px] p-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors resize-vertical disabled:bg-slate-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -192,7 +192,7 @@ export function ContactModal({ isOpen, onClose, source = "General" }: ContactMod
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm tracking-wide shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm tracking-wide shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading && <Loader2 className="animate-spin" size={18} />}
               <span>{loading ? "Sending Message..." : "Send Message"}</span>

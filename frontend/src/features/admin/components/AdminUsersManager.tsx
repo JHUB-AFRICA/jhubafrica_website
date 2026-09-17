@@ -491,7 +491,7 @@ export function AdminUsersManager() {
                 fontWeight: 700,
                 opacity: isCreating || !isMinLength || !isMatch || !email.trim() || !firstName.trim() || !lastName.trim() ? 0.5 : 1,
                 cursor: isCreating ? "not-allowed" : "pointer",
-                transition: "all 0.2s ease",
+                transition: "opacity 0.2s ease",
               }}
             >
               {isCreating ? <Loader2 className="animate-spin" size={18} /> : <UserPlus size={18} />}

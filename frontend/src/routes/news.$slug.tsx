@@ -237,7 +237,7 @@ function NewsDetailPage() {
                     cursor: "pointer",
                     flexShrink: 0,
                     opacity: activeIndex === idx ? 1 : 0.65,
-                    transition: "all 0.2s ease",
+                    transition: "opacity 0.2s ease, border-color 0.2s ease",
                     backgroundColor: "#f1f5f9",
                   }}
                 >

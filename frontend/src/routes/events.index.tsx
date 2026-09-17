@@ -206,7 +206,7 @@ function EventsPage() {
                   color: activeTab === tab.key ? "var(--jhub-blue)" : "var(--text-muted)",
                   cursor: "pointer",
                   fontWeight: activeTab === tab.key ? "700" : "500",
-                  transition: "all 0.2s"
+                  transition: "color 0.2s, background-color 0.2s, border-color 0.2s",
                 }}
               >
                 {tab.label}

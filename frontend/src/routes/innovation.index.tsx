@@ -105,7 +105,7 @@ function InnovationPage() {
   const [q, setQ] = useState("");
   const [stage, setStage] = useState<(typeof STAGES)[number]>("All");
   const [sector, setSector] = useState<string>("All");
-  const [counts, setCounts] = useState<number[]>(INNOVATION_METRICS.map(() => 0));
+  const [counts, setCounts] = useState<number[]>(() => INNOVATION_METRICS.map(() => 0));
 
   useEffect(() => {
     const duration = 1500; // ms

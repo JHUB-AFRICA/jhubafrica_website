@@ -175,7 +175,7 @@ function NewsIndexPage() {
                     color: selectedTag === tag ? "var(--jhub-blue)" : "var(--text-muted)",
                     cursor: "pointer",
                     fontWeight: selectedTag === tag ? "700" : "500",
-                    transition: "all 0.2s",
+                    transition: "color 0.2s, background-color 0.2s, border-color 0.2s",
                     textTransform: tag === "ALL" ? "none" : "capitalize",
                   }}
                 >

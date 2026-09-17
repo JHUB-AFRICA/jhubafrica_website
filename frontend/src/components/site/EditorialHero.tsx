@@ -59,6 +59,171 @@ export interface EditorialHeroProps {
   style?: CSSProperties;
 }
 
+const themeClassMap: Record<string, string> = {
+  default: styles.themeDefault,
+  navy: styles.themeNavy,
+  green: styles.themeGreen,
+  dark: styles.themeDark,
+  emerald: styles.themeEmerald,
+};
+
+const variantClassMap: Record<string, string> = {
+  default: styles.badgeDefault,
+  sector: styles.badgeSector,
+  stage: styles.badgeStage,
+  verified: styles.badgeVerified,
+  accent: styles.badgeAccent,
+  outline: styles.badgeOutline,
+};
+
+function HeroBackLink({ backLink }: { backLink?: HeroBackLinkConfig | ReactNode }) {
+  if (!backLink) return null;
+  if (React.isValidElement(backLink)) return backLink;
+
+  const config = backLink as HeroBackLinkConfig;
+  const icon = config.icon ?? <ArrowLeft size={16} />;
+
+  if (config.to) {
+    return (
+      <Link to={config.to} className={styles.heroBackLink}>
+        {icon}
+        <span>{config.label}</span>
+      </Link>
+    );
+  }
+  if (config.href) {
+    return (
+      <a href={config.href} className={styles.heroBackLink}>
+        {icon}
+        <span>{config.label}</span>
+      </a>
+    );
+  }
+  if (config.onClick) {
+    return (
+      <button type="button" onClick={config.onClick} className={styles.heroBackLink}>
+        {icon}
+        <span>{config.label}</span>
+      </button>
+    );
+  }
+  return null;
+}
+
+function HeroBadgeItemComponent({ badge }: { badge: HeroBadgeItem | ReactNode }) {
+  if (React.isValidElement(badge)) {
+    return badge;
+  }
+
+  if (typeof badge === "string" || typeof badge === "number") {
+    return (
+      <span className={styles.badgeDefault}>
+        {badge}
+      </span>
+    );
+  }
+
+  const item = badge as HeroBadgeItem;
+  if (!item || !item.label) return null;
+
+  const variantClass = variantClassMap[item.variant || "default"] || styles.badgeDefault;
+  const badgeStyle: CSSProperties = {};
+  if (item.color) badgeStyle.color = item.color;
+  if (item.bg) badgeStyle.backgroundColor = item.bg;
+
+  return (
+    <span
+      className={`${variantClass} ${item.className || ""}`}
+      style={badgeStyle}
+    >
+      {item.icon}
+      <span>{item.label}</span>
+    </span>
+  );
+}
+
+function HeroBadges({ badges }: { badges?: Array<HeroBadgeItem | ReactNode> | ReactNode }) {
+  if (!badges) return null;
+  if (!Array.isArray(badges)) {
+    return <div className={styles.heroMetaRow}>{badges}</div>;
+  }
+  if (badges.length === 0) return null;
+
+  return (
+    <div className={styles.heroMetaRow}>
+      {badges.map((b, i) => {
+        const key = React.isValidElement(b) && b.key
+          ? String(b.key)
+          : typeof b === "string" || typeof b === "number"
+            ? `badge-val-${b}`
+            : (b as any)?.label && typeof (b as any).label === "string"
+              ? `${(b as any).variant || "default"}-${(b as any).label}`
+              : `badge-slot-${i}`;
+        return <HeroBadgeItemComponent key={key} badge={b} />;
+      })}
+    </div>
+  );
+}
+
+function HeroMedia({ media, maxWidth }: { media?: ReactNode; maxWidth?: string | number }) {
+  if (!media) return null;
+
+  const frameStyle: CSSProperties = {};
+  if (maxWidth) {
+    frameStyle.maxWidth = typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth;
+  }
+
+  return (
+    <div className={styles.heroMediaCol}>
+      <div className={styles.heroMediaFrame} style={frameStyle}>
+        {typeof media === "string" ? (
+          <img src={media} alt="Hero media" className={styles.heroMediaMedia} />
+        ) : (
+          media
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HeroContentColumn({
+  title,
+  tagline,
+  description,
+  badges,
+  actions,
+  isCentered,
+  children,
+}: {
+  title: ReactNode;
+  tagline?: ReactNode;
+  description?: ReactNode;
+  badges?: Array<HeroBadgeItem | ReactNode> | ReactNode;
+  actions?: ReactNode;
+  isCentered: boolean;
+  children?: ReactNode;
+}) {
+  const isH1 = React.isValidElement(title) && (title.type === "h1" || (typeof title.type === "string" && title.type === "h1"));
+  const isTaglineP = React.isValidElement(tagline) && tagline.type === "p";
+  const isDescP = React.isValidElement(description) && description.type === "p";
+
+  return (
+    <div className={`${styles.heroContentCol} ${isCentered ? styles.centerAligned : ""}`}>
+      <HeroBadges badges={badges} />
+
+      {isH1 ? title : <h1 className={styles.heroHeading}>{title}</h1>}
+
+      {tagline && (isTaglineP ? tagline : <p className={styles.heroTagline}>{tagline}</p>)}
+
+      {description && (isDescP ? description : <p className={styles.heroSummary}>{description}</p>)}
+
+      {actions && <div className={styles.heroActionsRow}>{actions}</div>}
+
+      {children}
+    </div>
+  );
+}
+
 export function EditorialHero({
   title,
   tagline,
@@ -79,187 +244,30 @@ export function EditorialHero({
   className = "",
   style,
 }: EditorialHeroProps) {
-  // Theme class selection
-  const themeClassMap: Record<string, string> = {
-    default: styles.themeDefault,
-    navy: styles.themeNavy,
-    green: styles.themeGreen,
-    dark: styles.themeDark,
-    emerald: styles.themeEmerald,
-  };
-
   const selectedThemeClass = themeClassMap[themeVariant] || styles.themeDefault;
   const isCentered = align === "center";
 
-  // Render Back Link
-  const renderBackLink = () => {
-    if (!backLink) return null;
-
-    if (React.isValidElement(backLink)) {
-      return backLink;
-    }
-
-    const config = backLink as HeroBackLinkConfig;
-    const icon = config.icon ?? <ArrowLeft size={16} />;
-
-    if (config.to) {
-      return (
-        <Link to={config.to} className={styles.heroBackLink}>
-          {icon}
-          <span>{config.label}</span>
-        </Link>
-      );
-    }
-
-    if (config.href) {
-      return (
-        <a href={config.href} className={styles.heroBackLink}>
-          {icon}
-          <span>{config.label}</span>
-        </a>
-      );
-    }
-
-    if (config.onClick) {
-      return (
-        <button
-          type="button"
-          onClick={config.onClick}
-          className={styles.heroBackLink}
-        >
-          {icon}
-          <span>{config.label}</span>
-        </button>
-      );
-    }
-
-    return null;
+  const containerStyle: CSSProperties = {
+    ...style,
+    ...(customBackground ? { background: customBackground } : {}),
   };
 
-  // Render Single Badge
-  const renderBadge = (badge: HeroBadgeItem | ReactNode, index: number) => {
-    if (React.isValidElement(badge)) {
-      return React.cloneElement(badge, { key: badge.key ?? index });
-    }
+  const innerStyle: CSSProperties = containerMaxWidth
+    ? { maxWidth: typeof containerMaxWidth === "number" ? `${containerMaxWidth}px` : containerMaxWidth }
+    : {};
 
-    if (typeof badge === "string" || typeof badge === "number") {
-      return (
-        <span key={index} className={styles.badgeDefault}>
-          {badge}
-        </span>
-      );
-    }
-
-    const item = badge as HeroBadgeItem;
-    if (!item || !item.label) return null;
-
-    const variantClassMap: Record<string, string> = {
-      default: styles.badgeDefault,
-      sector: styles.badgeSector,
-      stage: styles.badgeStage,
-      verified: styles.badgeVerified,
-      accent: styles.badgeAccent,
-      outline: styles.badgeOutline,
-    };
-
-    const variantClass = variantClassMap[item.variant || "default"] || styles.badgeDefault;
-
-    const badgeStyle: CSSProperties = {};
-    if (item.color) badgeStyle.color = item.color;
-    if (item.bg) badgeStyle.backgroundColor = item.bg;
-
-    return (
-      <span
-        key={index}
-        className={`${variantClass} ${item.className || ""}`}
-        style={badgeStyle}
-      >
-        {item.icon}
-        <span>{item.label}</span>
-      </span>
-    );
-  };
-
-  // Render Badges Row
-  const renderBadges = () => {
-    if (!badges) return null;
-
-    if (Array.isArray(badges)) {
-      if (badges.length === 0) return null;
-      return (
-        <div className={styles.heroMetaRow}>
-          {badges.map((b, i) => renderBadge(b, i))}
-        </div>
-      );
-    }
-
-    return <div className={styles.heroMetaRow}>{badges}</div>;
-  };
-
-  // Render Media
-  const renderMedia = () => {
-    if (!media) return null;
-
-    const frameStyle: CSSProperties = {};
-    if (mediaMaxWidth) {
-      frameStyle.maxWidth = typeof mediaMaxWidth === "number" ? `${mediaMaxWidth}px` : mediaMaxWidth;
-    }
-
-    return (
-      <div className={styles.heroMediaCol}>
-        <div className={styles.heroMediaFrame} style={frameStyle}>
-          {typeof media === "string" ? (
-            <img src={media} alt="Hero media" className={styles.heroMediaMedia} />
-          ) : (
-            media
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // Content Column
-  const contentColumn = (
-    <div className={`${styles.heroContentCol} ${isCentered ? styles.centerAligned : ""}`}>
-      {renderBadges()}
-
-      {React.isValidElement(title) && (title.type === "h1" || (typeof title.type === "string" && title.type === "h1")) ? (
-        title
-      ) : (
-        <h1 className={styles.heroHeading}>{title}</h1>
-      )}
-
-      {tagline && (
-        React.isValidElement(tagline) && tagline.type === "p" ? (
-          tagline
-        ) : (
-          <p className={styles.heroTagline}>{tagline}</p>
-        )
-      )}
-
-      {description && (
-        React.isValidElement(description) && description.type === "p" ? (
-          description
-        ) : (
-          <p className={styles.heroSummary}>{description}</p>
-        )
-      )}
-
-      {actions && <div className={styles.heroActionsRow}>{actions}</div>}
-
+  const content = (
+    <HeroContentColumn
+      title={title}
+      tagline={tagline}
+      description={description}
+      badges={badges}
+      actions={actions}
+      isCentered={isCentered}
+    >
       {children}
-    </div>
+    </HeroContentColumn>
   );
-
-  const containerStyle: CSSProperties = { ...style };
-  if (customBackground) {
-    containerStyle.background = customBackground;
-  }
-
-  const innerStyle: CSSProperties = {};
-  if (containerMaxWidth) {
-    innerStyle.maxWidth = typeof containerMaxWidth === "number" ? `${containerMaxWidth}px` : containerMaxWidth;
-  }
 
   return (
     <section
@@ -269,7 +277,7 @@ export function EditorialHero({
       {meshOverlay && <div className={styles.heroMeshOverlay} />}
 
       <div className={styles.heroInner} style={innerStyle}>
-        {renderBackLink()}
+        <HeroBackLink backLink={backLink} />
 
         {media ? (
           <div
@@ -277,13 +285,13 @@ export function EditorialHero({
               mediaPosition === "right" ? styles.mediaRight : ""
             }`}
           >
-            {mediaPosition === "left" && renderMedia()}
-            {contentColumn}
-            {mediaPosition === "right" && renderMedia()}
+            {mediaPosition === "left" && <HeroMedia media={media} maxWidth={mediaMaxWidth} />}
+            {content}
+            {mediaPosition === "right" && <HeroMedia media={media} maxWidth={mediaMaxWidth} />}
           </div>
         ) : (
           <div className={`${styles.heroSingleCol} ${isCentered ? styles.centerAligned : ""}`}>
-            {contentColumn}
+            {content}
           </div>
         )}
 

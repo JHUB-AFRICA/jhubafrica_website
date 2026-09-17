@@ -838,31 +838,31 @@ function AdminPage() {
               </TabsList>
             </div>
 
-            <TabsContent value="news" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+            <TabsContent value="news" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 transition-opacity duration-200">
               <NewsAdmin items={news} onDeleteRequest={requestDelete} />
             </TabsContent>
 
-            <TabsContent value="events" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+            <TabsContent value="events" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 transition-opacity duration-200">
               <EventsAdmin items={events} onDeleteRequest={requestDelete} />
             </TabsContent>
 
-            <TabsContent value="innovations" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+            <TabsContent value="innovations" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 transition-opacity duration-200">
               <InnovationsAdmin items={innovations} onDeleteRequest={requestDelete} />
             </TabsContent>
 
-            <TabsContent value="courses" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+            <TabsContent value="courses" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 transition-opacity duration-200">
               <CoursesAdmin items={courses} onDeleteRequest={requestDelete} />
             </TabsContent>
 
-            <TabsContent value="team" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+            <TabsContent value="team" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 transition-opacity duration-200">
               <TeamAdmin items={team} onDeleteRequest={requestDelete} />
             </TabsContent>
 
-            <TabsContent value="users" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+            <TabsContent value="users" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 transition-opacity duration-200">
               <AdminUsersManager />
             </TabsContent>
 
-            <TabsContent value="email" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 duration-200">
+            <TabsContent value="email" className="outline-none focus:outline-none data-[state=active]:animate-in data-[state=active]:fade-in-50 data-[state=active]:slide-in-from-bottom-1 transition-opacity duration-200">
               <EmailAdmin />
             </TabsContent>
           </Tabs>

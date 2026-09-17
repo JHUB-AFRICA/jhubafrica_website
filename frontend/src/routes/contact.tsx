@@ -373,6 +373,7 @@ function ContactPage() {
               style={{ border: 0, display: "block" }}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
+              sandbox="allow-scripts allow-popups"
             />
           </div>
 

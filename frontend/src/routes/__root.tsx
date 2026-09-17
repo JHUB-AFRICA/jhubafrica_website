@@ -92,47 +92,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     errorComponent: ErrorComponent,
 });
 
+function observeElement(observer: IntersectionObserver, el: Element) {
+  observer.observe(el);
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-revealed");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.05, rootMargin: "0px 0px -20px 0px" }
+    );
 
-    const observeElements = () => {
-      const elements = document.querySelectorAll(".content-section, .theme-row-item, .horizontal-event-card");
-      if (elements.length === 0) return;
+    const elements = document.querySelectorAll(".content-section, .theme-row-item, .horizontal-event-card");
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 50 && rect.bottom >= 0) {
+        el.classList.add("is-revealed");
+      } else {
+        observeElement(observer, el);
+      }
+    });
 
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("is-revealed");
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.05, rootMargin: "0px 0px -20px 0px" }
-      );
-
-      elements.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight + 50 && rect.bottom >= 0) {
-          el.classList.add("is-revealed");
-        } else {
-          observer.observe(el);
-        }
-      });
-
-      return () => observer.disconnect();
-    };
-
-    const cleanup = observeElements();
-    const timeout = setTimeout(observeElements, 120);
+    const timeout = setTimeout(() => {
+      const remaining = document.querySelectorAll(".content-section:not(.is-revealed), .theme-row-item:not(.is-revealed), .horizontal-event-card:not(.is-revealed)");
+      remaining.forEach((el) => observeElement(observer, el));
+    }, 120);
 
     return () => {
-      if (cleanup) cleanup();
       clearTimeout(timeout);
+      observer.disconnect();
     };
   }, [router.state.location.pathname]);
 

@@ -129,7 +129,7 @@ export function scrollToForm(sectionId: string) {
 
 export function useNewsAdmin() {
     const router = useRouter();
-    const [draft, setDraft] = useState<NewsDraft>(getEmptyNews());
+    const [draft, setDraft] = useState<NewsDraft>(getEmptyNews);
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -244,7 +244,7 @@ export function useNewsAdmin() {
 
 export function useEventAdmin() {
     const router = useRouter();
-    const [draft, setDraft] = useState<EventDraft>(getEmptyEvent());
+    const [draft, setDraft] = useState<EventDraft>(getEmptyEvent);
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -328,7 +328,7 @@ export function useEventAdmin() {
 
 export function useInnovationAdmin() {
     const router = useRouter();
-    const [draft, setDraft] = useState<InnovationDraft>(getEmptyInnovation());
+    const [draft, setDraft] = useState<InnovationDraft>(getEmptyInnovation);
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -412,7 +412,7 @@ export function useInnovationAdmin() {
 
 export function useCourseAdmin() {
     const router = useRouter();
-    const [draft, setDraft] = useState<CourseDraft>(getEmptyCourse());
+    const [draft, setDraft] = useState<CourseDraft>(getEmptyCourse);
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -505,7 +505,7 @@ export function getEmptyTeamMember(): Omit<JHubTeamMember, "id"> {
 
 export function useTeamAdmin() {
     const router = useRouter();
-    const [draft, setDraft] = useState<TeamMemberDraft>(getEmptyTeamMember());
+    const [draft, setDraft] = useState<TeamMemberDraft>(getEmptyTeamMember);
     const [msg, setMsg] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);

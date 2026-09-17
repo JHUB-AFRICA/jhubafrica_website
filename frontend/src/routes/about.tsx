@@ -205,7 +205,7 @@ function AboutPage() {
                 color: activeCategory === tab.key ? "var(--jhub-blue)" : "var(--text-muted)",
                 cursor: "pointer",
                 fontWeight: activeCategory === tab.key ? "700" : "500",
-                transition: "all 0.2s"
+                transition: "color 0.2s, background-color 0.2s, border-color 0.2s",
               }}
             >
               {tab.label}
