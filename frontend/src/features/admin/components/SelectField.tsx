@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -7,13 +7,18 @@ interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement>
 export function SelectField({
   label,
   style,
+  id,
   children,
   ...rest
 }: SelectFieldProps) {
+  const generatedId = useId();
+  const selectId = id || generatedId;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", width: "100%" }}>
       {label && (
         <label
+          htmlFor={selectId}
           style={{
             fontSize: "0.82rem",
             fontWeight: 700,
@@ -27,7 +32,7 @@ export function SelectField({
           {label}
         </label>
       )}
-      <select style={{ ...style }} {...rest}>
+      <select id={selectId} aria-label={rest["aria-label"] || label} style={{ ...style }} {...rest}>
         {children}
       </select>
     </div>

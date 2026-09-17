@@ -304,8 +304,8 @@ function ForStudentsPage() {
                   Key Program Highlights
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                  {track.highlights.map((h, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
+                  {track.highlights.map((h) => (
+                    <div key={`${track.id}-${h}`} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
                       <CheckCircle2 size={18} color={track.accentColor} style={{ flexShrink: 0, marginTop: "2px" }} />
                       <span style={{ fontSize: "0.92rem", color: "var(--text-main, #1e293b)", fontWeight: 500, lineHeight: 1.5 }}>
                         {h}

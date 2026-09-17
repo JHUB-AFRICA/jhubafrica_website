@@ -132,12 +132,14 @@ function ContactPage() {
               className={styles['contact-form-container']}
             >
               <div className={styles['contact-form-field']}>
-                <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
+                <label htmlFor="contact-name" className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
                   Your Name *
                 </label>
                 <input
                   required
+                  id="contact-name"
                   name="name"
+                  aria-label="Your Name"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="First and Last Name"
@@ -148,13 +150,15 @@ function ContactPage() {
 
               <div className={styles['contact-form-row']}>
                 <div className={styles['contact-form-field']}>
-                  <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
+                  <label htmlFor="contact-email" className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
                     Email Address *
                   </label>
                   <input
                     required
+                    id="contact-email"
                     type="email"
                     name="email"
+                    aria-label="Email Address"
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="name@example.com"
@@ -163,11 +167,13 @@ function ContactPage() {
                   />
                 </div>
                 <div className={styles['contact-form-field']}>
-                  <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
+                  <label htmlFor="contact-phone" className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
                     Phone Number (Optional)
                   </label>
                   <input
+                    id="contact-phone"
                     name="phone"
+                    aria-label="Phone Number (Optional)"
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="+254 720 000 000"
@@ -179,11 +185,13 @@ function ContactPage() {
 
               <div className={styles['contact-form-row']}>
                 <div className={styles['contact-form-field']}>
-                  <label className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
+                  <label htmlFor="contact-role" className={`${styles['contact-form-label']} ${styles['contact-form-label-required']}`}>
                     Who are you? *
                   </label>
                   <select
+                    id="contact-role"
                     name="role"
+                    aria-label="Who are you?"
                     value={formData.role}
                     onChange={handleChange}
                     className={styles['contact-form-input']}
@@ -199,11 +207,13 @@ function ContactPage() {
                   </select>
                 </div>
                 <div className={styles['contact-form-field']}>
-                  <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
+                  <label htmlFor="contact-organisation" className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
                     Organization (Optional)
                   </label>
                   <input
+                    id="contact-organisation"
                     name="organisation"
+                    aria-label="Organization (Optional)"
                     value={formData.organisation}
                     onChange={handleChange}
                     placeholder="Company or Institution"
@@ -214,11 +224,13 @@ function ContactPage() {
               </div>
 
               <div className={styles['contact-form-field']}>
-                <label className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
+                <label htmlFor="contact-inquiry" className={`${styles['contact-form-label']} ${styles['contact-form-label-optional']}`}>
                   Detailed Inquiry (Optional)
                 </label>
                 <textarea
+                  id="contact-inquiry"
                   name="inquiry"
+                  aria-label="Detailed Inquiry (Optional)"
                   value={formData.inquiry}
                   onChange={handleChange}
                   placeholder="How can we assist you?"

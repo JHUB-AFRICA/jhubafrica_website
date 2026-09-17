@@ -220,7 +220,6 @@ function AboutPage() {
               <article
                 key={member.id}
                 className={`${styles['team-card-borderless']} ${isExpanded ? styles['team-card-expanded'] : ''}`}
-                onClick={() => setExpandedId(isExpanded ? null : member.id)}
               >
                 <div className={styles['team-card-media']}>
                   <img
@@ -252,8 +251,9 @@ function AboutPage() {
                   <button
                     type="button"
                     className={styles['team-card-btn']}
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    aria-expanded={isExpanded}
+                    aria-label={`${isExpanded ? "Collapse" : "Expand"} bio for ${member.name}`}
+                    onClick={() => {
                       setExpandedId(isExpanded ? null : member.id);
                     }}
                   >

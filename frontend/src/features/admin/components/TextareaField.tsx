@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useId } from "react";
 
 interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
 }
 
-export function TextareaField({ label, style, ...rest }: TextareaFieldProps) {
+export function TextareaField({ label, style, id, ...rest }: TextareaFieldProps) {
+  const generatedId = useId();
+  const textareaId = id || generatedId;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", width: "100%" }}>
       {label && (
         <label
+          htmlFor={textareaId}
           style={{
             fontSize: "0.82rem",
             fontWeight: 700,
@@ -22,7 +26,7 @@ export function TextareaField({ label, style, ...rest }: TextareaFieldProps) {
           {label}
         </label>
       )}
-      <textarea style={{ ...style }} {...rest} />
+      <textarea id={textareaId} aria-label={rest["aria-label"] || label} style={{ ...style }} {...rest} />
     </div>
   );
 }

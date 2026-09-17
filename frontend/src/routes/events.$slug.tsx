@@ -77,8 +77,8 @@ function EventDetailPage() {
 
         <div style={{ fontSize: "1.1rem", lineHeight: "1.8", color: "#334155" }}>
           {event.desc ? (
-            event.desc.split("\n\n").map((paragraph: string, index: number) => (
-              <p key={index} style={{ marginBottom: "1.5rem" }}>
+            event.desc.split("\n\n").map((paragraph: string) => (
+              <p key={`p-${paragraph.slice(0, 32)}`} style={{ marginBottom: "1.5rem" }}>
                 {paragraph}
               </p>
             ))

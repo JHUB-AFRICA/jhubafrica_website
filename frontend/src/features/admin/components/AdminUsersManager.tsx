@@ -260,6 +260,7 @@ export function AdminUsersManager() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.5rem" }}>
             <div>
               <label
+                htmlFor="admin-user-first-name"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -277,6 +278,8 @@ export function AdminUsersManager() {
               </label>
               <input
                 required
+                id="admin-user-first-name"
+                aria-label="First Name"
                 type="text"
                 placeholder="e.g. John"
                 value={firstName}
@@ -288,6 +291,7 @@ export function AdminUsersManager() {
 
             <div>
               <label
+                htmlFor="admin-user-last-name"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -305,6 +309,8 @@ export function AdminUsersManager() {
               </label>
               <input
                 required
+                id="admin-user-last-name"
+                aria-label="Last Name"
                 type="text"
                 placeholder="e.g. Kariuki"
                 value={lastName}
@@ -318,6 +324,7 @@ export function AdminUsersManager() {
           {/* Row 2: Email */}
           <div>
             <label
+              htmlFor="admin-user-email"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -335,6 +342,8 @@ export function AdminUsersManager() {
             </label>
             <input
               required
+              id="admin-user-email"
+              aria-label="Official Administrator Email Address"
               type="email"
               placeholder="e.g. j.kariuki@jhubafrica.com"
               value={email}
@@ -348,6 +357,7 @@ export function AdminUsersManager() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.5rem" }}>
             <div>
               <label
+                htmlFor="admin-user-password"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -366,6 +376,8 @@ export function AdminUsersManager() {
               <div style={{ position: "relative" }}>
                 <input
                   required
+                  id="admin-user-password"
+                  aria-label="Initial Password"
                   type={showPassword ? "text" : "password"}
                   placeholder="At least 8 characters"
                   value={password}
@@ -400,6 +412,7 @@ export function AdminUsersManager() {
 
             <div>
               <label
+                htmlFor="admin-user-confirm-password"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -418,6 +431,8 @@ export function AdminUsersManager() {
               <div style={{ position: "relative" }}>
                 <input
                   required
+                  id="admin-user-confirm-password"
+                  aria-label="Confirm Password"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Re-enter password"
                   value={confirmPassword}

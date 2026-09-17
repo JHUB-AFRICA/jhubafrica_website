@@ -443,8 +443,8 @@ function Index() {
             { icon: <Leaf size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "Green Digital Innovation", desc: "Climate-friendly products that reduce waste and improve efficiency." },
             { icon: <Globe size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "Digital Trade", desc: "Platforms and tools that enable regional market access." },
             { icon: <Cpu size={28} style={{ color: "var(--jhub-green)", flexShrink: 0 }} />, title: "AI & Digital Transformation", desc: "Inclusive AI and automation for African enterprises." }
-          ].map((theme, index) => (
-            <div key={index} className="theme-row-item" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem", paddingBottom: "2rem", borderBottom: "1px solid var(--border-color)" }}>
+          ].map((theme) => (
+            <div key={theme.title} className="theme-row-item" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem", paddingBottom: "2rem", borderBottom: "1px solid var(--border-color)" }}>
               {/* Column 1: Icon + Title (Enlarged) */}
               <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                 {theme.icon}

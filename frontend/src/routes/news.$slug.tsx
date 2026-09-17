@@ -111,23 +111,39 @@ function NewsDetailPage() {
               margin: "0 auto",
               boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
               backgroundColor: "#0f172a",
-              cursor: "zoom-in",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-            onClick={() => setIsLightboxOpen(true)}
           >
-            <img
-              src={allImages[activeIndex]}
-              alt={`${post.title} - image ${activeIndex + 1}`}
+            <button
+              type="button"
+              aria-label="Enlarge active photo in lightbox view"
+              onClick={() => setIsLightboxOpen(true)}
               style={{
-                maxWidth: "100%",
-                maxHeight: "420px",
-                objectFit: "contain",
-                transition: "transform 0.3s ease",
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                margin: 0,
+                cursor: "zoom-in",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                height: "100%",
               }}
-            />
+            >
+              <img
+                src={allImages[activeIndex]}
+                alt={`${post.title} (${activeIndex + 1} of ${allImages.length})`}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "420px",
+                  objectFit: "contain",
+                  transition: "transform 0.3s ease",
+                }}
+              />
+            </button>
 
             {/* Photo Counter Badge */}
             {allImages.length > 1 && (
@@ -224,8 +240,9 @@ function NewsDetailPage() {
             >
               {allImages.map((imgUrl, idx) => (
                 <button
-                  key={idx}
+                  key={`thumb-${imgUrl}`}
                   type="button"
+                  aria-label={`View photo ${idx + 1} of ${allImages.length}`}
                   onClick={() => setActiveIndex(idx)}
                   style={{
                     border: activeIndex === idx ? "2px solid var(--jhub-green, #10b981)" : "2px solid transparent",
@@ -354,6 +371,7 @@ function NewsDetailPage() {
               <>
                 <button
                   type="button"
+                  aria-label="Previous photo"
                   onClick={prevImage}
                   style={{
                     position: "absolute",
@@ -375,6 +393,7 @@ function NewsDetailPage() {
                 </button>
                 <button
                   type="button"
+                  aria-label="Next photo"
                   onClick={nextImage}
                   style={{
                     position: "absolute",

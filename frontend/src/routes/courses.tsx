@@ -310,8 +310,8 @@ function CoursesPage() {
 
                   {/* Highlights Checklist */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.65rem", marginBottom: "1.75rem", marginTop: "auto" }}>
-                    {prog.highlights.map((h, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.65rem" }}>
+                    {prog.highlights.map((h) => (
+                      <div key={`${prog.id}-${h}`} style={{ display: "flex", alignItems: "flex-start", gap: "0.65rem" }}>
                         <CheckCircle2 size={17} color={prog.accentColor} style={{ flexShrink: 0, marginTop: "3px" }} />
                         <span style={{ fontSize: "0.92rem", color: "var(--text-main, #1e293b)", fontWeight: 500, lineHeight: 1.4 }}>
                           {h}

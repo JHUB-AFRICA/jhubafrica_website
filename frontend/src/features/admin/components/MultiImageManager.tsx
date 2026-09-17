@@ -253,9 +253,9 @@ export function MultiImageManager({
   return (
     <div style={{ gridColumn: '1 / -1', marginTop: '1rem', marginBottom: '1.25rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-        <label style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1e293b' }}>
+        <span style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1e293b' }}>
           {label} ({normalizedImages.length})
-        </label>
+        </span>
         {normalizedImages.length > 0 && (
           <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
             {normalizedImages.length} image{normalizedImages.length === 1 ? '' : 's'} added
@@ -285,6 +285,7 @@ export function MultiImageManager({
         {!isCustom ? (
           <select
             value={selectedFolder}
+            aria-label="Storage Folder"
             onChange={(e) => {
               if (e.target.value === '__new__') {
                 setIsCustom(true)
@@ -313,6 +314,7 @@ export function MultiImageManager({
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <input
               type="text"
+              aria-label="New storage folder name"
               placeholder="e.g. hackathon-2026 or events/summit"
               value={customFolder}
               onChange={(e) => setCustomFolder(e.target.value)}
@@ -385,6 +387,15 @@ export function MultiImageManager({
 
       {/* Upload Dropzone */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload photos by clicking or dragging and dropping files here"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            fileInputRef.current?.click()
+          }
+        }}
         onDragOver={(e) => {
           e.preventDefault()
           setIsDragOver(true)

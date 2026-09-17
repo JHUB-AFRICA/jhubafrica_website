@@ -142,6 +142,16 @@ function HeroBadgeItemComponent({ badge }: { badge: HeroBadgeItem | ReactNode })
   );
 }
 
+function getHeroBadgeKey(b: HeroBadgeItem | ReactNode): string {
+  if (React.isValidElement(b) && b.key) return String(b.key);
+  if (typeof b === "string" || typeof b === "number") return `badge-val-${b}`;
+  if ((b as any)?.id) return `badge-id-${(b as any).id}`;
+  if ((b as any)?.label && typeof (b as any).label === "string") {
+    return `badge-${(b as any).variant || "default"}-${(b as any).label}`;
+  }
+  return "badge-item";
+}
+
 function HeroBadges({ badges }: { badges?: Array<HeroBadgeItem | ReactNode> | ReactNode }) {
   if (!badges) return null;
   if (!Array.isArray(badges)) {
@@ -151,16 +161,9 @@ function HeroBadges({ badges }: { badges?: Array<HeroBadgeItem | ReactNode> | Re
 
   return (
     <div className={styles.heroMetaRow}>
-      {badges.map((b, i) => {
-        const key = React.isValidElement(b) && b.key
-          ? String(b.key)
-          : typeof b === "string" || typeof b === "number"
-            ? `badge-val-${b}`
-            : (b as any)?.label && typeof (b as any).label === "string"
-              ? `${(b as any).variant || "default"}-${(b as any).label}`
-              : `badge-slot-${i}`;
-        return <HeroBadgeItemComponent key={key} badge={b} />;
-      })}
+      {badges.map((b) => (
+        <HeroBadgeItemComponent key={getHeroBadgeKey(b)} badge={b} />
+      ))}
     </div>
   );
 }
@@ -177,7 +180,7 @@ function HeroMedia({ media, maxWidth }: { media?: ReactNode; maxWidth?: string |
     <div className={styles.heroMediaCol}>
       <div className={styles.heroMediaFrame} style={frameStyle}>
         {typeof media === "string" ? (
-          <img src={media} alt="Hero media" className={styles.heroMediaMedia} />
+          <img src={media} alt="Editorial illustration" className={styles.heroMediaMedia} />
         ) : (
           media
         )}

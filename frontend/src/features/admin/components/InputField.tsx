@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useId } from "react";
 
 interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
-export function InputField({ label, style, ...rest }: InputFieldProps) {
+export function InputField({ label, style, id, ...rest }: InputFieldProps) {
+  const generatedId = useId();
+  const inputId = id || generatedId;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", width: "100%" }}>
       {label && (
         <label
+          htmlFor={inputId}
           style={{
             fontSize: "0.82rem",
             fontWeight: 700,
@@ -22,7 +26,7 @@ export function InputField({ label, style, ...rest }: InputFieldProps) {
           {label}
         </label>
       )}
-      <input style={{ ...style }} {...rest} />
+      <input id={inputId} aria-label={rest["aria-label"] || label} style={{ ...style }} {...rest} />
     </div>
   );
 }

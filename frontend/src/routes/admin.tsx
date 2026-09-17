@@ -66,6 +66,10 @@ import { EmailAdmin } from "@/features/admin/components/EmailAdmin";
 import { AdminUsersManager } from "@/features/admin/components/AdminUsersManager";
 import styles from "../styles/Admin.module.css";
 
+function getDraftTeamMemberKey(m: any, idx: number): string {
+  return m.id || `draft-member-${idx}`;
+}
+
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
@@ -1076,9 +1080,9 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
         </SelectField>
         {/* TipTap Rich Text Editor for Content Story */}
         <div style={{ gridColumn: "1 / -1" }}>
-          <label style={{ display: "block", fontWeight: 600, marginBottom: "0.5rem", color: "#1e293b", fontSize: "0.95rem" }}>
+          <span style={{ display: "block", fontWeight: 600, marginBottom: "0.5rem", color: "#1e293b", fontSize: "0.95rem" }}>
             Full Story (Rich Content)
-          </label>
+          </span>
           <RichTextEditor
             content={draft.body}
             jsonContent={draft.contentJson}
@@ -1102,7 +1106,7 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
         {/* Auto-extracted Summary Excerpt Field */}
         <div style={{ gridColumn: "1 / -1" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
-            <label style={{ fontWeight: 600, color: "#1e293b", fontSize: "0.95rem" }}>
+            <label htmlFor="admin-news-excerpt" style={{ fontWeight: 600, color: "#1e293b", fontSize: "0.95rem" }}>
               Summary / Excerpt <span style={{ fontWeight: 400, color: "#64748b", fontSize: "0.85rem" }}>(Auto-extracted from story for card display)</span>
             </label>
             <button
@@ -1127,6 +1131,8 @@ function NewsAdmin({ items, onDeleteRequest }: NewsAdminProps) {
             </button>
           </div>
           <textarea
+            id="admin-news-excerpt"
+            aria-label="Summary / Excerpt"
             rows={2}
             placeholder="Auto-extracted snippet from full story (max 150 chars)..."
             value={draft.excerpt}
@@ -1559,11 +1565,12 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {(draft.teamMembers || []).map((m, idx) => (
-                <div key={idx} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                <div key={getDraftTeamMemberKey(m, idx)} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
                   <input
                     type="text"
                     required
                     placeholder="Full Name"
+                    aria-label={`Team member ${idx + 1} full name`}
                     value={m.name}
                     onChange={(e) => {
                       const updated = [...(draft.teamMembers || [])];
@@ -1581,6 +1588,7 @@ function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminProps) {
                     type="text"
                     required
                     placeholder="Role (e.g. Lead Developer)"
+                    aria-label={`Team member ${idx + 1} role`}
                     value={m.role}
                     onChange={(e) => {
                       const updated = [...(draft.teamMembers || [])];

@@ -166,6 +166,7 @@ function EventsPage() {
             <Search size={18} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
             <input
               type="text"
+              aria-label="Search events by title, description or location"
               placeholder="Search events by title, description or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

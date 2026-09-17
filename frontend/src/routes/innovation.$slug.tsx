@@ -411,8 +411,8 @@ function InnovationDetailPage() {
                 .split(/[,;\n]+/)
                 .map((item) => item.trim())
                 .filter(Boolean)
-                .map((item, idx) => (
-                  <span key={idx} className={styles['support-clean-pill']}>
+                .map((item) => (
+                  <span key={item} className={styles['support-clean-pill']}>
                     {item}
                   </span>
                 ))}
@@ -443,7 +443,7 @@ function InnovationDetailPage() {
                 const c = avatarColors[idx % avatarColors.length];
 
                 return (
-                  <div key={idx} className={styles['team-card-editorial']}>
+                  <div key={m.id || `${m.name}-${m.role}`} className={styles['team-card-editorial']}>
                     <div
                       className={styles['team-avatar-editorial']}
                       style={{ backgroundColor: c.bg, color: c.color }}

@@ -7,23 +7,27 @@ interface RichContentRendererProps {
   style?: React.CSSProperties
 }
 
-function renderTipTapNode(node: any, index: number): React.ReactNode {
+function renderTipTapNode(node: any, path: string = 'doc'): React.ReactNode {
   if (!node) return null
 
   switch (node.type) {
     case 'doc':
       return (
-        <React.Fragment key={index}>
-          {(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}
+        <React.Fragment key={path}>
+          {(node.content || []).map((child: any, i: number) =>
+            renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
+          )}
         </React.Fragment>
       )
 
     case 'paragraph': {
       const hasContent = node.content && node.content.length > 0
       return (
-        <p key={index} style={{ marginBottom: '1.5rem', lineHeight: '1.85', minHeight: '1.25rem' }}>
+        <p key={path} style={{ marginBottom: '1.5rem', lineHeight: '1.85', minHeight: '1.25rem' }}>
           {hasContent ? (
-            node.content.map((child: any, i: number) => renderTipTapNode(child, i))
+            node.content.map((child: any, i: number) =>
+              renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
+            )
           ) : (
             <>&nbsp;</>
           )}
@@ -34,7 +38,7 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
     case 'heading': {
       const level = node.attrs?.level || 2
       const headingContent = (node.content || []).map((child: any, i: number) =>
-        renderTipTapNode(child, i)
+        renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
       )
       const headingStyle = {
         color: 'var(--jhub-blue, #0f2d59)',
@@ -44,38 +48,44 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
         lineHeight: 1.3,
       }
 
-      if (level === 1) return <h1 key={index} style={{ ...headingStyle, fontSize: '2rem' }}>{headingContent}</h1>
-      if (level === 2) return <h2 key={index} style={{ ...headingStyle, fontSize: '1.65rem' }}>{headingContent}</h2>
-      if (level === 3) return <h3 key={index} style={{ ...headingStyle, fontSize: '1.35rem' }}>{headingContent}</h3>
-      if (level === 4) return <h4 key={index} style={{ ...headingStyle, fontSize: '1.15rem' }}>{headingContent}</h4>
-      return <h5 key={index} style={{ ...headingStyle, fontSize: '1.05rem' }}>{headingContent}</h5>
+      if (level === 1) return <h1 key={path} style={{ ...headingStyle, fontSize: '2rem' }}>{headingContent}</h1>
+      if (level === 2) return <h2 key={path} style={{ ...headingStyle, fontSize: '1.65rem' }}>{headingContent}</h2>
+      if (level === 3) return <h3 key={path} style={{ ...headingStyle, fontSize: '1.35rem' }}>{headingContent}</h3>
+      if (level === 4) return <h4 key={path} style={{ ...headingStyle, fontSize: '1.15rem' }}>{headingContent}</h4>
+      return <h5 key={path} style={{ ...headingStyle, fontSize: '1.05rem' }}>{headingContent}</h5>
     }
 
     case 'bulletList':
       return (
-        <ul key={index} style={{ paddingLeft: '1.75rem', marginBottom: '1.25rem', lineHeight: '1.8', listStyleType: 'disc' }}>
-          {(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}
+        <ul key={path} style={{ paddingLeft: '1.75rem', marginBottom: '1.25rem', lineHeight: '1.8', listStyleType: 'disc' }}>
+          {(node.content || []).map((child: any, i: number) =>
+            renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
+          )}
         </ul>
       )
 
     case 'orderedList':
       return (
-        <ol key={index} style={{ paddingLeft: '1.75rem', marginBottom: '1.25rem', lineHeight: '1.8', listStyleType: 'decimal' }}>
-          {(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}
+        <ol key={path} style={{ paddingLeft: '1.75rem', marginBottom: '1.25rem', lineHeight: '1.8', listStyleType: 'decimal' }}>
+          {(node.content || []).map((child: any, i: number) =>
+            renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
+          )}
         </ol>
       )
 
     case 'listItem':
       return (
-        <li key={index} style={{ marginBottom: '0.4rem' }}>
-          {(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}
+        <li key={path} style={{ marginBottom: '0.4rem' }}>
+          {(node.content || []).map((child: any, i: number) =>
+            renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
+          )}
         </li>
       )
 
     case 'blockquote':
       return (
         <blockquote
-          key={index}
+          key={path}
           style={{
             borderLeft: '4px solid var(--jhub-green, #10b981)',
             paddingLeft: '1.25rem',
@@ -88,14 +98,16 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
             borderRadius: '0 6px 6px 0',
           }}
         >
-          {(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}
+          {(node.content || []).map((child: any, i: number) =>
+            renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
+          )}
         </blockquote>
       )
 
     case 'codeBlock':
       return (
         <pre
-          key={index}
+          key={path}
           style={{
             backgroundColor: '#0f172a',
             color: '#f8fafc',
@@ -107,7 +119,11 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
             fontSize: '0.9rem',
           }}
         >
-          <code>{(node.content || []).map((child: any, i: number) => renderTipTapNode(child, i))}</code>
+          <code>
+            {(node.content || []).map((child: any, i: number) =>
+              renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
+            )}
+          </code>
         </pre>
       )
 
@@ -115,7 +131,7 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
       const caption = node.attrs?.title || node.attrs?.alt || ''
       return (
         <figure
-          key={index}
+          key={path}
           style={{
             margin: '2rem auto',
             maxWidth: '80%',
@@ -156,29 +172,30 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
     }
 
     case 'horizontalRule':
-      return <hr key={index} style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '2rem 0' }} />
+      return <hr key={path} style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '2rem 0' }} />
 
     case 'text': {
       let textElement: React.ReactNode = node.text
 
       if (node.marks) {
-        node.marks.forEach((mark: any) => {
+        node.marks.forEach((mark: any, mIdx: number) => {
+          const markKey = `${path}.mark.${mark.type || 'm'}.${mIdx}`
           if (mark.type === 'bold') {
-            textElement = <strong key="b">{textElement}</strong>
+            textElement = <strong key={markKey}>{textElement}</strong>
           }
           if (mark.type === 'italic') {
-            textElement = <em key="i">{textElement}</em>
+            textElement = <em key={markKey}>{textElement}</em>
           }
           if (mark.type === 'strike') {
-            textElement = <s key="s">{textElement}</s>
+            textElement = <s key={markKey}>{textElement}</s>
           }
           if (mark.type === 'underline') {
-            textElement = <u key="u">{textElement}</u>
+            textElement = <u key={markKey}>{textElement}</u>
           }
           if (mark.type === 'code') {
             textElement = (
               <code
-                key="code"
+                key={markKey}
                 style={{
                   backgroundColor: '#f1f5f9',
                   color: '#0f172a',
@@ -195,7 +212,7 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
           if (mark.type === 'link') {
             textElement = (
               <a
-                key="a"
+                key={markKey}
                 href={mark.attrs?.href}
                 target={mark.attrs?.target || '_blank'}
                 rel="noopener noreferrer"
@@ -207,14 +224,16 @@ function renderTipTapNode(node: any, index: number): React.ReactNode {
           }
         })
       }
-      return <React.Fragment key={index}>{textElement}</React.Fragment>
+      return <React.Fragment key={path}>{textElement}</React.Fragment>
     }
 
     default:
       if (node.content) {
         return (
-          <React.Fragment key={index}>
-            {node.content.map((child: any, i: number) => renderTipTapNode(child, i))}
+          <React.Fragment key={path}>
+            {node.content.map((child: any, i: number) =>
+              renderTipTapNode(child, `${path}.${child.type || 'n'}.${i}`)
+            )}
           </React.Fragment>
         )
       }
@@ -234,7 +253,7 @@ export function RichContentRenderer({
   if (contentJson && typeof contentJson === 'object' && contentJson.type === 'doc') {
     return (
       <div className={combinedClass} style={{ fontSize: '1.1rem', color: '#334155', ...style }}>
-        {renderTipTapNode(contentJson, 0)}
+        {renderTipTapNode(contentJson, 'doc')}
       </div>
     )
   }
@@ -255,17 +274,20 @@ export function RichContentRenderer({
     return <p style={{ fontStyle: 'italic', color: '#94a3b8' }}>No content available.</p>
   }
 
-  const paragraphs = content.split(/\n\s*\n/)
+  const paragraphBlocks = content.split(/\n\s*\n/).map((p: string, i: number) => ({
+    id: `para-${i}-${p.trim().slice(0, 16)}`,
+    text: p.trim(),
+  }))
+
   return (
     <div className={combinedClass} style={{ fontSize: '1.1rem', color: '#334155', ...style }}>
-      {paragraphs.map((paragraph: string, index: number) => {
-        const trimmed = paragraph.trim()
-        if (!trimmed) {
-          return <p key={index} style={{ marginBottom: '1.5rem', minHeight: '1.25rem' }}>&nbsp;</p>
+      {paragraphBlocks.map((block) => {
+        if (!block.text) {
+          return <p key={block.id} style={{ marginBottom: '1.5rem', minHeight: '1.25rem' }}>&nbsp;</p>
         }
         return (
-          <p key={index} style={{ marginBottom: '1.5rem', lineHeight: '1.85' }}>
-            {trimmed}
+          <p key={block.id} style={{ marginBottom: '1.5rem', lineHeight: '1.85' }}>
+            {block.text}
           </p>
         )
       })}
