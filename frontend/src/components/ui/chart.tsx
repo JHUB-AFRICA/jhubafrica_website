@@ -1,7 +1,11 @@
 import * as React from "react";
-import * as RechartsPrimitive from "recharts";
+import type * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
+
+const ResponsiveContainer = React.lazy(() =>
+  import("recharts").then((mod) => ({ default: mod.ResponsiveContainer }))
+);
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -57,9 +61,11 @@ const ChartContainer = React.forwardRef<
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        <React.Suspense fallback={null}>
+          <ResponsiveContainer>
+            {children}
+          </ResponsiveContainer>
+        </React.Suspense>
       </div>
     </ChartContext.Provider>
   );
@@ -99,7 +105,9 @@ ${colorConfig
   );
 };
 
-const ChartTooltip = RechartsPrimitive.Tooltip;
+const ChartTooltip = React.lazy(() =>
+  import("recharts").then((mod) => ({ default: mod.Tooltip }))
+);
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
@@ -257,7 +265,9 @@ const ChartTooltipContent = React.forwardRef<
 );
 ChartTooltipContent.displayName = "ChartTooltip";
 
-const ChartLegend = RechartsPrimitive.Legend;
+const ChartLegend = React.lazy(() =>
+  import("recharts").then((mod) => ({ default: mod.Legend }))
+);
 
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getNewsBySlug } from "../../axios/api/news";
 import { NewsPost } from "../types/news";
 import { RichContentRenderer } from "../components/ui/RichContentRenderer";
@@ -68,12 +68,16 @@ function NewsDetailPage() {
     if (!isLightboxOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIsLightboxOpen(false);
-      if (e.key === "ArrowLeft") prevImage();
-      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") {
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
+      }
+      if (e.key === "ArrowRight") {
+        setActiveIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLightboxOpen, prevImage, nextImage]);
+  }, [isLightboxOpen, allImages.length]);
 
   return (
     <>

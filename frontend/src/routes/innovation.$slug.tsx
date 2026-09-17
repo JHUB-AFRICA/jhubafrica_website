@@ -22,6 +22,7 @@ import EditorialHero from "../components/site/EditorialHero";
 import jhubSvg from "../assets/svgs/4.svg";
 import heroStyles from "../styles/EditorialHero.module.css";
 import styles from "../styles/IndividualInnovation.module.css";
+import { InnovationMediaPlaceholder } from "../components/site/InnovationMediaPlaceholder";
 
 const STAGES = ["Concept", "Prototype", "Pilot", "Market entry", "Scale"] as const;
 
@@ -508,21 +509,7 @@ function InnovationDetailPage() {
                         alt={item.title}
                       />
                     ) : (
-                      <div style={{ height: "100%", width: "100%", position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #07152b 0%, #0f2d59 50%, #064e3b 100%)" }}>
-                        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }} xmlns="http://www.w3.org/2000/svg">
-                          <defs>
-                            <pattern id={`grid-related-${item.id}`} width="20" height="20" patternUnits="userSpaceOnUse">
-                              <circle cx="2" cy="2" r="1" fill="#ffffff" />
-                            </pattern>
-                          </defs>
-                          <rect width="100%" height="100%" fill={`url(#grid-related-${item.id})`} />
-                        </svg>
-                        <div style={{ position: "absolute", top: "-20px", left: "-20px", width: "120px", height: "120px", borderRadius: "50%", background: "radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%)", filter: "blur(10px)" }} />
-                        <div style={{ position: "absolute", bottom: "-30px", right: "-10px", width: "140px", height: "140px", borderRadius: "50%", background: "radial-gradient(circle, rgba(15, 45, 89, 0.6) 0%, rgba(15, 45, 89, 0) 70%)", filter: "blur(10px)" }} />
-                        <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                          <span style={{ color: "#ffffff", fontSize: "1.25rem", fontWeight: "800", letterSpacing: "0.15em", textTransform: "uppercase", background: "rgba(255, 255, 255, 0.08)", border: "none", borderRadius: "8px", padding: "6px 16px", backdropFilter: "blur(4px)" }}>JHUB</span>
-                        </div>
-                      </div>
+                      <InnovationMediaPlaceholder id={item.id} />
                     )}
                   </div>
 

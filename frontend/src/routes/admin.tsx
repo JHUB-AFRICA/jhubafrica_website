@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Loader2,
   Eye,
@@ -122,7 +122,7 @@ function AdminPage() {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [resetToken, setResetToken] = useState<string | null>(null);
+  const resetTokenRef = useRef<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -149,11 +149,11 @@ function AdminPage() {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("resetToken");
       if (token) {
-        setResetToken(token);
+        resetTokenRef.current = token;
         setAuthMode("reset");
       }
     }
-  }, []);
+  }, [router]);
 
   async function tryUnlock(e: React.FormEvent) {
     e.preventDefault();
@@ -220,7 +220,7 @@ function AdminPage() {
       return;
     }
 
-    if (!resetToken) {
+    if (!resetTokenRef.current) {
       const msg = "Reset token is missing. Please request a new password reset link.";
       setErr(msg);
       toast.error(msg);
@@ -229,7 +229,7 @@ function AdminPage() {
 
     setLoading(true);
     try {
-      const response = await submitPasswordReset(resetToken, newPassword);
+      const response = await submitPasswordReset(resetTokenRef.current, newPassword);
       const msg = response.message || "Password updated successfully!";
       setSuccessMsg(msg);
       toast.success(msg);

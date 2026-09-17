@@ -241,6 +241,81 @@ function renderTipTapNode(node: any, path: string = 'doc'): React.ReactNode {
   }
 }
 
+function domNodeToReact(node: Node, path: string): React.ReactNode {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent || null;
+  }
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return null;
+  }
+
+  const el = node as HTMLElement;
+  const tagName = el.tagName.toLowerCase();
+
+  // Disallow dangerous executable or structural elements
+  if (['script', 'iframe', 'object', 'embed', 'form', 'input', 'style'].includes(tagName)) {
+    return null;
+  }
+
+  const children: React.ReactNode[] = [];
+  Array.from(el.childNodes).forEach((child, i) => {
+    const renderedChild = domNodeToReact(child, `${path}.${i}`);
+    if (renderedChild !== null && renderedChild !== undefined) {
+      children.push(renderedChild);
+    }
+  });
+
+  const props: Record<string, any> = { key: path };
+
+  // Allow safe attributes only
+  if (tagName === 'a') {
+    const href = el.getAttribute('href');
+    if (href && !href.trim().toLowerCase().startsWith('javascript:')) {
+      props.href = href;
+      props.target = el.getAttribute('target') || '_blank';
+      props.rel = 'noopener noreferrer';
+      props.style = { color: 'var(--jhub-green, #10b981)', textDecoration: 'underline' };
+    }
+  } else if (tagName === 'img') {
+    const src = el.getAttribute('src');
+    if (src && !src.trim().toLowerCase().startsWith('javascript:')) {
+      props.src = src;
+      props.alt = el.getAttribute('alt') || '';
+      props.style = { maxWidth: '100%', borderRadius: '8px' };
+    }
+  }
+
+  const validTags = [
+    'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li', 'blockquote', 'pre', 'code',
+    'strong', 'b', 'em', 'i', 'u', 's', 'a', 'img',
+    'span', 'div', 'hr', 'br'
+  ];
+
+  if (validTags.includes(tagName)) {
+    return React.createElement(tagName, props, children.length > 0 ? children : undefined);
+  }
+
+  return children.length > 0 ? <React.Fragment key={path}>{children}</React.Fragment> : null;
+}
+
+function renderHtmlSafely(htmlString: string): React.ReactNode {
+  if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+    return <p>{htmlString.replace(/<[^>]*>/g, ' ')}</p>;
+  }
+
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const nodes = Array.from(doc.body.childNodes);
+    return nodes.map((n, i) => domNodeToReact(n, `html-node.${i}`));
+  } catch (err) {
+    console.warn('Failed to parse HTML content safely:', err);
+    return <p>{htmlString.replace(/<[^>]*>/g, ' ')}</p>;
+  }
+}
+
 export function RichContentRenderer({
   content,
   contentJson,
@@ -258,14 +333,12 @@ export function RichContentRenderer({
     )
   }
 
-  // If HTML string is detected
+  // If HTML string is detected, render via safe DOM parser
   if (content && (content.includes('<p>') || content.includes('<h2>') || content.includes('<div>'))) {
     return (
-      <div
-        className={combinedClass}
-        style={{ fontSize: '1.1rem', color: '#334155', ...style }}
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
+      <div className={combinedClass} style={{ fontSize: '1.1rem', color: '#334155', ...style }}>
+        {renderHtmlSafely(content)}
+      </div>
     )
   }
 
