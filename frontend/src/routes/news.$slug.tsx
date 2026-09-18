@@ -310,11 +310,10 @@ function NewsDetailPage() {
       {/* Fullscreen Lightbox Modal */}
       <NewsLightboxModal
         isOpen={isLightboxOpen}
-        onClose={() => setIsLightboxOpen(false)}
+        setIsOpen={setIsLightboxOpen}
         images={allImages}
         activeIndex={activeIndex}
-        onPrev={prevImage}
-        onNext={nextImage}
+        setActiveIndex={setActiveIndex}
       />
     </>
   );

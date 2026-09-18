@@ -9,6 +9,7 @@ import {
   Check,
   Copy,
   ExternalLink,
+  MessageSquare,
 } from "lucide-react";
 import { getInnovationBySlug, getInnovations } from "../../axios/api/innovations";
 import { InnovationItem } from "../types/innovations";

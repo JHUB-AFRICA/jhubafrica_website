@@ -2,39 +2,41 @@ import { useEffect } from "react";
 
 interface NewsLightboxModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  setIsOpen: (open: boolean) => void;
   images: string[];
   activeIndex: number;
-  onPrev: () => void;
-  onNext: () => void;
+  setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function NewsLightboxModal({
   isOpen,
-  onClose,
+  setIsOpen,
   images,
   activeIndex,
-  onPrev,
-  onNext,
+  setActiveIndex,
 }: NewsLightboxModalProps) {
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") onPrev();
-      if (e.key === "ArrowRight") onNext();
+      if (e.key === "Escape") {
+        setIsOpen(false);
+      } else if (e.key === "ArrowLeft") {
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+      } else if (e.key === "ArrowRight") {
+        setActiveIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onPrev, onNext, onClose]);
+  }, [isOpen, images.length, setIsOpen, setActiveIndex]);
 
   if (!isOpen) return null;
 
   return (
     <div
-      onClick={onClose}
+      onClick={() => setIsOpen(false)}
       style={{
         position: "fixed",
         inset: 0,
@@ -48,7 +50,7 @@ export function NewsLightboxModal({
     >
       <button
         type="button"
-        onClick={onClose}
+        onClick={() => setIsOpen(false)}
         style={{
           position: "absolute",
           top: "20px",
@@ -85,7 +87,7 @@ export function NewsLightboxModal({
             <button
               type="button"
               aria-label="Previous photo"
-              onClick={onPrev}
+              onClick={() => setActiveIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
               style={{
                 position: "absolute",
                 left: "-50px",
@@ -107,7 +109,7 @@ export function NewsLightboxModal({
             <button
               type="button"
               aria-label="Next photo"
-              onClick={onNext}
+              onClick={() => setActiveIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
               style={{
                 position: "absolute",
                 right: "-50px",
