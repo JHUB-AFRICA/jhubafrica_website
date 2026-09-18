@@ -2,18 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   ArrowLeft,
-  Share2,
   CheckCircle,
   Lightbulb,
   AlertTriangle,
-  Layers,
-  TrendingUp,
   ShieldCheck,
-  Users,
   Check,
   Copy,
   ExternalLink,
-  MessageSquare,
 } from "lucide-react";
 import { getInnovationBySlug, getInnovations } from "../../axios/api/innovations";
 import { InnovationItem } from "../types/innovations";
@@ -23,8 +18,9 @@ import jhubSvg from "../assets/svgs/4.svg";
 import heroStyles from "../styles/EditorialHero.module.css";
 import styles from "../styles/IndividualInnovation.module.css";
 import { InnovationMediaPlaceholder } from "../components/site/InnovationMediaPlaceholder";
-
-const STAGES = ["Concept", "Prototype", "Pilot", "Market entry", "Scale"] as const;
+import { InnovationStageTimeline } from "../components/site/InnovationStageTimeline";
+import { InnovationTeamSection } from "../components/site/InnovationTeamSection";
+import { InnovationStickyNav } from "../components/site/InnovationStickyNav";
 
 export const Route = createFileRoute("/innovation/$slug")({
   head: () => ({
@@ -81,52 +77,13 @@ function InnovationDetailPage() {
       </div>
     );
   }
-
-  // Determine active stage index
-  const currentStageIndex = STAGES.findIndex(
-    (s) => s.toLowerCase() === (innovation.stage || "").toLowerCase()
-  );
-  const activeStageIdx = currentStageIndex >= 0 ? currentStageIndex : 0;
-
-  // Render initials for team member profile circles
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .filter(Boolean)
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const handleShareTwitter = () => {
-    const text = encodeURIComponent(`Explore "${innovation.title}" on the JHUB Africa Innovation Portfolio:`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(window.location.href)}`, "_blank");
-  };
-
-  const handleShareLinkedIn = () => {
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, "_blank");
-  };
-
-  const handleShareWhatsApp = () => {
-    const text = encodeURIComponent(`Check out "${innovation.title}" incubated at JHUB Africa: ${window.location.href}`);
-    window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
-  };
-
   const projectUrl = innovation.website || innovation.projectLinks;
-
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   return (
     <div className={styles['editorial-wrapper']}>
@@ -194,83 +151,7 @@ function InnovationDetailPage() {
       />
 
       {/* 2. STICKY SUBHEADER ANCHOR BAR */}
-      <nav className={styles['sticky-nav-bar']}>
-        <div className={styles['sticky-nav-inner']}>
-          <div className={styles['sticky-nav-links']}>
-            <button
-              type="button"
-              onClick={() => scrollToSection("overview")}
-              className={styles['nav-anchor-link']}
-              style={{ background: "none", border: "none", cursor: "pointer" }}
-            >
-              Overview
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollToSection("story")}
-              className={styles['nav-anchor-link']}
-              style={{ background: "none", border: "none", cursor: "pointer" }}
-            >
-              Challenge & Solution
-            </button>
-            {(innovation.traction || innovation.beneficiaries || innovation.impactEvidence) && (
-              <button
-                type="button"
-                onClick={() => scrollToSection("impact")}
-                className={styles['nav-anchor-link']}
-                style={{ background: "none", border: "none", cursor: "pointer" }}
-              >
-                Traction & Impact
-              </button>
-            )}
-            {innovation.need && (
-              <button
-                type="button"
-                onClick={() => scrollToSection("support")}
-                className={styles['nav-anchor-link']}
-                style={{ background: "none", border: "none", cursor: "pointer" }}
-              >
-                Support Needs
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => scrollToSection("team")}
-              className={styles['nav-anchor-link']}
-              style={{ background: "none", border: "none", cursor: "pointer" }}
-            >
-              Innovator Team
-            </button>
-          </div>
-
-          <div className={styles['sticky-nav-cta']}>
-            <button
-              type="button"
-              onClick={handleShareTwitter}
-              style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}
-              title="Share on X"
-            >
-              <Share2 size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={handleShareLinkedIn}
-              style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}
-              title="Share on LinkedIn"
-            >
-              <ExternalLink size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={handleShareWhatsApp}
-              style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}
-              title="Share on WhatsApp"
-            >
-              <MessageSquare size={16} />
-            </button>
-          </div>
-        </div>
-      </nav>
+      <InnovationStickyNav innovation={innovation} />
 
       {/* 3. EDITORIAL BODY CONTENT */}
       <main className={styles['editorial-container']}>
@@ -313,36 +194,7 @@ function InnovationDetailPage() {
         </div>
 
         {/* Lifecycle Stepper Strip */}
-        <section className={styles['stepper-strip']}>
-          <div className={styles['stepper-strip-header']}>
-            <span>Venture Incubation Lifecycle</span>
-            <span style={{ color: "var(--jhub-green, #10b981)", fontWeight: 700 }}>
-              Current Milestone: {innovation.stage}
-            </span>
-          </div>
-
-          <div className={styles['stepper-track']}>
-            {STAGES.map((s, idx) => {
-              const isCompleted = idx < activeStageIdx;
-              const isActive = idx === activeStageIdx;
-              return (
-                <div
-                  key={s}
-                  className={`${styles['stepper-step']} ${
-                    isActive
-                      ? styles['step-active']
-                      : isCompleted
-                      ? styles['step-completed']
-                      : ""
-                  }`}
-                >
-                  <div className={styles['stepper-bar']} />
-                  <span className={styles['step-title']}>{s}</span>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+        <InnovationStageTimeline currentStage={innovation.stage} />
 
         {/* Editorial Story Section: 2-Column Split */}
         <section id="story" className={styles['editorial-story-section']}>
@@ -422,45 +274,7 @@ function InnovationDetailPage() {
         )}
 
         {/* Innovators & Development Team */}
-        <section id="team" className={styles['team-editorial-section']}>
-          <span className={styles['section-eyebrow']} style={{ color: "#7c3aed" }}>
-            Ecosystem Attribution
-          </span>
-          <h3 className={styles['support-title']}>Innovators & Development Team</h3>
-
-          {!innovation.teamMembers || innovation.teamMembers.length === 0 ? (
-            <div className={styles['team-empty-box']}>
-              💼 Team profiles and research attribution are maintained under the JHUB Africa Innovation Registry. For direct founder inquiries, connect via the JHUB desk.
-            </div>
-          ) : (
-            <div className={styles['team-grid-editorial']}>
-              {innovation.teamMembers.map((m, idx) => {
-                const avatarColors = [
-                  { bg: "#dbeafe", color: "#1e40af" },
-                  { bg: "#dcfce7", color: "#166534" },
-                  { bg: "#f3e8ff", color: "#6b21a8" },
-                  { bg: "#ffedd5", color: "#c2410c" },
-                ];
-                const c = avatarColors[idx % avatarColors.length];
-
-                return (
-                  <div key={m.id || `${m.name}-${m.role}`} className={styles['team-card-editorial']}>
-                    <div
-                      className={styles['team-avatar-editorial']}
-                      style={{ backgroundColor: c.bg, color: c.color }}
-                    >
-                      {getInitials(m.name)}
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem", minWidth: 0 }}>
-                      <strong className={styles['team-name-editorial']}>{m.name}</strong>
-                      <span className={styles['team-role-editorial']}>{m.role}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
+        <InnovationTeamSection teamMembers={innovation.teamMembers} />
 
         {/* Editorial Partnership CTA Banner */}
         <section className={styles['editorial-cta-banner']}>

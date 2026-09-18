@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { getNewsBySlug } from "../../axios/api/news";
 import { NewsPost } from "../types/news";
 import { RichContentRenderer } from "../components/ui/RichContentRenderer";
 import ResourceFallback from "../components/site/ResourceFallback";
 import EditorialHero from "../components/site/EditorialHero";
+import { NewsLightboxModal } from "../components/site/NewsLightboxModal";
 
 export const Route = createFileRoute("/news/$slug")({
   head: (ctx: { loaderData?: NewsPost }) => {
@@ -62,22 +63,6 @@ function NewsDetailPage() {
   const nextImage = useCallback(() => {
     setActiveIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
   }, [allImages.length]);
-
-  // Keyboard navigation for lightbox
-  useEffect(() => {
-    if (!isLightboxOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsLightboxOpen(false);
-      if (e.key === "ArrowLeft") {
-        setActiveIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
-      }
-      if (e.key === "ArrowRight") {
-        setActiveIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLightboxOpen, allImages.length]);
 
   return (
     <>
@@ -323,105 +308,14 @@ function NewsDetailPage() {
       </section>
 
       {/* Fullscreen Lightbox Modal */}
-      {isLightboxOpen && (
-        <div
-          onClick={() => setIsLightboxOpen(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(15, 23, 42, 0.95)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "2rem",
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setIsLightboxOpen(false)}
-            style={{
-              position: "absolute",
-              top: "20px",
-              right: "24px",
-              background: "none",
-              border: "none",
-              color: "#ffffff",
-              fontSize: "2rem",
-              cursor: "pointer",
-            }}
-            title="Close (Esc)"
-          >
-            ✕
-          </button>
-
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{ position: "relative", maxWidth: "90vw", maxHeight: "85vh", display: "flex", alignItems: "center" }}
-          >
-            <img
-              src={allImages[activeIndex]}
-              alt=""
-              style={{
-                maxWidth: "100%",
-                maxHeight: "85vh",
-                objectFit: "contain",
-                borderRadius: "8px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-              }}
-            />
-
-            {allImages.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  aria-label="Previous photo"
-                  onClick={prevImage}
-                  style={{
-                    position: "absolute",
-                    left: "-50px",
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: "44px",
-                    height: "44px",
-                    fontSize: "1.5rem",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  ‹
-                </button>
-                <button
-                  type="button"
-                  aria-label="Next photo"
-                  onClick={nextImage}
-                  style={{
-                    position: "absolute",
-                    right: "-50px",
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: "44px",
-                    height: "44px",
-                    fontSize: "1.5rem",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  ›
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <NewsLightboxModal
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+        images={allImages}
+        activeIndex={activeIndex}
+        onPrev={prevImage}
+        onNext={nextImage}
+      />
     </>
   );
 }
