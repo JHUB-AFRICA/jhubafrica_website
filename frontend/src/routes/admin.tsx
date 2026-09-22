@@ -15,7 +15,7 @@ import {
   Sparkles,
   LayoutDashboard,
 } from "lucide-react";
-import { adminLogout } from "../../axios/api/admin/auth";
+import { adminLogout, adminGetMe, AdminUser } from "../../axios/api/admin/auth";
 import { getAccessToken, setAccessToken, refreshSession } from "../../axios/axios";
 import {
   AlertDialog,
@@ -107,20 +107,53 @@ export const Route = createFileRoute("/admin")({
 function AdminPage() {
   const router = useRouter();
   const [unlocked, setUnlocked] = useState(false);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = window.localStorage.getItem("jhub_admin_user");
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch {}
+    }
+    return null;
+  });
   const { news, events, innovations, courses, team } = Route.useLoaderData();
 
   useEffect(() => {
     if (getAccessToken()) {
       setUnlocked(true);
+      if (!adminUser) {
+        adminGetMe()
+          .then((user) => {
+            if (user) {
+              setAdminUser(user);
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("jhub_admin_user", JSON.stringify(user));
+              }
+            }
+          })
+          .catch(() => {});
+      }
     } else {
       refreshSession().then((token) => {
         if (token) {
           setUnlocked(true);
           router.invalidate();
+          adminGetMe()
+            .then((user) => {
+              if (user) {
+                setAdminUser(user);
+                if (typeof window !== "undefined") {
+                  window.localStorage.setItem("jhub_admin_user", JSON.stringify(user));
+                }
+              }
+            })
+            .catch(() => {});
         }
       });
     }
-  }, [router]);
+  }, [router, adminUser]);
 
   async function lock() {
     try {
@@ -129,6 +162,10 @@ function AdminPage() {
       console.warn("Sign out request failed:", e);
     }
     setAccessToken(null);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("jhub_admin_user");
+    }
+    setAdminUser(null);
     setUnlocked(false);
     toast.info("Admin session locked.");
     await router.invalidate();
@@ -157,7 +194,10 @@ function AdminPage() {
   if (!unlocked) {
     return (
       <AdminAuthCard
-        onUnlocked={async () => {
+        onUnlocked={async (user) => {
+          if (user) {
+            setAdminUser(user);
+          }
           setUnlocked(true);
           await router.invalidate();
         }}
@@ -199,9 +239,15 @@ function AdminPage() {
                 </div>
                 <div className={styles.adminProfileText}>
                   <span className={styles.adminProfileName}>
-                    {email ? email.split("@")[0] : "Administrator"}
+                    {adminUser?.firstName
+                      ? `${adminUser.firstName} ${adminUser.lastName || ""}`.trim()
+                      : adminUser?.email
+                      ? adminUser.email.split("@")[0]
+                      : "Administrator"}
                   </span>
-                  <span className={styles.adminProfileRole}>Active Session</span>
+                  <span className={styles.adminProfileRole}>
+                    {adminUser?.roles || "Active Session"}
+                  </span>
                 </div>
               </div>
 

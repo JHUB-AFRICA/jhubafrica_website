@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { AdminLoginForm } from "./auth/AdminLoginForm";
 import { AdminForgotForm } from "./auth/AdminForgotForm";
 import { AdminResetForm } from "./auth/AdminResetForm";
+import { AdminUser } from "../../../../axios/api/admin/auth";
 
 interface AdminAuthCardProps {
-  onUnlocked: () => void | Promise<void>;
+  onUnlocked: (user?: AdminUser) => void | Promise<void>;
 }
 
 export function AdminAuthCard({ onUnlocked }: AdminAuthCardProps) {

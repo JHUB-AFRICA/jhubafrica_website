@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Eye, EyeOff, AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { adminLogin } from "../../../../../axios/api/admin/auth";
+import { adminLogin, AdminUser } from "../../../../../axios/api/admin/auth";
 import { setAccessToken } from "../../../../../axios/axios";
 import { AdminAuthHeader } from "./AdminAuthHeader";
 import styles from "../../../../styles/Admin.module.css";
 
 interface AdminLoginFormProps {
-  onUnlocked: () => void | Promise<void>;
+  onUnlocked: (user?: AdminUser) => void | Promise<void>;
   onForgotPassword: () => void;
 }
 
@@ -26,9 +26,12 @@ export function AdminLoginForm({ onUnlocked, onForgotPassword }: AdminLoginFormP
     try {
       const response = await adminLogin(email, password);
       setAccessToken(response.token);
+      if (typeof window !== "undefined" && response.user) {
+        window.localStorage.setItem("jhub_admin_user", JSON.stringify(response.user));
+      }
       setErr("");
       toast.success("Welcome back! Signed in as administrator.");
-      await onUnlocked();
+      await onUnlocked(response.user);
     } catch (error: any) {
       console.error(error);
       const errMsg = error?.response?.data?.error || "Invalid email or password.";
