@@ -105,6 +105,13 @@ export function InnovationsAdmin({ items, onDeleteRequest }: InnovationsAdminPro
           onChange={(e) => setDraft({ ...draft, need: e.target.value })}
           className={styles['input-style']}
         />
+        <InputField
+          label="Project Website / Demo URL"
+          placeholder="https://example.com or demo link"
+          value={draft.website || ""}
+          onChange={(e) => setDraft({ ...draft, website: e.target.value })}
+          className={styles['input-style']}
+        />
         <TextareaField
           required
           rows={3}

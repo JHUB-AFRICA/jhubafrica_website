@@ -89,6 +89,7 @@ export function getEmptyInnovation(): Omit<InnovationItem, "id"> {
         description: "",
         status: "APPROVED",
         coverImageUrl: "",
+        website: "",
         teamMembers: [],
     };
 }

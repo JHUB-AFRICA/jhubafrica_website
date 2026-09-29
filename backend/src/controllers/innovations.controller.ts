@@ -15,7 +15,7 @@ export async function getInnovations(req: Request, res: Response, next: NextFunc
       .select(`
         id, slug, title, tagline, description, stage, status, sector,
         is_featured, cover_image_url, created_at,
-        problem, solution, support_required,
+        problem, solution, support_required, website,
         owner:users(id, first_name, last_name),
         InnovationToInnovationCategory(innovation_categories(name, slug))
       `, { count: 'exact' })
@@ -109,7 +109,7 @@ export async function createDraft(req: Request, res: Response, next: NextFunctio
     const slugify = (await import('slugify')).default
     const slug = slugify(req.body.title, { lower: true, strict: true })
 
-    const { title, tagline, description, problem, solution, stage, sector, categories, beneficiaries, traction, impactEvidence, supportRequired, ownerId, coverImageUrl, status } = req.body
+    const { title, tagline, description, problem, solution, stage, sector, categories, beneficiaries, traction, impactEvidence, supportRequired, ownerId, coverImageUrl, status, website } = req.body
 
     let owner_id = req.user?.sub || (ownerId && ownerId !== '00000000-0000-0000-0000-000000000000' ? ownerId : null)
 
@@ -160,6 +160,7 @@ export async function createDraft(req: Request, res: Response, next: NextFunctio
         impact_evidence: impactEvidence,
         support_required: supportRequired,
         cover_image_url: coverImageUrl,
+        website: website || null,
         owner_id,
         status: status || 'APPROVED',
       })
@@ -307,6 +308,7 @@ export async function updateInnovation(req: Request, res: Response, next: NextFu
     if (req.body.impactEvidence !== undefined) updates.impact_evidence = req.body.impactEvidence
     if (req.body.supportRequired !== undefined) updates.support_required = req.body.supportRequired
     if (req.body.coverImageUrl !== undefined) updates.cover_image_url = req.body.coverImageUrl
+    if (req.body.website !== undefined) updates.website = req.body.website || null
 
     let query = supabaseAdmin
       .from('innovations')

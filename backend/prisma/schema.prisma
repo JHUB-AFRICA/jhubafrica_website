@@ -179,6 +179,7 @@ model Innovation {
 
   // Media
   coverImageUrl String?  @map("cover_image_url")
+  website       String?
   mediaUrls     String[] @map("media_urls")
   images        InnovationImage[]
   contentJson   Json?    @map("content_json")

@@ -93,6 +93,7 @@ export const addInnovation = async (innovation: Omit<InnovationItem, "id">): Pro
     supportRequired: innovation.need || "None",
     teamMembers: innovation.teamMembers || [],
     coverImageUrl: innovation.coverImageUrl || "",
+    website: innovation.website || innovation.projectLinks || "",
     status: ("status" in innovation && innovation.status) ? innovation.status : "APPROVED",
   };
   if (ownerId) {
@@ -129,6 +130,7 @@ export const updateInnovation = async (innovation: InnovationItem): Promise<Inno
     ownerId,
     teamMembers: innovation.teamMembers || [],
     coverImageUrl: innovation.coverImageUrl || "",
+    website: innovation.website || innovation.projectLinks || "",
   };
   const response = await adminApi.patch<{ data: any }>(`/api/v1/innovations/${innovation.id}`, payload);
   const updated = response.data.data;

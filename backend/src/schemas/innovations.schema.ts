@@ -25,6 +25,7 @@ export const createSchema = z.object({
   supportRequired: z.string().optional(),
   ownerId:         z.string().uuid().optional(),
   coverImageUrl:   z.string().optional().or(z.literal('')),
+  website:         z.string().optional().or(z.literal('')),
   teamMembers:     z.array(z.object({
     name: z.string().min(1),
     role: z.string().min(1)

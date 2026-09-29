@@ -84,7 +84,12 @@ function InnovationDetailPage() {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const projectUrl = innovation.website || innovation.projectLinks;
+  const rawProjectUrl = (innovation.website || innovation.projectLinks || "").trim();
+  const projectUrl = rawProjectUrl
+    ? /^https?:\/\//i.test(rawProjectUrl)
+      ? rawProjectUrl
+      : `https://${rawProjectUrl}`
+    : null;
 
   return (
     <div className={styles['editorial-wrapper']}>
@@ -132,8 +137,9 @@ function InnovationDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={heroStyles.btnOutline}
+                title="Open Innovation Webpage in a new tab"
               >
-                <span>Visit Live Project / Demo</span>
+                <span>Visit Webpage</span>
                 <ExternalLink size={16} />
               </a>
             )}
@@ -289,11 +295,24 @@ function InnovationDetailPage() {
           <div className={styles['editorial-cta-actions']}>
             <ApplyDialog
               triggerText="Sponsor this Innovation"
-              triggerClassName={styles['hero-btn-primary']}
+              triggerClassName={styles['cta-btn-primary']}
               source={`Innovation: ${innovation.title}`}
             />
 
-            <Link to="/contact" className={styles['hero-btn-outline']}>
+            {projectUrl && (
+              <a
+                href={projectUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles['cta-btn-outline']}
+                title="Open Innovation Webpage in a new tab"
+              >
+                <ExternalLink size={16} />
+                <span>Visit Webpage</span>
+              </a>
+            )}
+
+            <Link to="/contact" className={styles['cta-btn-outline']}>
               <MessageSquare size={16} />
               <span>Contact Innovation Desk</span>
             </Link>
