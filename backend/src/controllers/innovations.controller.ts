@@ -10,31 +10,36 @@ export async function getInnovations(req: Request, res: Response, next: NextFunc
     const limitNum = Math.min(100, Math.max(1, parseInt(limit as string) || 50))
     const offset = (pageNum - 1) * limitNum
 
-    let query = supabase
-      .from('innovations')
-      .select(`
-        id, slug, title, tagline, description, stage, status, sector,
-        is_featured, cover_image_url, created_at,
-        problem, solution, support_required, website,
-        owner:users(id, first_name, last_name),
-        InnovationToInnovationCategory(innovation_categories(name, slug))
-      `, { count: 'exact' })
-      .eq('status', 'APPROVED')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limitNum - 1)
+    const cacheKey = `innovations:list:${JSON.stringify(req.query || {})}`
+    const result = await withCache(cacheKey, CacheTTL.medium, async () => {
+      let query = supabase
+        .from('innovations')
+        .select(`
+          id, slug, title, tagline, description, stage, status, sector,
+          is_featured, cover_image_url, created_at,
+          problem, solution, support_required, website,
+          owner:users(id, first_name, last_name),
+          InnovationToInnovationCategory(innovation_categories(name, slug))
+        `, { count: 'exact' })
+        .eq('status', 'APPROVED')
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limitNum - 1)
 
-    if (stage) query = query.eq('stage', stage)
-    if (sector) query = query.eq('sector', sector)
-    if (featured) query = query.eq('is_featured', true)
-    if (search) query = query.ilike('title', `%${search}%`)
+      if (stage) query = query.eq('stage', stage)
+      if (sector) query = query.eq('sector', sector)
+      if (featured) query = query.eq('is_featured', true)
+      if (search) query = query.ilike('title', `%${search}%`)
 
-    const { data, error, count } = await query
-    if (error) throw error
+      const { data, error, count } = await query
+      if (error) throw error
 
-    res.json({
-      data,
-      meta: { page: pageNum, limit: limitNum, total: count, totalPages: Math.ceil((count ?? 0) / limitNum) },
+      return {
+        data,
+        meta: { page: pageNum, limit: limitNum, total: count, totalPages: Math.ceil((count ?? 0) / limitNum) },
+      }
     })
+
+    res.json(result)
   } catch (err) {
     next(err)
   }

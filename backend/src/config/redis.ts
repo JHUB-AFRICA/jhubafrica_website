@@ -1,15 +1,62 @@
 import { Redis } from '@upstash/redis'
 import { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } from './env.js'
 
-// Only instantiate Redis if the required credentials are provided
-const hasRedisConfig = UPSTASH_REDIS_REST_URL && UPSTASH_REDIS_REST_TOKEN
+// In-memory cache fallback store
+interface MemoryCacheEntry {
+  value: any
+  expiresAt: number
+}
 
-export const redis = hasRedisConfig
+const memoryStore = new Map<string, MemoryCacheEntry>()
+
+// Only instantiate Redis if the required credentials are provided
+const hasRedisConfig = Boolean(UPSTASH_REDIS_REST_URL && UPSTASH_REDIS_REST_TOKEN)
+
+export const redis: any = hasRedisConfig
   ? new Redis({
     url: UPSTASH_REDIS_REST_URL as string,
     token: UPSTASH_REDIS_REST_TOKEN as string,
   })
-  : null
+  : {
+      get: async <T>(key: string): Promise<T | null> => {
+        const entry = memoryStore.get(key)
+        if (!entry) return null
+        if (Date.now() > entry.expiresAt) {
+          memoryStore.delete(key)
+          return null
+        }
+        return entry.value as T
+      },
+      setex: async (key: string, ttlSeconds: number, value: any): Promise<'OK'> => {
+        memoryStore.set(key, {
+          value,
+          expiresAt: Date.now() + ttlSeconds * 1000,
+        })
+        return 'OK'
+      },
+      del: async (...keys: string[]): Promise<number> => {
+        let count = 0
+        for (const k of keys) {
+          if (memoryStore.delete(k)) count++
+          for (const memKey of memoryStore.keys()) {
+            if (memKey.startsWith(k)) {
+              memoryStore.delete(memKey)
+              count++
+            }
+          }
+        }
+        return count
+      },
+      exists: async (key: string): Promise<number> => {
+        const entry = memoryStore.get(key)
+        if (!entry) return 0
+        if (Date.now() > entry.expiresAt) {
+          memoryStore.delete(key)
+          return 0
+        }
+        return 1
+      },
+    }
 
 // Cache key namespaces — keeps keys organised and easy to invalidate by prefix
 export const CacheKey = {
@@ -34,14 +81,25 @@ export async function withCache<T>(
   ttl: number,
   fetcher: () => Promise<T>
 ): Promise<T> {
-  // If Redis is not configured, fall back to executing the database/fetch query directly
-  if (!redis) return fetcher()
-
-  const cached = await redis.get<T>(key)
-  if (cached !== null) return cached
+  if (redis) {
+    try {
+      const cached = await redis.get(key)
+      if (cached !== null && cached !== undefined) return cached as T
+    } catch (e) {
+      console.warn(`[Cache GET error for ${key}]:`, e)
+    }
+  }
 
   const fresh = await fetcher()
-  await redis.setex(key, ttl, fresh)
+
+  if (redis) {
+    try {
+      await redis.setex(key, ttl, fresh)
+    } catch (e) {
+      console.warn(`[Cache SETEX error for ${key}]:`, e)
+    }
+  }
+
   return fresh
 }
 
