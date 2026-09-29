@@ -57,6 +57,8 @@ export interface EditorialHeroProps {
   className?: string;
   /** Custom inline styles */
   style?: CSSProperties;
+  /** Hero layout variant: "split" (default) or "overlap" for photo hero with edge blending */
+  layoutVariant?: "split" | "overlap";
 }
 
 const themeClassMap: Record<string, string> = {
@@ -168,12 +170,41 @@ function HeroBadges({ badges }: { badges?: Array<HeroBadgeItem | ReactNode> | Re
   );
 }
 
-function HeroMedia({ media, maxWidth }: { media?: ReactNode; maxWidth?: string | number }) {
+function HeroMedia({
+  media,
+  maxWidth,
+  isOverlap,
+}: {
+  media?: ReactNode;
+  maxWidth?: string | number;
+  isOverlap?: boolean;
+}) {
   if (!media) return null;
 
   const frameStyle: CSSProperties = {};
   if (maxWidth) {
     frameStyle.maxWidth = typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth;
+  }
+
+  if (isOverlap) {
+    return (
+      <div className={styles.heroOverlapMediaCol}>
+        <div className={styles.heroOverlapMediaFrame} style={frameStyle}>
+          {typeof media === "string" ? (
+            <img
+              src={media}
+              alt="Innovation hero photo"
+              className={styles.heroOverlapImage}
+              loading="eager"
+              decoding="async"
+            />
+          ) : (
+            media
+          )}
+          <div className={styles.heroOverlapGradient} aria-hidden="true" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -196,6 +227,7 @@ function HeroContentColumn({
   badges,
   actions,
   isCentered,
+  isOverlap,
   children,
 }: {
   title: ReactNode;
@@ -204,6 +236,7 @@ function HeroContentColumn({
   badges?: Array<HeroBadgeItem | ReactNode> | ReactNode;
   actions?: ReactNode;
   isCentered: boolean;
+  isOverlap?: boolean;
   children?: ReactNode;
 }) {
   const isH1 = React.isValidElement(title) && (title.type === "h1" || (typeof title.type === "string" && title.type === "h1"));
@@ -211,7 +244,11 @@ function HeroContentColumn({
   const isDescP = React.isValidElement(description) && description.type === "p";
 
   return (
-    <div className={`${styles.heroContentCol} ${isCentered ? styles.centerAligned : ""}`}>
+    <div
+      className={`${styles.heroContentCol} ${isCentered ? styles.centerAligned : ""} ${
+        isOverlap ? styles.heroOverlapContentCol : ""
+      }`}
+    >
       <HeroBadges badges={badges} />
 
       {isH1 ? title : <h1 className={styles.heroHeading}>{title}</h1>}
@@ -246,9 +283,11 @@ export function EditorialHero({
   containerMaxWidth,
   className = "",
   style,
+  layoutVariant = "split",
 }: EditorialHeroProps) {
   const selectedThemeClass = themeClassMap[themeVariant] || styles.themeDefault;
   const isCentered = align === "center";
+  const isOverlap = layoutVariant === "overlap";
 
   const containerStyle: CSSProperties = {
     ...style,
@@ -267,6 +306,7 @@ export function EditorialHero({
       badges={badges}
       actions={actions}
       isCentered={isCentered}
+      isOverlap={isOverlap}
     >
       {children}
     </HeroContentColumn>
@@ -274,7 +314,9 @@ export function EditorialHero({
 
   return (
     <section
-      className={`${styles.heroEditorial} ${selectedThemeClass} ${className}`}
+      className={`${styles.heroEditorial} ${selectedThemeClass} ${
+        isOverlap ? styles.heroEditorialOverlap : ""
+      } ${className}`}
       style={containerStyle}
     >
       {meshOverlay && <div className={styles.heroMeshOverlay} />}
@@ -284,13 +326,17 @@ export function EditorialHero({
 
         {media ? (
           <div
-            className={`${styles.heroSplitGrid} ${
-              mediaPosition === "right" ? styles.mediaRight : ""
-            }`}
+            className={`${
+              isOverlap ? styles.heroOverlapGrid : styles.heroSplitGrid
+            } ${mediaPosition === "right" ? styles.mediaRight : ""}`}
           >
-            {mediaPosition === "left" && <HeroMedia media={media} maxWidth={mediaMaxWidth} />}
+            {mediaPosition === "left" && (
+              <HeroMedia media={media} maxWidth={mediaMaxWidth} isOverlap={isOverlap} />
+            )}
             {content}
-            {mediaPosition === "right" && <HeroMedia media={media} maxWidth={mediaMaxWidth} />}
+            {mediaPosition === "right" && (
+              <HeroMedia media={media} maxWidth={mediaMaxWidth} isOverlap={isOverlap} />
+            )}
           </div>
         ) : (
           <div className={`${styles.heroSingleCol} ${isCentered ? styles.centerAligned : ""}`}>

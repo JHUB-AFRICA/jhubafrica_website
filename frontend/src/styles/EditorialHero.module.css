@@ -391,3 +391,144 @@
   margin-top: 2.5rem;
   width: 100%;
 }
+
+/* ==========================================================================
+   Overlap Hero Variant (Innovations Detail Showcase)
+   Landscape 3:2 photo taking ~45% width, ~10-15% text overlap, and edge gradient
+   ========================================================================== */
+
+.heroEditorialOverlap {
+  overflow: visible;
+}
+
+.heroOverlapGrid {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.heroOverlapMediaCol {
+  flex: 0 0 45%;
+  width: 45%;
+  max-width: 45%;
+  position: relative;
+  z-index: 1;
+}
+
+.heroOverlapMediaFrame {
+  width: 100%;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.45), 0 4px 16px rgba(0, 0, 0, 0.25);
+  background-color: #07152b;
+}
+
+.heroOverlapImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%; /* focus on the bee / center subject */
+  display: block;
+}
+
+/* Gradient overlay on photo:
+   Fading from transparent at about 65% of the image width to the banner's
+   background colour (#07152b) at the overlap.
+   The left side of the photo stays bright and clear. */
+.heroOverlapGradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(7, 21, 43, 0) 0%,
+    rgba(7, 21, 43, 0) 65%,
+    rgba(7, 21, 43, 0.6) 80%,
+    rgba(7, 21, 43, 0.92) 94%,
+    rgba(7, 21, 43, 1) 100%
+  );
+  z-index: 2;
+}
+
+/* Overlapping text content column:
+   Left edge overlaps right edge of photo by about 12.2% of image width (5.5 / 45)
+   Higher z-index so text sits on top of the image */
+.heroOverlapContentCol {
+  flex: 1 1 60%;
+  margin-left: -5.5%;
+  position: relative;
+  z-index: 3;
+}
+
+.heroOverlapContentCol .heroHeading {
+  font-size: clamp(2.3rem, 4.4vw, 4.2rem);
+}
+
+/* If media position is right */
+.heroOverlapGrid.mediaRight {
+  flex-direction: row-reverse;
+}
+
+.heroOverlapGrid.mediaRight .heroOverlapContentCol {
+  margin-left: 0;
+  margin-right: -5.5%;
+}
+
+.heroOverlapGrid.mediaRight .heroOverlapGradient {
+  background: linear-gradient(
+    270deg,
+    rgba(7, 21, 43, 0) 0%,
+    rgba(7, 21, 43, 0) 65%,
+    rgba(7, 21, 43, 0.6) 80%,
+    rgba(7, 21, 43, 0.92) 94%,
+    rgba(7, 21, 43, 1) 100%
+  );
+}
+
+/* Responsive behaviour:
+   On tablet and mobile, stack the image above the text, and drop the overlap.
+   Let the gradient fade the bottom of the image into the banner so the text still reads cleanly. */
+@media (max-width: 900px) {
+  .heroOverlapGrid,
+  .heroOverlapGrid.mediaRight {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2rem;
+  }
+
+  .heroOverlapMediaCol {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .heroOverlapMediaFrame {
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: 16px;
+  }
+
+  .heroOverlapContentCol,
+  .heroOverlapGrid.mediaRight .heroOverlapContentCol {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .heroOverlapGradient,
+  .heroOverlapGrid.mediaRight .heroOverlapGradient {
+    background: linear-gradient(
+      180deg,
+      rgba(7, 21, 43, 0) 0%,
+      rgba(7, 21, 43, 0) 65%,
+      rgba(7, 21, 43, 0.6) 80%,
+      rgba(7, 21, 43, 0.92) 94%,
+      rgba(7, 21, 43, 1) 100%
+    );
+  }
+}

@@ -327,6 +327,7 @@
   padding: 1.75rem 2.25rem;
   margin-bottom: 4.5rem;
   box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04);
+  scroll-margin-top: 80px;
 }
 
 .stepper-strip-header {

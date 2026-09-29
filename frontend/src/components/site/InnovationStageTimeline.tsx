@@ -4,16 +4,17 @@ const STAGES = ["Concept", "Prototype", "Pilot", "Market entry", "Scale"];
 
 interface InnovationStageTimelineProps {
   currentStage?: string;
+  id?: string;
 }
 
-export function InnovationStageTimeline({ currentStage = "" }: InnovationStageTimelineProps) {
+export function InnovationStageTimeline({ currentStage = "", id }: InnovationStageTimelineProps) {
   const currentStageIndex = STAGES.findIndex(
     (s) => s.toLowerCase() === currentStage.toLowerCase()
   );
   const activeStageIdx = currentStageIndex >= 0 ? currentStageIndex : 0;
 
   return (
-    <section className={styles['stepper-strip']}>
+    <section id={id} className={styles['stepper-strip']}>
       <div className={styles['stepper-strip-header']}>
         <span>Venture Incubation Lifecycle</span>
         <span style={{ color: "var(--jhub-green, #10b981)", fontWeight: 700 }}>
