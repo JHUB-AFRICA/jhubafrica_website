@@ -529,55 +529,124 @@
 
 /* Team Showcase */
 .team-editorial-section {
-  margin-bottom: 5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  margin-bottom: 5.5rem;
 }
 
-.team-grid-editorial {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.75rem;
-}
-
-.team-card-editorial {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 1.5rem 1.75rem;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+/* Principal Investigator / Lead Row */
+.team-lead-row {
+  border-top: 2px solid #0d9488; /* 2px teal rule sits above him */
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  margin-bottom: 2.75rem;
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 1.35rem;
 }
 
-.team-card-editorial:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.08);
-}
-
-.team-avatar-editorial {
+.team-lead-avatar {
   width: 56px;
   height: 56px;
+  min-width: 56px;
   border-radius: 50%;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.team-lead-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.team-lead-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--jhub-blue, #0f172a);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.team-lead-role {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #0d9488;
+  letter-spacing: 0.02em;
+}
+
+/* Implied 3-Column Team Grid */
+.team-grid-implied {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.25rem 2.5rem;
+}
+
+@media (max-width: 960px) {
+  .team-grid-implied {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .team-grid-implied {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.team-grid-entry {
+  border-top: 1px solid #e2e8f0; /* thin, pale hairline */
+  padding-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.team-entry-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.92rem;
+  color: #334155;
   flex-shrink: 0;
 }
 
-.team-name-editorial {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0f172a;
+.team-entry-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
 }
 
-.team-role-editorial {
-  font-size: 0.88rem;
+.team-entry-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.team-entry-role {
+  font-size: 0.85rem;
   color: #64748b;
+  line-height: 1.4;
 }
 
 /* Editorial CTA Banner */
