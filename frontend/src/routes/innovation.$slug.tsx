@@ -11,11 +11,11 @@ import {
   ExternalLink,
   MessageSquare,
 } from "lucide-react";
-import { getInnovationBySlug, getInnovations } from "../../axios/api/innovations";
+import { getInnovationBySlug, getFeaturedInnovations } from "../../axios/api/innovations";
 import { InnovationItem } from "../types/innovations";
 import ApplyDialog from "../components/site/ApplyDialog";
 import EditorialHero from "../components/site/EditorialHero";
-import jhubSvg from "../assets/svgs/4.svg";
+import smartNyukiBeeImg from "../assets/images/smart-nyuki-1.jpg";
 import heroStyles from "../styles/EditorialHero.module.css";
 import styles from "../styles/IndividualInnovation.module.css";
 import { InnovationMediaPlaceholder } from "../components/site/InnovationMediaPlaceholder";
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/innovation/$slug")({
     try {
       const [innovation, allInnovations] = await Promise.all([
         getInnovationBySlug(params.slug),
-        getInnovations().catch(() => []),
+        getFeaturedInnovations().catch(() => []),
       ]);
       return { innovation, allInnovations };
     } catch (err) {
@@ -91,19 +91,42 @@ function InnovationDetailPage() {
       : `https://${rawProjectUrl}`
     : null;
 
+  const isSmartNyuki =
+    innovation.slug === "smart-nyuki" ||
+    /smart[-_ ]?nyuki/i.test(innovation.title) ||
+    /nyuki/i.test(innovation.slug);
+
+  const heroImageSrc = isSmartNyuki
+    ? (innovation.coverImageUrl &&
+       !innovation.coverImageUrl.includes(".svg") &&
+       !innovation.coverImageUrl.endsWith("smart-nyuki.jpg")
+        ? innovation.coverImageUrl
+        : smartNyukiBeeImg)
+    : (innovation.coverImageUrl || smartNyukiBeeImg);
+
   return (
     <div className={styles['editorial-wrapper']}>
       {/* 1. REUSABLE IMMERSIVE HERO BANNER */}
       <EditorialHero
+        layoutVariant="overlap"
         backLink={{
           to: "/innovation",
           label: "Back to Innovations Portfolio",
         }}
         media={
           <img
-            src={jhubSvg}
-            alt="JHUB Africa Venture SVG"
-            className={heroStyles.heroMediaMedia}
+            src={heroImageSrc}
+            srcSet={`${heroImageSrc} 540w`}
+            sizes="(max-width: 900px) 100vw, (max-width: 1240px) 45vw, 558px"
+            alt={innovation.title}
+            className={heroStyles.heroOverlapImage}
+            loading="eager"
+            decoding="async"
+            onError={(e) => {
+              if (e.currentTarget.src !== smartNyukiBeeImg) {
+                e.currentTarget.src = smartNyukiBeeImg;
+              }
+            }}
           />
         }
         mediaPosition="left"
@@ -162,46 +185,8 @@ function InnovationDetailPage() {
 
       {/* 3. EDITORIAL BODY CONTENT */}
       <main className={styles['editorial-container']}>
-        {/* Showcase Media Frame */}
-        <div id="overview" className={styles['showcase-media-frame']}>
-          {innovation.coverImageUrl ? (
-            <img
-              src={innovation.coverImageUrl}
-              alt={innovation.title}
-              className={styles['showcase-img']}
-            />
-          ) : (
-            <div style={{ height: "100%", width: "100%", position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #07152b 0%, #0f2d59 50%, #064e3b 100%)" }}>
-              <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }} xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <pattern id="grid-editorial-cover" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <circle cx="2" cy="2" r="1" fill="#ffffff" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#grid-editorial-cover)" />
-              </svg>
-              <div style={{ position: "absolute", top: "-20px", left: "-20px", width: "160px", height: "160px", borderRadius: "50%", background: "radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%)", filter: "blur(12px)" }} />
-              <div style={{ position: "absolute", bottom: "-30px", right: "-10px", width: "180px", height: "180px", borderRadius: "50%", background: "radial-gradient(circle, rgba(15, 45, 89, 0.6) 0%, rgba(15, 45, 89, 0) 70%)", filter: "blur(12px)" }} />
-              <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: "2.5rem", textAlign: "center" }}>
-                <span style={{ color: "#ffffff", fontSize: "1.4rem", fontWeight: "800", letterSpacing: "0.15em", textTransform: "uppercase", background: "rgba(255, 255, 255, 0.08)", border: "none", borderRadius: "8px", padding: "8px 20px", backdropFilter: "blur(4px)", marginBottom: "1rem" }}>JHUB AFRICA</span>
-                <h2 style={{ color: "#ffffff", fontSize: "1.75rem", margin: "0 0 0.5rem 0", fontWeight: 800 }}>
-                  {innovation.title}
-                </h2>
-                <span style={{ fontSize: "0.85rem", letterSpacing: "1px", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.85)" }}>
-                  {innovation.sector} · {innovation.stage}
-                </span>
-              </div>
-            </div>
-          )}
-
-          <div className={styles['showcase-watermark']}>
-            <ShieldCheck size={16} color="var(--jhub-green, #10b981)" />
-            <span>JHUB Africa Incubated Project · Technology House, JKUAT</span>
-          </div>
-        </div>
-
-        {/* Lifecycle Stepper Strip */}
-        <InnovationStageTimeline currentStage={innovation.stage} />
+        {/* Venture Incubation Lifecycle (Overview Anchor) */}
+        <InnovationStageTimeline id="overview" currentStage={innovation.stage} />
 
         {/* Editorial Story Section: 2-Column Split */}
         <section id="story" className={styles['editorial-story-section']}>

@@ -28,6 +28,7 @@ const baseURL = import.meta.env.VITE_APP_API_URL || "http://localhost:4001";
 // no Authorization header — nothing that forces a CORS preflight.
 export const api = axios.create({
   baseURL,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,6 +40,7 @@ export const api = axios.create({
 // axios/api/admin/*.ts to use this instead of `api`.
 export const adminApi = axios.create({
   baseURL,
+  timeout: 30000, // 30s for admin uploads
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

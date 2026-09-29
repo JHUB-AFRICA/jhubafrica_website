@@ -10,10 +10,24 @@ import { InnovationItem } from "../../types/innovations";
 import { CourseItem } from "../../types/courses";
 import { JHubTeamMember } from "../../types/team";
 
+import { adminApi } from "../../../axios/axios";
+
 export type NewsDraft = NewsPost | (Omit<NewsPost, "id"> & { id?: string });
 export type EventDraft = EventItem | (Omit<EventItem, "id"> & { id?: string });
 export type InnovationDraft = InnovationItem | (Omit<InnovationItem, "id"> & { id?: string });
 export type CourseDraft = CourseItem | (Omit<CourseItem, "id"> & { id?: string });
+
+export async function uploadImageToStorage(file: File, bucket: "innovation-images" | "post-images" = "post-images"): Promise<string> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("bucket", bucket);
+    const res = await adminApi.post<{ url: string; path: string }>("/api/v1/admin/uploads/direct", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return res.data.url;
+}
 
 export async function fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -223,8 +237,18 @@ export function useNewsAdmin() {
 
     const handleImageUpload = useCallback(async (file: File | null) => {
         if (!file) return;
-        const base64 = await fileToBase64(file);
-        setDraft((prev) => ({ ...prev, image: base64 }));
+        try {
+            setMsg("Uploading image to storage...");
+            const url = await uploadImageToStorage(file, "post-images");
+            setDraft((prev) => ({ ...prev, image: url }));
+            setMsg("Image uploaded successfully.");
+            setTimeout(() => setMsg(""), 2000);
+        } catch (err: any) {
+            console.error("Failed to upload image:", err);
+            setMsg(err?.response?.data?.error || "Error uploading image. Falling back to local preview.");
+            const base64 = await fileToBase64(file);
+            setDraft((prev) => ({ ...prev, image: base64 }));
+        }
     }, []);
 
     const resetDraft = useCallback(() => setDraft(getEmptyNews()), []);
@@ -307,8 +331,18 @@ export function useEventAdmin() {
 
     const handleImageUpload = useCallback(async (file: File | null) => {
         if (!file) return;
-        const base64 = await fileToBase64(file);
-        setDraft((prev) => ({ ...prev, image: base64 }));
+        try {
+            setMsg("Uploading event image to storage...");
+            const url = await uploadImageToStorage(file, "post-images");
+            setDraft((prev) => ({ ...prev, image: url }));
+            setMsg("Event image uploaded successfully.");
+            setTimeout(() => setMsg(""), 2000);
+        } catch (err: any) {
+            console.error("Failed to upload event image:", err);
+            setMsg(err?.response?.data?.error || "Error uploading image. Falling back to local preview.");
+            const base64 = await fileToBase64(file);
+            setDraft((prev) => ({ ...prev, image: base64 }));
+        }
     }, []);
 
     const resetDraft = useCallback(() => setDraft(getEmptyEvent()), []);
@@ -391,8 +425,18 @@ export function useInnovationAdmin() {
 
     const handleImageUpload = useCallback(async (file: File | null) => {
         if (!file) return;
-        const base64 = await fileToBase64(file);
-        setDraft((prev) => ({ ...prev, coverImageUrl: base64 }));
+        try {
+            setMsg("Uploading innovation cover image to storage...");
+            const url = await uploadImageToStorage(file, "innovation-images");
+            setDraft((prev) => ({ ...prev, coverImageUrl: url }));
+            setMsg("Cover image uploaded successfully.");
+            setTimeout(() => setMsg(""), 2000);
+        } catch (err: any) {
+            console.error("Failed to upload innovation cover image:", err);
+            setMsg(err?.response?.data?.error || "Error uploading image. Falling back to local preview.");
+            const base64 = await fileToBase64(file);
+            setDraft((prev) => ({ ...prev, coverImageUrl: base64 }));
+        }
     }, []);
 
     const resetDraft = useCallback(() => setDraft(getEmptyInnovation()), []);
