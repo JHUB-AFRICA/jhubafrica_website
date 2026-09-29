@@ -1,4 +1,3 @@
-import { Share2, ExternalLink, MessageSquare } from "lucide-react";
 import type { InnovationItem } from "../../types/innovations";
 import styles from "../../styles/IndividualInnovation.module.css";
 
@@ -7,20 +6,6 @@ interface InnovationStickyNavProps {
 }
 
 export function InnovationStickyNav({ innovation }: InnovationStickyNavProps) {
-  const handleShareTwitter = () => {
-    const text = encodeURIComponent(`Explore "${innovation.title}" on the JHUB Africa Innovation Portfolio:`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(window.location.href)}`, "_blank");
-  };
-
-  const handleShareLinkedIn = () => {
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, "_blank");
-  };
-
-  const handleShareWhatsApp = () => {
-    const text = encodeURIComponent(`Check out "${innovation.title}" incubated at JHUB Africa: ${window.location.href}`);
-    window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
-  };
-
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
@@ -75,33 +60,6 @@ export function InnovationStickyNav({ innovation }: InnovationStickyNavProps) {
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
             Innovator Team
-          </button>
-        </div>
-
-        <div className={styles['sticky-nav-cta']}>
-          <button
-            type="button"
-            onClick={handleShareTwitter}
-            style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}
-            title="Share on X"
-          >
-            <Share2 size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={handleShareLinkedIn}
-            style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}
-            title="Share on LinkedIn"
-          >
-            <ExternalLink size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={handleShareWhatsApp}
-            style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}
-            title="Share on WhatsApp"
-          >
-            <MessageSquare size={16} />
           </button>
         </div>
       </div>
