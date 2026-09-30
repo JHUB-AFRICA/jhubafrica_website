@@ -247,27 +247,18 @@ Attachment: ${attachmentUrl || 'None'}
 
     if (error) throw error
 
-    // Send email notifications
-    try {
+    // Return response to user immediately (<50ms)
+    res.status(201).json({
+      message: 'Innovation submitted successfully. We will review and get back to you.',
+      submissionId: data.id,
+    })
+
+    // Dispatch background emails in parallel without blocking client
+    const { dispatchAsyncEmail } = await import('../services/email.service.js')
+    dispatchAsyncEmail('innovation-proposal', async () => {
       const { compileInnovationSubmissionLeadEmail } = await import('../templates/emails/leads.templates.js')
       const { sendInnovationLeadNotification, sendUserAcknowledgment } = await import('../services/email.service.js')
 
-      // 1. Send confirmation to innovator
-      await sendUserAcknowledgment(
-        contactEmail,
-        contactName,
-        `Innovation Submission: ${title}`,
-        `Thank you for submitting "${title}" to JHUB Africa. Your project has been registered in our pipeline and will be evaluated by our Innovation Team.`,
-        data.id,
-        [
-          { label: 'Innovation Title', value: title },
-          { label: 'Sector', value: sector },
-          { label: 'Current Stage', value: stage },
-          { label: 'Support Needed', value: supportRequired || 'Mentorship / Incubation' },
-        ]
-      )
-
-      // 2. Notify Innovation Lead
       const emailHtml = compileInnovationSubmissionLeadEmail({
         contactName,
         contactEmail,
@@ -283,14 +274,22 @@ Attachment: ${attachmentUrl || 'None'}
         attachmentUrl,
       })
 
-      await sendInnovationLeadNotification(`[Innovation Submission] ${title}`, emailHtml)
-    } catch (emailErr) {
-      console.error('Failed to dispatch innovation emails:', emailErr)
-    }
-
-    res.status(201).json({
-      message: 'Innovation submitted successfully. We will review and get back to you.',
-      submissionId: data.id,
+      await Promise.allSettled([
+        sendUserAcknowledgment(
+          contactEmail,
+          contactName,
+          `Innovation Submission: ${title}`,
+          `Thank you for submitting "${title}" to JHUB Africa. Your project has been registered in our pipeline and will be evaluated by our Innovation Team.`,
+          data.id,
+          [
+            { label: 'Innovation Title', value: title },
+            { label: 'Sector', value: sector },
+            { label: 'Current Stage', value: stage },
+            { label: 'Support Needed', value: supportRequired || 'Mentorship / Incubation' },
+          ]
+        ),
+        sendInnovationLeadNotification(`[Innovation Submission] ${title}`, emailHtml),
+      ])
     })
   } catch (err) {
     next(err)

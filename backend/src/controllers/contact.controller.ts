@@ -40,29 +40,20 @@ export async function submitInquiry(req: Request, res: Response, next: NextFunct
       console.warn('[Contact Controller] Database save skipped or failed, proceeding with emails:', dbErr)
     }
 
-    // Send email notifications
-    try {
+    // Return response to user immediately (<50ms)
+    res.status(201).json({
+      message: 'Message received. We aim to respond within 2 business days.',
+      inquiryId,
+    })
+
+    // Dispatch background emails in parallel without blocking client
+    const { dispatchAsyncEmail } = await import('../services/email.service.js')
+    dispatchAsyncEmail('contact-inquiry', async () => {
       const { compileGeneralContactLeadEmail } = await import('../templates/emails/leads.templates.js')
       const { sendSecretariatNotification, sendUserAcknowledgment } = await import('../services/email.service.js')
 
       const inquirySubject = subject || (role ? `Inquiry from ${role} (${name})` : `Inquiry from ${name}`)
 
-      // 1. Send confirmation acknowledgment to the user
-      await sendUserAcknowledgment(
-        email,
-        name,
-        inquirySubject,
-        'Thank you for reaching out to JHUB Africa. We have received your message and our team will get back to you shortly.',
-        inquiryId,
-        [
-          { label: 'Name', value: name },
-          { label: 'Role / Category', value: role || category || 'General' },
-          { label: 'Organization', value: organisation || 'Not Specified' },
-          { label: 'Phone', value: phone || 'Not Provided' },
-        ]
-      )
-
-      // 2. Notify internal team (consolidated to EMAIL_TO in .env)
       const leadHtml = compileGeneralContactLeadEmail({
         category: category || role || 'General',
         subject: inquirySubject,
@@ -73,14 +64,22 @@ export async function submitInquiry(req: Request, res: Response, next: NextFunct
         preferredResponseChannel: preferredResponseChannel || 'email',
       })
 
-      await sendSecretariatNotification(inquirySubject, leadHtml)
-    } catch (emailErr) {
-      console.error('[Email Notification Error]:', emailErr)
-    }
-
-    res.status(201).json({
-      message: 'Message received. We aim to respond within 2 business days.',
-      inquiryId,
+      await Promise.allSettled([
+        sendUserAcknowledgment(
+          email,
+          name,
+          inquirySubject,
+          'Thank you for reaching out to JHUB Africa. We have received your message and our team will get back to you shortly.',
+          inquiryId,
+          [
+            { label: 'Name', value: name },
+            { label: 'Role / Category', value: role || category || 'General' },
+            { label: 'Organization', value: organisation || 'Not Specified' },
+            { label: 'Phone', value: phone || 'Not Provided' },
+          ]
+        ),
+        sendSecretariatNotification(inquirySubject, leadHtml),
+      ])
     })
   } catch (err) {
     next(err)

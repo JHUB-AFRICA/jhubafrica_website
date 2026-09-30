@@ -6,7 +6,7 @@ import { redis } from '../config/redis.js'
 import { NODE_ENV, JWT_SECRET, CORS_ORIGINS } from '../config/env.js'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
-import { sendEmail } from '../services/email.service.js'
+import { sendEmail, dispatchAsyncEmail } from '../services/email.service.js'
 import { compileResetPasswordEmail } from '../templates/emails/reset-password.template.js'
 
 // CHANGED: derive isProd once, reuse below
@@ -412,7 +412,7 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
       (CORS_ORIGINS ? CORS_ORIGINS.split(',')[0].trim() : 'http://localhost:5173')
     const resetUrl = `${frontendUrl}/admin?resetToken=${encodeURIComponent(resetToken)}`
 
-    // 4. Send email
+    // 4. Send email asynchronously to prevent timing attacks
     const recipientName = dbUser.first_name ? `${dbUser.first_name} ${dbUser.last_name || ''}`.trim() : 'Administrator'
     const emailHtml = compileResetPasswordEmail({
       recipientName,
@@ -420,13 +420,15 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
       expiresInMinutes: 15,
     })
 
-    await sendEmail({
-      to: dbUser.email,
-      subject: '🔒 Reset Your JHUB Africa Administrator Password',
-      html: emailHtml,
-    })
-
     console.info(`🔑 [ADMIN PASSWORD RESET LINK]: ${resetUrl}`)
+
+    dispatchAsyncEmail('admin-password-reset', async () => {
+      await sendEmail({
+        to: dbUser.email,
+        subject: '🔒 Reset Your JHUB Africa Administrator Password',
+        html: emailHtml,
+      })
+    })
 
     res.json({
       message: successMsg,

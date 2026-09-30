@@ -72,27 +72,15 @@ ${proposedCollaboration}
     })
     if (error) throw error
 
-    // Send email notifications
-    try {
+    // Return response to applicant immediately (<50ms)
+    res.status(201).json({ message: 'Partnership application received. We will be in touch within 5 business days.' })
+
+    // Dispatch background emails in parallel without blocking client
+    const { dispatchAsyncEmail } = await import('../services/email.service.js')
+    dispatchAsyncEmail('partnership-application', async () => {
       const { compilePartnerInquiryLeadEmail } = await import('../templates/emails/leads.templates.js')
       const { sendPartnershipsLeadNotification, sendUserAcknowledgment } = await import('../services/email.service.js')
 
-      // 1. Send confirmation to partner
-      await sendUserAcknowledgment(
-        contactEmail,
-        contactName,
-        `Partnership Proposal: ${organizationName}`,
-        `Thank you for your interest in partnering with JHUB Africa. We have received your proposal and our Strategic Partnerships team will review it.`,
-        undefined,
-        [
-          { label: 'Organization', value: organizationName },
-          { label: 'Partnership Type', value: partnershipType },
-          { label: 'Sector', value: sector },
-          { label: 'Timeline', value: expectedTimeline || 'Flexible' },
-        ]
-      )
-
-      // 2. Notify Strategic Partnerships Lead
       const emailHtml = compilePartnerInquiryLeadEmail({
         organizationName,
         partnershipType,
@@ -104,12 +92,23 @@ ${proposedCollaboration}
         contactPhone,
       })
 
-      await sendPartnershipsLeadNotification(`[Partnership Proposal] ${organizationName}`, emailHtml)
-    } catch (emailErr) {
-      console.error('Failed to notify Partnerships Lead:', emailErr)
-    }
-
-    res.status(201).json({ message: 'Partnership application received. We will be in touch within 5 business days.' })
+      await Promise.allSettled([
+        sendUserAcknowledgment(
+          contactEmail,
+          contactName,
+          `Partnership Proposal: ${organizationName}`,
+          `Thank you for your interest in partnering with JHUB Africa. We have received your proposal and our Strategic Partnerships team will review it.`,
+          undefined,
+          [
+            { label: 'Organization', value: organizationName },
+            { label: 'Partnership Type', value: partnershipType },
+            { label: 'Sector', value: sector },
+            { label: 'Timeline', value: expectedTimeline || 'Flexible' },
+          ]
+        ),
+        sendPartnershipsLeadNotification(`[Partnership Proposal] ${organizationName}`, emailHtml),
+      ])
+    })
   } catch (err) {
     next(err)
   }
@@ -146,8 +145,12 @@ Message: ${message || 'None'}
     })
     if (error) throw error
 
-    // Send email notifications
-    try {
+    // Return response to sponsor immediately (<50ms)
+    res.status(201).json({ message: 'Sponsorship interest received. Our partnerships team will follow up shortly.' })
+
+    // Dispatch background emails in parallel without blocking client
+    const { dispatchAsyncEmail } = await import('../services/email.service.js')
+    dispatchAsyncEmail('sponsorship-inquiry', async () => {
       let projectTitle = undefined
       if (innovationId) {
         const { data: innovation } = await supabaseAdmin
@@ -161,22 +164,6 @@ Message: ${message || 'None'}
       const { compileSponsorInquiryLeadEmail } = await import('../templates/emails/leads.templates.js')
       const { sendFundingLeadNotification, sendUserAcknowledgment } = await import('../services/email.service.js')
 
-      // 1. Send confirmation to sponsor
-      await sendUserAcknowledgment(
-        sponsorEmail,
-        sponsorName,
-        `Sponsorship Interest: ${organization}`,
-        `Thank you for your interest in supporting innovation at JHUB Africa. Our Funding & Resource Mobilization team has received your inquiry.`,
-        undefined,
-        [
-          { label: 'Organization', value: organization },
-          { label: 'Sponsorship Type', value: sponsorshipType },
-          { label: 'Interest Area', value: interestArea },
-          { label: 'Target Project', value: projectTitle || 'General Innovation Pool' },
-        ]
-      )
-
-      // 2. Notify Funding Lead
       const emailHtml = compileSponsorInquiryLeadEmail({
         sponsorName,
         sponsorEmail,
@@ -190,12 +177,23 @@ Message: ${message || 'None'}
         message,
       })
 
-      await sendFundingLeadNotification(`[Sponsor Inquiry] ${organization}`, emailHtml)
-    } catch (emailErr) {
-      console.error('Failed to notify Funding Lead:', emailErr)
-    }
-
-    res.status(201).json({ message: 'Sponsorship interest received. Our partnerships team will follow up shortly.' })
+      await Promise.allSettled([
+        sendUserAcknowledgment(
+          sponsorEmail,
+          sponsorName,
+          `Sponsorship Interest: ${organization}`,
+          `Thank you for your interest in supporting innovation at JHUB Africa. Our Funding & Resource Mobilization team has received your inquiry.`,
+          undefined,
+          [
+            { label: 'Organization', value: organization },
+            { label: 'Sponsorship Type', value: sponsorshipType },
+            { label: 'Interest Area', value: interestArea },
+            { label: 'Target Project', value: projectTitle || 'General Innovation Pool' },
+          ]
+        ),
+        sendFundingLeadNotification(`[Sponsor Inquiry] ${organization}`, emailHtml),
+      ])
+    })
   } catch (err) {
     next(err)
   }

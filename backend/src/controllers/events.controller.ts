@@ -157,8 +157,12 @@ export async function rsvp(req: Request, res: Response, next: NextFunction) {
 
     if (error) throw error
 
-    // Retrieve recipient details and send the RSVP confirmation email
-    try {
+    // Return response to attendee immediately (<50ms)
+    res.status(201).json({ message: `RSVP confirmed for ${event.title}`, data })
+
+    // Dispatch background emails in parallel without blocking client
+    const { dispatchAsyncEmail } = await import('../services/email.service.js')
+    dispatchAsyncEmail('event-rsvp', async () => {
       let recipientEmail = guestEmail
       let recipientName = guestName
 
@@ -176,7 +180,8 @@ export async function rsvp(req: Request, res: Response, next: NextFunction) {
 
       if (recipientEmail && event) {
         const { compileRsvpEmail } = await import('../templates/emails/rsvp.template.js')
-        const { sendEmail } = await import('../services/email.service.js')
+        const { compileEventRegistrationLeadEmail } = await import('../templates/emails/leads.templates.js')
+        const { sendEmail, sendEventsCoordinatorNotification } = await import('../services/email.service.js')
 
         const emailHtml = compileRsvpEmail({
           recipientName,
@@ -187,16 +192,6 @@ export async function rsvp(req: Request, res: Response, next: NextFunction) {
           isOnline: event.is_online,
           meetingUrl: event.meeting_url,
         })
-
-        await sendEmail({
-          to: recipientEmail,
-          subject: `RSVP Confirmed: ${event.title}`,
-          html: emailHtml,
-        })
-
-        // Notify Events Coordinator using professional template
-        const { compileEventRegistrationLeadEmail } = await import('../templates/emails/leads.templates.js')
-        const { sendEventsCoordinatorNotification } = await import('../services/email.service.js')
 
         const coordEmailHtml = compileEventRegistrationLeadEmail({
           eventTitle: event.title,
@@ -209,13 +204,16 @@ export async function rsvp(req: Request, res: Response, next: NextFunction) {
           marketingConsent,
         })
 
-        await sendEventsCoordinatorNotification(`[Event Registration] ${event.title} - ${recipientName}`, coordEmailHtml)
+        await Promise.allSettled([
+          sendEmail({
+            to: recipientEmail,
+            subject: `RSVP Confirmed: ${event.title}`,
+            html: emailHtml,
+          }),
+          sendEventsCoordinatorNotification(`[Event Registration] ${event.title} - ${recipientName}`, coordEmailHtml),
+        ])
       }
-    } catch (emailErr) {
-      console.error('Failed to send event RSVP confirmation email:', emailErr)
-    }
-
-    res.status(201).json({ message: `RSVP confirmed for ${event.title}`, data })
+    })
   } catch (err) {
     next(err)
   }

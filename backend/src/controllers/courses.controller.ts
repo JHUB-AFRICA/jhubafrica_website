@@ -127,19 +127,24 @@ export async function enroll(req: Request, res: Response, next: NextFunction) {
     if (error) throw error
 
     // Retrieve user, course, and cohort details for the confirmation email
-    try {
-      const { data: user } = await supabaseAdmin
-        .from('users')
-        .select('email, first_name, last_name')
-        .eq('id', userId)
-        .single()
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('email, first_name, last_name')
+      .eq('id', userId)
+      .single()
 
-      const { data: course } = await supabaseAdmin
-        .from('courses')
-        .select('title, delivery_mode, duration_weeks')
-        .eq('id', id)
-        .single()
+    const { data: course } = await supabaseAdmin
+      .from('courses')
+      .select('title, delivery_mode, duration_weeks')
+      .eq('id', id)
+      .single()
 
+    // Return response to student immediately (<50ms)
+    res.status(201).json({ message: 'Enrollment submitted for review.', data })
+
+    // Dispatch enrollment confirmation email in background
+    const { dispatchAsyncEmail } = await import('../services/email.service.js')
+    dispatchAsyncEmail('course-enrollment', async () => {
       let cohort = null
       if (req.body.cohortId) {
         const { data: cohortData } = await supabaseAdmin
@@ -171,11 +176,7 @@ export async function enroll(req: Request, res: Response, next: NextFunction) {
           html: emailHtml,
         })
       }
-    } catch (emailErr) {
-      console.error('Failed to send enrollment email confirmation:', emailErr)
-    }
-
-    res.status(201).json({ message: 'Enrollment submitted for review.', data })
+    })
   } catch (err) {
     next(err)
   }
@@ -253,8 +254,12 @@ ${eligibilityDetails}
     })
     if (error) throw error
 
-    // Notify Training & Courses Coordinator using professional template
-    try {
+    // Return response to user immediately (<50ms)
+    res.status(201).json({ message: 'Interest registered. We will be in touch soon.' })
+
+    // Dispatch background emails in parallel without blocking client
+    const { dispatchAsyncEmail } = await import('../services/email.service.js')
+    dispatchAsyncEmail('course-interest', async () => {
       let courseTitle = 'Unknown Course'
       const { data: course } = await supabaseAdmin
         .from('courses')
@@ -264,7 +269,7 @@ ${eligibilityDetails}
       if (course) courseTitle = course.title
 
       const { compileCourseInterestLeadEmail } = await import('../templates/emails/leads.templates.js')
-      const { sendCoursesCoordinatorNotification } = await import('../services/email.service.js')
+      const { sendCoursesCoordinatorNotification, sendUserAcknowledgment } = await import('../services/email.service.js')
 
       const emailHtml = compileCourseInterestLeadEmail({
         courseTitle,
@@ -277,12 +282,22 @@ ${eligibilityDetails}
         paymentReadiness,
       })
 
-      await sendCoursesCoordinatorNotification(`[Course Interest] ${courseTitle}`, emailHtml)
-    } catch (emailErr) {
-      console.error('Failed to notify Courses Coordinator:', emailErr)
-    }
-
-    res.status(201).json({ message: 'Interest registered. We will be in touch soon.' })
+      await Promise.allSettled([
+        sendUserAcknowledgment(
+          email,
+          name,
+          `Course Interest: ${courseTitle}`,
+          `Thank you for registering your interest in "${courseTitle}". Our Training & Courses Coordinator will review your details and notify you when the upcoming cohort opens.`,
+          undefined,
+          [
+            { label: 'Course', value: courseTitle },
+            { label: 'Preferred Cohort', value: preferredCohort },
+            { label: 'Learning Mode', value: preferredLearningMode },
+          ]
+        ),
+        sendCoursesCoordinatorNotification(`[Course Interest] ${courseTitle}`, emailHtml),
+      ])
+    })
   } catch (err) {
     next(err)
   }
