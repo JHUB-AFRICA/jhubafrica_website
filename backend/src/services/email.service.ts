@@ -12,6 +12,9 @@ import {
 } from '../config/env.js'
 import { compileAcknowledgmentEmail } from '../templates/emails/acknowledgment.template.js'
 
+import fs from 'fs'
+import path from 'path'
+
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
 
 export interface EmailOptions {
@@ -27,6 +30,41 @@ export const getInnovationsEmail = () => EMAIL_INNOVATIONS || getInternalNotific
 export const getCoursesEmail = () => EMAIL_COURSES || getInternalNotificationEmail()
 export const getPartnershipsEmail = () => EMAIL_PARTNERSHIPS || getInternalNotificationEmail()
 export const getEventsEmail = () => EMAIL_EVENTS || getInternalNotificationEmail()
+
+/**
+ * Saves an HTML email snapshot locally to temp/emails/ in development mode
+ * for easy browser preview without needing a real inbox or domain verification.
+ */
+function saveLocalEmailPreview({ to, subject, html, from }: { to: string[]; subject: string; html: string; from: string }) {
+  try {
+    const tempDir = path.resolve(process.cwd(), 'temp', 'emails')
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true })
+    }
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+    const slug = subject.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30)
+    const fileName = `${timestamp}_${slug}.html`
+    const filePath = path.join(tempDir, fileName)
+
+    const devHeader = `
+      <!-- LOCAL EMAIL PREVIEW HEADER -->
+      <div style="background: #0f172a; color: #f8fafc; font-family: monospace; font-size: 13px; padding: 12px 16px; border-bottom: 2px solid #3b82f6;">
+        <div style="margin-bottom: 4px;"><strong style="color: #93c5fd;">[Local Dev Mailbox Preview]</strong></div>
+        <div><strong>To:</strong> ${to.join(', ')}</div>
+        <div><strong>From:</strong> ${from}</div>
+        <div><strong>Subject:</strong> ${subject}</div>
+        <div><strong>Captured At:</strong> ${new Date().toLocaleString()}</div>
+      </div>
+    `
+    const fullHtml = html.includes('<body') ? html.replace(/<body[^>]*>/i, `$&${devHeader}`) : `${devHeader}${html}`
+
+    fs.writeFileSync(filePath, fullHtml, 'utf-8')
+    console.info(`📁 [Local Dev Mailbox]: Saved preview to ${filePath}`)
+  } catch (err: any) {
+    console.warn(`[Local Dev Mailbox] Could not save email preview:`, err?.message)
+  }
+}
 
 /**
  * Fire-and-forget asynchronous email dispatcher.
@@ -54,6 +92,11 @@ export async function sendEmail({ to, subject, html, replyTo }: EmailOptions) {
   // Default to onboarding@resend.dev if not explicitly configured so unverified test accounts work
   const fromAddress = EMAIL_FROM || 'onboarding@resend.dev'
   const replyAddress = replyTo || EMAIL_REPLY_TO || undefined
+
+  // In development, automatically save rendered email snapshot to disk
+  if (NODE_ENV !== 'production') {
+    saveLocalEmailPreview({ to: recipients, subject, html, from: fromAddress })
+  }
 
   if (!resend) {
     console.info(`\n📧 [EMAIL SIMULATION] (Set RESEND_API_KEY to send live emails)`)

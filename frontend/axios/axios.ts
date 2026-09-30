@@ -21,7 +21,7 @@ function addRefreshSubscriber(callback: (token: string) => void) {
   refreshSubscribers.push(callback);
 }
 
-const baseURL = import.meta.env.VITE_APP_API_URL || "http://localhost:4001";
+export const baseURL = import.meta.env.VITE_APP_API_URL || "http://localhost:4000";
 
 // CHANGED: `api` is now for PUBLIC reads only (news, events, public
 // innovations/courses listings). No withCredentials, no CSRF header,

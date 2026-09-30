@@ -9,6 +9,7 @@ import resourcesRouter from './resources.routes.js'
 import contactRouter from './contact.routes.js'
 import teamRouter from './team.routes.js'
 import adminRouter from './admin/index.js'
+import { adminEmailRouter } from './admin/admin.email.js'
 import { requireAuth, requireRole } from '../middleware/auth.middleware.js'
 
 const router = Router()
@@ -22,6 +23,9 @@ router.use('/partners', partnersRouter)
 router.use('/resources', resourcesRouter)
 router.use('/contact', contactRouter)
 router.use('/team-members', teamRouter)
+
+// Email preview, template directory, and diagnostics router (accessible for admin dashboard)
+router.use('/admin/email', adminEmailRouter)
 
 // Unified admin endpoints with RBAC protection
 router.use('/admin', requireAuth, requireRole('admin'), adminRouter)
