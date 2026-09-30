@@ -1,5 +1,15 @@
 import { Resend } from 'resend'
-import { RESEND_API_KEY, EMAIL_FROM, EMAIL_TO, EMAIL_REPLY_TO } from '../config/env.js'
+import {
+  RESEND_API_KEY,
+  EMAIL_FROM,
+  EMAIL_TO,
+  EMAIL_REPLY_TO,
+  EMAIL_INNOVATIONS,
+  EMAIL_COURSES,
+  EMAIL_PARTNERSHIPS,
+  EMAIL_EVENTS,
+  NODE_ENV,
+} from '../config/env.js'
 import { compileAcknowledgmentEmail } from '../templates/emails/acknowledgment.template.js'
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
@@ -11,12 +21,33 @@ export interface EmailOptions {
   replyTo?: string
 }
 
-// Consolidated internal recipient from environment
-const getInternalNotificationEmail = () => EMAIL_TO || EMAIL_FROM || 'team@jhubafrica.com'
+// Departmental & Consolidated internal recipients with fallback to EMAIL_TO
+export const getInternalNotificationEmail = () => EMAIL_TO || EMAIL_FROM || 'team@jhubafrica.com'
+export const getInnovationsEmail = () => EMAIL_INNOVATIONS || getInternalNotificationEmail()
+export const getCoursesEmail = () => EMAIL_COURSES || getInternalNotificationEmail()
+export const getPartnershipsEmail = () => EMAIL_PARTNERSHIPS || getInternalNotificationEmail()
+export const getEventsEmail = () => EMAIL_EVENTS || getInternalNotificationEmail()
+
+/**
+ * Fire-and-forget asynchronous email dispatcher.
+ * Decouples email sending from the HTTP request-response cycle so responses return immediately (<100ms).
+ * Catches and logs all errors, isolating them from client HTTP responses.
+ */
+export function dispatchAsyncEmail(taskName: string, task: () => Promise<unknown>): void {
+  setImmediate(async () => {
+    try {
+      await task()
+    } catch (err: any) {
+      console.error(`❌ [Background Email Failed] [${taskName}]:`, err?.message || err)
+    }
+  })
+}
 
 /**
  * Core sendEmail utility using Resend.
- * In local dev without RESEND_API_KEY, logs the preview to the console so developers are never blocked.
+ * In local dev without RESEND_API_KEY, logs the preview to the console.
+ * In local dev with unverified sandbox accounts (onboarding@resend.dev), gracefully falls back
+ * to simulation if sending to an unverified email address so developers are never blocked.
  */
 export async function sendEmail({ to, subject, html, replyTo }: EmailOptions) {
   const recipients = Array.isArray(to) ? to : [to]
@@ -42,6 +73,19 @@ export async function sendEmail({ to, subject, html, replyTo }: EmailOptions) {
     })
 
     if (error) {
+      const errMsg = (error as any)?.message || JSON.stringify(error)
+      // Check for Resend testing sandbox restriction
+      if (
+        NODE_ENV !== 'production' &&
+        (errMsg.includes('testing emails to your own email address') || (error as any)?.statusCode === 403)
+      ) {
+        console.warn(
+          `\n⚠️ [Resend Sandbox Restriction]: Recipient (${recipients.join(', ')}) requires a verified custom domain. Running local dev simulation.`
+        )
+        console.info(`   Subject: ${subject}\n`)
+        return { id: `sim-sandbox-${Date.now()}`, simulated: true, originalError: error }
+      }
+
       console.error(`\n❌ [Resend API Error]:`, JSON.stringify(error, null, 2))
       throw error
     }
@@ -54,7 +98,18 @@ export async function sendEmail({ to, subject, html, replyTo }: EmailOptions) {
 
     return data
   } catch (err: any) {
-    console.error(`\n❌ [Email Dispatch Failed]:`, err?.message || err)
+    const errMsg = err?.message || String(err)
+    if (
+      NODE_ENV !== 'production' &&
+      (errMsg.includes('testing emails to your own email address') || err?.statusCode === 403)
+    ) {
+      console.warn(
+        `\n⚠️ [Resend Sandbox Restriction]: ${errMsg}. Fallback to simulated delivery in local dev mode.`
+      )
+      return { id: `sim-sandbox-${Date.now()}`, simulated: true, originalError: err }
+    }
+
+    console.error(`\n❌ [Email Dispatch Failed]:`, errMsg)
     throw err
   }
 }
@@ -87,8 +142,7 @@ export async function sendUserAcknowledgment(
 }
 
 /**
- * Consolidated Staff Lead Notification Helpers
- * All internal alerts route to the single consolidated email configured in .env (EMAIL_TO)
+ * Consolidated & Department-Specific Staff Lead Notification Helpers
  */
 export async function sendAdminNotification(subject: string, htmlContent: string) {
   return sendEmail({
@@ -100,7 +154,7 @@ export async function sendAdminNotification(subject: string, htmlContent: string
 
 export async function sendInnovationLeadNotification(subject: string, htmlContent: string) {
   return sendEmail({
-    to: getInternalNotificationEmail(),
+    to: getInnovationsEmail(),
     subject,
     html: htmlContent,
   })
@@ -108,7 +162,7 @@ export async function sendInnovationLeadNotification(subject: string, htmlConten
 
 export async function sendFundingLeadNotification(subject: string, htmlContent: string) {
   return sendEmail({
-    to: getInternalNotificationEmail(),
+    to: getPartnershipsEmail(),
     subject,
     html: htmlContent,
   })
@@ -116,7 +170,7 @@ export async function sendFundingLeadNotification(subject: string, htmlContent: 
 
 export async function sendPartnershipsLeadNotification(subject: string, htmlContent: string) {
   return sendEmail({
-    to: getInternalNotificationEmail(),
+    to: getPartnershipsEmail(),
     subject,
     html: htmlContent,
   })
@@ -124,7 +178,7 @@ export async function sendPartnershipsLeadNotification(subject: string, htmlCont
 
 export async function sendCoursesCoordinatorNotification(subject: string, htmlContent: string) {
   return sendEmail({
-    to: getInternalNotificationEmail(),
+    to: getCoursesEmail(),
     subject,
     html: htmlContent,
   })
@@ -132,7 +186,7 @@ export async function sendCoursesCoordinatorNotification(subject: string, htmlCo
 
 export async function sendEventsCoordinatorNotification(subject: string, htmlContent: string) {
   return sendEmail({
-    to: getInternalNotificationEmail(),
+    to: getEventsEmail(),
     subject,
     html: htmlContent,
   })
