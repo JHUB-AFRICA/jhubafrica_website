@@ -1,4 +1,5 @@
 import { compileBaseLayout } from './base.layout.js'
+import { escapeHtml } from './utils.js'
 
 export interface EnrollmentEmailOptions {
   studentName: string
@@ -13,6 +14,12 @@ export interface EnrollmentEmailOptions {
 export function compileEnrollmentEmail(options: EnrollmentEmailOptions): string {
   const { studentName, courseTitle, deliveryMode, durationWeeks, startDate, zoomLink, location } = options
 
+  const safeStudentName = escapeHtml(studentName)
+  const safeCourseTitle = escapeHtml(courseTitle)
+  const safeDeliveryMode = escapeHtml(deliveryMode)
+  const safeLocation = location ? escapeHtml(location) : null
+  const safeZoomLink = zoomLink ? escapeHtml(zoomLink) : null
+
   const formattedDate = startDate ? new Date(startDate).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -22,15 +29,15 @@ export function compileEnrollmentEmail(options: EnrollmentEmailOptions): string 
 
   const contentHtml = `
     <h2 style="margin-top: 0; margin-bottom: 8px; color: #0f172a; font-size: 20px; font-weight: 700;">Enrollment Confirmed!</h2>
-    <p style="margin-top: 0; margin-bottom: 24px; color: #64748b; font-size: 15px; line-height: 1.5;">Dear ${studentName},</p>
-    <p style="margin-top: 0; margin-bottom: 24px; color: #334155; font-size: 15px; line-height: 1.6;">Congratulations! You have been successfully enrolled in <strong>${courseTitle}</strong>. We are thrilled to welcome you to this cohort.</p>
+    <p style="margin-top: 0; margin-bottom: 24px; color: #64748b; font-size: 15px; line-height: 1.5;">Dear ${safeStudentName},</p>
+    <p style="margin-top: 0; margin-bottom: 24px; color: #334155; font-size: 15px; line-height: 1.6;">Congratulations! You have been successfully enrolled in <strong>${safeCourseTitle}</strong>. We are thrilled to welcome you to this cohort.</p>
     
     <div style="background-color: #f8fafc; border-radius: 8px; padding: 24px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
       <h3 style="margin-top: 0; margin-bottom: 16px; color: #0f172a; font-size: 16px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">Course Details</h3>
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
         <tr>
           <td style="padding: 6px 0; font-size: 14px; color: #64748b; width: 140px;">Delivery Mode</td>
-          <td style="padding: 6px 0; font-size: 14px; color: #0f172a; font-weight: 500;">${deliveryMode}</td>
+          <td style="padding: 6px 0; font-size: 14px; color: #0f172a; font-weight: 500;">${safeDeliveryMode}</td>
         </tr>
         ${durationWeeks ? `
         <tr>
@@ -42,20 +49,20 @@ export function compileEnrollmentEmail(options: EnrollmentEmailOptions): string 
           <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Start Date</td>
           <td style="padding: 6px 0; font-size: 14px; color: #0f172a; font-weight: 500;">${formattedDate}</td>
         </tr>
-        ${location ? `
+        ${safeLocation ? `
         <tr>
           <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Physical Location</td>
-          <td style="padding: 6px 0; font-size: 14px; color: #0f172a; font-weight: 500;">${location}</td>
+          <td style="padding: 6px 0; font-size: 14px; color: #0f172a; font-weight: 500;">${safeLocation}</td>
         </tr>
         ` : ''}
       </table>
     </div>
 
-    ${zoomLink ? `
+    ${safeZoomLink ? `
     <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 20px; margin-bottom: 24px; text-align: center;">
       <h4 style="margin-top: 0; margin-bottom: 8px; color: #065f46; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Virtual Classroom Connection</h4>
       <p style="margin-top: 0; margin-bottom: 16px; color: #065f46; font-size: 14px;">Here is your link to access the live virtual sessions:</p>
-      <a href="${zoomLink}" style="background-color: #10b981; color: #ffffff; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">
+      <a href="${safeZoomLink}" style="background-color: #10b981; color: #ffffff; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">
         Join Class (Zoom)
       </a>
     </div>
@@ -72,8 +79,8 @@ export function compileEnrollmentEmail(options: EnrollmentEmailOptions): string 
   `
 
   return compileBaseLayout({
-    title: `Enrollment Confirmed: ${courseTitle}`,
-    preheader: `Welcome to the class, ${studentName}! Your enrollment is complete.`,
+    title: `Enrollment Confirmed: ${safeCourseTitle}`,
+    preheader: `Welcome to the class, ${safeStudentName}! Your enrollment is complete.`,
     contentHtml
   })
 }

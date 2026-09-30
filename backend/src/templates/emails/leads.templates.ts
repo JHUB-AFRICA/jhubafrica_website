@@ -1,4 +1,5 @@
 import { compileBaseLayout } from './base.layout.js'
+import { escapeHtml, formatMultilineHtml } from './utils.js'
 
 // Helper to compile details tables in leads emails
 function compileDetailsTable(rows: { label: string; value: string }[]): string {
@@ -28,16 +29,29 @@ export function compileInnovationSubmissionLeadEmail(data: {
   projectLinks?: string
   attachmentUrl?: string
 }): string {
+  const safeName = escapeHtml(data.contactName)
+  const safeEmail = escapeHtml(data.contactEmail)
+  const safePhone = escapeHtml(data.phone)
+  const safeTitle = escapeHtml(data.title)
+  const safeSector = escapeHtml(data.sector)
+  const safeStage = escapeHtml(data.stage)
+  const safeTeam = escapeHtml(data.teamInfo)
+  const safeProblem = formatMultilineHtml(data.problem)
+  const safeSolution = formatMultilineHtml(data.solution)
+  const safeSupport = formatMultilineHtml(data.supportRequired)
+  const safeProjectLinks = data.projectLinks ? escapeHtml(data.projectLinks) : null
+  const safeAttachmentUrl = data.attachmentUrl ? escapeHtml(data.attachmentUrl) : null
+
   const table = compileDetailsTable([
-    { label: 'Innovator Name', value: data.contactName },
-    { label: 'Email Address', value: `<a href="mailto:${data.contactEmail}" style="color: #3b82f6; text-decoration: none;">${data.contactEmail}</a>` },
-    { label: 'Phone Number', value: data.phone },
-    { label: 'Project Name', value: data.title },
-    { label: 'Sector', value: data.sector },
-    { label: 'Development Stage', value: `<span style="background-color: #eff6ff; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">${data.stage}</span>` },
-    { label: 'Team Info', value: data.teamInfo },
-    { label: 'Project Links', value: data.projectLinks ? `<a href="${data.projectLinks}" style="color: #3b82f6; text-decoration: none;">${data.projectLinks}</a>` : 'N/A' },
-    { label: 'Attachment Link', value: data.attachmentUrl ? `<a href="${data.attachmentUrl}" style="color: #3b82f6; text-decoration: none;">View File</a>` : 'N/A' }
+    { label: 'Innovator Name', value: safeName },
+    { label: 'Email Address', value: `<a href="mailto:${safeEmail}" style="color: #3b82f6; text-decoration: none;">${safeEmail}</a>` },
+    { label: 'Phone Number', value: safePhone },
+    { label: 'Project Name', value: safeTitle },
+    { label: 'Sector', value: safeSector },
+    { label: 'Development Stage', value: `<span style="background-color: #eff6ff; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">${safeStage}</span>` },
+    { label: 'Team Info', value: safeTeam },
+    { label: 'Project Links', value: safeProjectLinks ? `<a href="${safeProjectLinks}" style="color: #3b82f6; text-decoration: none;">${safeProjectLinks}</a>` : 'N/A' },
+    { label: 'Attachment Link', value: safeAttachmentUrl ? `<a href="${safeAttachmentUrl}" style="color: #3b82f6; text-decoration: none;">View File</a>` : 'N/A' }
   ])
 
   const contentHtml = `
@@ -49,23 +63,23 @@ export function compileInnovationSubmissionLeadEmail(data: {
 
     <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 4px; margin-bottom: 20px;">
       <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 8px;">Problem Being Addressed</div>
-      <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-line;">${data.problem}</div>
+      <div style="font-size: 14px; color: #334155; line-height: 1.6;">${safeProblem}</div>
     </div>
 
     <div style="background-color: #f8fafc; border-left: 4px solid #10b981; padding: 16px; border-radius: 4px; margin-bottom: 20px;">
       <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 8px;">Proposed Solution</div>
-      <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-line;">${data.solution}</div>
+      <div style="font-size: 14px; color: #334155; line-height: 1.6;">${safeSolution}</div>
     </div>
 
     <div style="background-color: #f8fafc; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 4px; margin-bottom: 30px;">
       <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 8px;">Support Requested</div>
-      <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-line;">${data.supportRequired}</div>
+      <div style="font-size: 14px; color: #334155; line-height: 1.6;">${safeSupport}</div>
     </div>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr>
         <td align="center">
-          <a href="mailto:${data.contactEmail}?subject=RE: Innovation Submission - ${encodeURIComponent(data.title)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
+          <a href="mailto:${safeEmail}?subject=RE: Innovation Submission - ${encodeURIComponent(data.title)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
             Contact Innovator
           </a>
         </td>
@@ -74,8 +88,8 @@ export function compileInnovationSubmissionLeadEmail(data: {
   `
 
   return compileBaseLayout({
-    title: `Innovation Submission: ${data.title}`,
-    preheader: `New innovation submission under stage ${data.stage} from ${data.contactName}`,
+    title: `Innovation Submission: ${safeTitle}`,
+    preheader: `New innovation submission under stage ${safeStage} from ${safeName}`,
     contentHtml
   })
 }
@@ -92,15 +106,26 @@ export function compileSponsorInquiryLeadEmail(data: {
   preferredContactMethod: string
   message?: string
 }): string {
+  const safeName = escapeHtml(data.sponsorName)
+  const safeEmail = escapeHtml(data.sponsorEmail)
+  const safeOrg = escapeHtml(data.organization)
+  const safeInterest = escapeHtml(data.interestArea)
+  const safeProj = data.projectTitle ? escapeHtml(data.projectTitle) : 'General/Undetermined'
+  const safeType = escapeHtml(data.sponsorshipType)
+  const safeBudget = data.budgetRange ? escapeHtml(data.budgetRange) : 'N/A'
+  const safeContact = escapeHtml(data.preferredContactMethod)
+  const safeOutcome = formatMultilineHtml(data.expectedOutcome)
+  const safeMessage = data.message ? formatMultilineHtml(data.message) : null
+
   const table = compileDetailsTable([
-    { label: 'Sponsor Name', value: data.sponsorName },
-    { label: 'Email Address', value: `<a href="mailto:${data.sponsorEmail}" style="color: #3b82f6; text-decoration: none;">${data.sponsorEmail}</a>` },
-    { label: 'Organization', value: data.organization },
-    { label: 'Interest Area', value: data.interestArea },
-    { label: 'Project of Interest', value: data.projectTitle || 'General/Undetermined' },
-    { label: 'Sponsorship Type', value: data.sponsorshipType },
-    { label: 'Budget Range', value: data.budgetRange || 'N/A' },
-    { label: 'Preferred Contact Method', value: `<span style="text-transform: capitalize;">${data.preferredContactMethod}</span>` }
+    { label: 'Sponsor Name', value: safeName },
+    { label: 'Email Address', value: `<a href="mailto:${safeEmail}" style="color: #3b82f6; text-decoration: none;">${safeEmail}</a>` },
+    { label: 'Organization', value: safeOrg },
+    { label: 'Interest Area', value: safeInterest },
+    { label: 'Project of Interest', value: safeProj },
+    { label: 'Sponsorship Type', value: safeType },
+    { label: 'Budget Range', value: safeBudget },
+    { label: 'Preferred Contact Method', value: `<span style="text-transform: capitalize;">${safeContact}</span>` }
   ])
 
   const contentHtml = `
@@ -112,20 +137,20 @@ export function compileSponsorInquiryLeadEmail(data: {
 
     <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 4px; margin-bottom: 20px;">
       <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 8px;">Expected Outcome</div>
-      <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-line;">${data.expectedOutcome}</div>
+      <div style="font-size: 14px; color: #334155; line-height: 1.6;">${safeOutcome}</div>
     </div>
 
-    ${data.message ? `
+    ${safeMessage ? `
     <div style="background-color: #f8fafc; border-left: 4px solid #64748b; padding: 16px; border-radius: 4px; margin-bottom: 30px;">
       <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 8px;">Additional Message</div>
-      <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-line;">${data.message}</div>
+      <div style="font-size: 14px; color: #334155; line-height: 1.6;">${safeMessage}</div>
     </div>
     ` : ''}
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr>
         <td align="center">
-          <a href="mailto:${data.sponsorEmail}?subject=RE: Sponsor Inquiry - ${encodeURIComponent(data.organization)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
+          <a href="mailto:${safeEmail}?subject=RE: Sponsor Inquiry - ${encodeURIComponent(data.organization)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
             Contact Sponsor
           </a>
         </td>
@@ -134,8 +159,8 @@ export function compileSponsorInquiryLeadEmail(data: {
   `
 
   return compileBaseLayout({
-    title: `Sponsor Inquiry: ${data.organization}`,
-    preheader: `New sponsorship interest from ${data.sponsorName} (${data.organization})`,
+    title: `Sponsor Inquiry: ${safeOrg}`,
+    preheader: `New sponsorship interest from ${safeName} (${safeOrg})`,
     contentHtml
   })
 }
@@ -150,14 +175,23 @@ export function compilePartnerInquiryLeadEmail(data: {
   contactEmail: string
   contactPhone: string
 }): string {
+  const safeOrg = escapeHtml(data.organizationName)
+  const safeType = escapeHtml(data.partnershipType)
+  const safeSector = escapeHtml(data.sector)
+  const safeTimeline = escapeHtml(data.expectedTimeline)
+  const safeName = escapeHtml(data.contactName)
+  const safeEmail = escapeHtml(data.contactEmail)
+  const safePhone = escapeHtml(data.contactPhone)
+  const safeCollaboration = formatMultilineHtml(data.proposedCollaboration)
+
   const table = compileDetailsTable([
-    { label: 'Organization Name', value: data.organizationName },
-    { label: 'Partnership Type', value: data.partnershipType },
-    { label: 'Sector', value: data.sector },
-    { label: 'Expected Timeline', value: data.expectedTimeline },
-    { label: 'Contact Name', value: data.contactName },
-    { label: 'Email Address', value: `<a href="mailto:${data.contactEmail}" style="color: #3b82f6; text-decoration: none;">${data.contactEmail}</a>` },
-    { label: 'Phone Number', value: data.contactPhone }
+    { label: 'Organization Name', value: safeOrg },
+    { label: 'Partnership Type', value: safeType },
+    { label: 'Sector', value: safeSector },
+    { label: 'Expected Timeline', value: safeTimeline },
+    { label: 'Contact Name', value: safeName },
+    { label: 'Email Address', value: `<a href="mailto:${safeEmail}" style="color: #3b82f6; text-decoration: none;">${safeEmail}</a>` },
+    { label: 'Phone Number', value: safePhone }
   ])
 
   const contentHtml = `
@@ -169,13 +203,13 @@ export function compilePartnerInquiryLeadEmail(data: {
 
     <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 4px; margin-bottom: 30px;">
       <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 8px;">Proposed Collaboration details</div>
-      <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-line;">${data.proposedCollaboration}</div>
+      <div style="font-size: 14px; color: #334155; line-height: 1.6;">${safeCollaboration}</div>
     </div>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr>
         <td align="center">
-          <a href="mailto:${data.contactEmail}?subject=RE: Partnership Proposal - ${encodeURIComponent(data.organizationName)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
+          <a href="mailto:${safeEmail}?subject=RE: Partnership Proposal - ${encodeURIComponent(data.organizationName)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
             Contact Partner Representative
           </a>
         </td>
@@ -184,8 +218,8 @@ export function compilePartnerInquiryLeadEmail(data: {
   `
 
   return compileBaseLayout({
-    title: `Partnership Inquiry: ${data.organizationName}`,
-    preheader: `New partnership proposal from ${data.organizationName} (${data.partnershipType})`,
+    title: `Partnership Inquiry: ${safeOrg}`,
+    preheader: `New partnership proposal from ${safeOrg} (${safeType})`,
     contentHtml
   })
 }
@@ -200,13 +234,21 @@ export function compileCourseInterestLeadEmail(data: {
   phone: string
   paymentReadiness: boolean
 }): string {
+  const safeTitle = escapeHtml(data.courseTitle)
+  const safeCohort = escapeHtml(data.preferredCohort)
+  const safeMode = escapeHtml(data.preferredLearningMode)
+  const safeName = escapeHtml(data.name)
+  const safeEmail = escapeHtml(data.email)
+  const safePhone = escapeHtml(data.phone)
+  const safeEligibility = formatMultilineHtml(data.eligibilityDetails)
+
   const table = compileDetailsTable([
-    { label: 'Student Name', value: data.name },
-    { label: 'Email Address', value: `<a href="mailto:${data.email}" style="color: #3b82f6; text-decoration: none;">${data.email}</a>` },
-    { label: 'Phone Number', value: data.phone },
-    { label: 'Course of Interest', value: data.courseTitle },
-    { label: 'Preferred Cohort', value: data.preferredCohort },
-    { label: 'Learning Mode', value: data.preferredLearningMode },
+    { label: 'Student Name', value: safeName },
+    { label: 'Email Address', value: `<a href="mailto:${safeEmail}" style="color: #3b82f6; text-decoration: none;">${safeEmail}</a>` },
+    { label: 'Phone Number', value: safePhone },
+    { label: 'Course of Interest', value: safeTitle },
+    { label: 'Preferred Cohort', value: safeCohort },
+    { label: 'Learning Mode', value: safeMode },
     { label: 'Payment Readiness', value: data.paymentReadiness ? `<span style="color: #059669; font-weight: 600;">Yes (Ready to pay on cohort confirmation)</span>` : `<span style="color: #dc2626;">No / Seeking Scholarship</span>` }
   ])
 
@@ -219,13 +261,13 @@ export function compileCourseInterestLeadEmail(data: {
 
     <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 4px; margin-bottom: 30px;">
       <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 8px;">Eligibility details</div>
-      <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-line;">${data.eligibilityDetails}</div>
+      <div style="font-size: 14px; color: #334155; line-height: 1.6;">${safeEligibility}</div>
     </div>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr>
         <td align="center">
-          <a href="mailto:${data.email}?subject=RE: Course Interest - ${encodeURIComponent(data.courseTitle)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
+          <a href="mailto:${safeEmail}?subject=RE: Course Interest - ${encodeURIComponent(data.courseTitle)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
             Contact Student
           </a>
         </td>
@@ -234,8 +276,8 @@ export function compileCourseInterestLeadEmail(data: {
   `
 
   return compileBaseLayout({
-    title: `Course Interest: ${data.courseTitle}`,
-    preheader: `Course interest from ${data.name} for ${data.courseTitle}`,
+    title: `Course Interest: ${safeTitle}`,
+    preheader: `Course interest from ${safeName} for ${safeTitle}`,
     contentHtml
   })
 }
@@ -250,14 +292,22 @@ export function compileEventRegistrationLeadEmail(data: {
   accessibilityRequirements?: string
   marketingConsent: boolean
 }): string {
+  const safeTitle = escapeHtml(data.eventTitle)
+  const safeName = escapeHtml(data.guestName)
+  const safeEmail = escapeHtml(data.guestEmail)
+  const safePhone = escapeHtml(data.guestPhone)
+  const safeAffiliation = escapeHtml(data.affiliation)
+  const safeDietary = data.dietaryRequirements ? escapeHtml(data.dietaryRequirements) : 'None'
+  const safeAccessibility = data.accessibilityRequirements ? escapeHtml(data.accessibilityRequirements) : 'None'
+
   const table = compileDetailsTable([
-    { label: 'Attendee Name', value: data.guestName },
-    { label: 'Email Address', value: `<a href="mailto:${data.guestEmail}" style="color: #3b82f6; text-decoration: none;">${data.guestEmail}</a>` },
-    { label: 'Phone Number', value: data.guestPhone },
-    { label: 'Event Name', value: data.eventTitle },
-    { label: 'Affiliation / Role', value: data.affiliation },
-    { label: 'Dietary Requirements', value: data.dietaryRequirements || 'None' },
-    { label: 'Accessibility Accommodations', value: data.accessibilityRequirements || 'None' },
+    { label: 'Attendee Name', value: safeName },
+    { label: 'Email Address', value: `<a href="mailto:${safeEmail}" style="color: #3b82f6; text-decoration: none;">${safeEmail}</a>` },
+    { label: 'Phone Number', value: safePhone },
+    { label: 'Event Name', value: safeTitle },
+    { label: 'Affiliation / Role', value: safeAffiliation },
+    { label: 'Dietary Requirements', value: safeDietary },
+    { label: 'Accessibility Accommodations', value: safeAccessibility },
     { label: 'Future Updates Consent', value: data.marketingConsent ? `<span style="color: #059669; font-weight: 600;">Consented</span>` : `<span style="color: #64748b;">Not Consented</span>` }
   ])
 
@@ -271,7 +321,7 @@ export function compileEventRegistrationLeadEmail(data: {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top: 20px;">
       <tr>
         <td align="center">
-          <a href="mailto:${data.guestEmail}?subject=RE: Event Registration - ${encodeURIComponent(data.eventTitle)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
+          <a href="mailto:${safeEmail}?subject=RE: Event Registration - ${encodeURIComponent(data.eventTitle)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
             Email Attendee
           </a>
         </td>
@@ -280,8 +330,8 @@ export function compileEventRegistrationLeadEmail(data: {
   `
 
   return compileBaseLayout({
-    title: `Event RSVP: ${data.eventTitle}`,
-    preheader: `New RSVP from ${data.guestName} for ${data.eventTitle}`,
+    title: `Event RSVP: ${safeTitle}`,
+    preheader: `New RSVP from ${safeName} for ${safeTitle}`,
     contentHtml
   })
 }
@@ -295,13 +345,21 @@ export function compileGeneralContactLeadEmail(data: {
   phone: string
   preferredResponseChannel: string
 }): string {
+  const safeCategory = escapeHtml(data.category)
+  const safeSubject = escapeHtml(data.subject)
+  const safeName = escapeHtml(data.name)
+  const safeEmail = escapeHtml(data.email)
+  const safePhone = escapeHtml(data.phone)
+  const safeChannel = escapeHtml(data.preferredResponseChannel)
+  const safeMessage = formatMultilineHtml(data.message)
+
   const table = compileDetailsTable([
-    { label: 'Sender Name', value: data.name },
-    { label: 'Email Address', value: `<a href="mailto:${data.email}" style="color: #3b82f6; text-decoration: none;">${data.email}</a>` },
-    { label: 'Phone Number', value: data.phone },
-    { label: 'Inquiry Category', value: `<span style="background-color: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">${data.category}</span>` },
-    { label: 'Subject', value: data.subject },
-    { label: 'Preferred Contact Channel', value: `<span style="text-transform: capitalize;">${data.preferredResponseChannel}</span>` }
+    { label: 'Sender Name', value: safeName },
+    { label: 'Email Address', value: `<a href="mailto:${safeEmail}" style="color: #3b82f6; text-decoration: none;">${safeEmail}</a>` },
+    { label: 'Phone Number', value: safePhone },
+    { label: 'Inquiry Category', value: `<span style="background-color: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">${safeCategory}</span>` },
+    { label: 'Subject', value: safeSubject },
+    { label: 'Preferred Contact Channel', value: `<span style="text-transform: capitalize;">${safeChannel}</span>` }
   ])
 
   const contentHtml = `
@@ -313,13 +371,13 @@ export function compileGeneralContactLeadEmail(data: {
 
     <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 4px; margin-bottom: 30px;">
       <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 8px;">Inquiry Message</div>
-      <div style="font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-line;">${data.message}</div>
+      <div style="font-size: 14px; color: #334155; line-height: 1.6;">${safeMessage}</div>
     </div>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr>
         <td align="center">
-          <a href="mailto:${data.email}?subject=RE: [Secretariat Inquiry] ${encodeURIComponent(data.subject)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
+          <a href="mailto:${safeEmail}?subject=RE: [Secretariat Inquiry] ${encodeURIComponent(data.subject)}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
             Respond to Sender
           </a>
         </td>
@@ -328,8 +386,8 @@ export function compileGeneralContactLeadEmail(data: {
   `
 
   return compileBaseLayout({
-    title: `Inquiry: ${data.subject}`,
-    preheader: `New general contact inquiry category ${data.category} from ${data.name}`,
+    title: `Inquiry: ${safeSubject}`,
+    preheader: `New general contact inquiry category ${safeCategory} from ${safeName}`,
     contentHtml
   })
 }

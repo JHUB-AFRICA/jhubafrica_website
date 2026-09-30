@@ -1,4 +1,5 @@
 import { compileBaseLayout } from './base.layout.js'
+import { escapeHtml } from './utils.js'
 
 export interface AcknowledgmentEmailOptions {
   recipientName: string
@@ -15,13 +16,18 @@ export function compileAcknowledgmentEmail({
   referenceId,
   details = [],
 }: AcknowledgmentEmailOptions): string {
+  const safeName = escapeHtml(recipientName)
+  const safeTitle = escapeHtml(subjectTitle)
+  const safeMessage = escapeHtml(confirmationMessage)
+  const safeRefId = referenceId ? escapeHtml(referenceId) : null
+
   const detailsHtml = details.length > 0 ? `
     <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; font-size: 14px;">
       <tbody>
         ${details.map((item, idx) => `
           <tr style="background-color: ${idx % 2 === 0 ? '#f8fafc' : '#ffffff'};">
-            <td style="padding: 10px 16px; font-weight: 600; color: #475569; width: 35%; border-bottom: 1px solid #e2e8f0;">${item.label}</td>
-            <td style="padding: 10px 16px; color: #0f172a; border-bottom: 1px solid #e2e8f0;">${item.value}</td>
+            <td style="padding: 10px 16px; font-weight: 600; color: #475569; width: 35%; border-bottom: 1px solid #e2e8f0;">${escapeHtml(item.label)}</td>
+            <td style="padding: 10px 16px; color: #0f172a; border-bottom: 1px solid #e2e8f0;">${escapeHtml(item.value)}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -30,16 +36,16 @@ export function compileAcknowledgmentEmail({
 
   const contentHtml = `
     <h2 style="margin-top: 0; color: #0f172a; font-size: 20px; font-weight: 700; line-height: 1.3;">
-      Hello ${recipientName || 'there'},
+      Hello ${safeName || 'there'},
     </h2>
     <p style="color: #334155; font-size: 15px; line-height: 1.6; margin-bottom: 16px;">
-      ${confirmationMessage}
+      ${safeMessage}
     </p>
     
-    ${referenceId ? `
+    ${safeRefId ? `
       <div style="background-color: #f1f5f9; border-left: 4px solid #10b981; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
         <span style="font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Reference ID</span>
-        <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 2px;">${referenceId}</div>
+        <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 2px;">${safeRefId}</div>
       </div>
     ` : ''}
 
@@ -56,8 +62,8 @@ export function compileAcknowledgmentEmail({
   `
 
   return compileBaseLayout({
-    title: subjectTitle,
-    preheader: `Thank you for reaching out to JHUB Africa regarding ${subjectTitle}.`,
+    title: safeTitle,
+    preheader: `Thank you for reaching out to JHUB Africa regarding ${safeTitle}.`,
     contentHtml,
   })
 }
